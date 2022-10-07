@@ -7,14 +7,12 @@ from ipywidgets import Tab
 from .DataPreperationWidgets import *
 
 
-class DataPreperationUI:
-    def __init__(self) -> None:
+class DataPreperationUI(Tab):
+    def __init__(self, **kwargs):
         self.uploader = UploadFile()
-        self.tab = Tab()
-        self.tab.children = [self.uploader]
+        self.tab_children = [self.uploader]
 
-    def display(self):
-        return self.tab
+        super().__init__(self.tab_children, **kwargs)
 
     def get_file_content(self):
         uploaded_file = self.uploader.value[0]
