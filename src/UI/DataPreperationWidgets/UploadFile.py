@@ -1,11 +1,19 @@
-from ipywidgets import FileUpload
+from ipyfilechooser import FileChooser
+from ipywidgets import AppLayout, Label
 
 
-class UploadFile(FileUpload):
-    def __init__(self):
-        self.accepted_file_extansions = ".txt"
-        self.multiple_files_upload = False
+class UploadFile(AppLayout):
+    def __init__(self, **kwargs):
+
+        self.header = Label(value="Please, select your data file:")
+        self.uploader = FileChooser(
+            path="db/Datasets", sandbox_path="db", filter_pattern="*.txt"
+        )
 
         super().__init__(
-            accept=self.accepted_file_extansions, multiple=self.multiple_files_upload
+            header=self.header,
+            center=self.uploader,
+            justify_items="center",
+            align_items="center",
+            **kwargs
         )
