@@ -1,13 +1,28 @@
-from ipywidgets import Tab
+from dataclasses import dataclass
+from ipywidgets import VBox, Layout
 
-from .DataPreperationWidgets import DataGridWidget, UploadFile
+from .DataPreperationWidgets import DataGridWidget, UploadFileWidget
 
 
-class DataPreperationUI(Tab):
+@dataclass
+class DataFile:
+    file: object = None
+
+
+@dataclass
+class WidgetLayout:
+    layout: object = Layout(
+        height="auto", width="auto", justify_items="center", align_items="center"
+    )
+
+
+class DataPreperationUI(VBox):
     def __init__(self, **kwargs):
-        self.file_uploader = UploadFile()
-        self.data_grid = DataGridWidget(file_uploader=self.file_uploader)
+        data_file = DataFile()
+        widget_layout = WidgetLayout()
+        widget_children = [
+            UploadFileWidget(data_file, widget_layout),
+            # DataGridWidget(data_file, widget_layout),
+        ]
 
-        self.tab_children = [self.file_uploader, self.data_grid]
-
-        super().__init__(children=self.tab_children, **kwargs)
+        super().__init__(children=widget_children, **kwargs)

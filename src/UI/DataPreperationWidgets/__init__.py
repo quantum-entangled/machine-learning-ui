@@ -1,2 +1,2 @@
 from .DataGridWidget import DataGridWidget
-from .UploadFile import UploadFile
+from .UploadFileWidget import UploadFileWidget
