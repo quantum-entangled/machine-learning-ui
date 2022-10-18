@@ -29,7 +29,7 @@ class UploadFileWidget(VBox):
     ]
 
     def __init__(self, data_file: File, **kwargs) -> None:
-        """Construct the upload file widget window."""
+        """Initialize the upload file widget window."""
         self.upload_button.on_click(
             partial(upload_file, data_file=data_file, file_chooser=self.file_chooser)
         )
@@ -42,7 +42,7 @@ def get_file_path(file_chooser: FileChooser) -> Any:
     return file_chooser.selected
 
 
-@UploadFileWidget.upload_status.capture(clear_output=True)
+@UploadFileWidget.upload_status.capture(clear_output=True, wait=True)
 def upload_file(*args, data_file: File, file_chooser: FileChooser) -> None:
     """Read file to the pandas format and store it in the global object."""
     try:

@@ -1,29 +1,35 @@
+from functools import partial
+from typing import Any, Protocol
+
 from ipydatagrid import DataGrid
-from IPython.display import clear_output, display
 from ipywidgets import Button, Output, VBox
 
 
+class File(Protocol):
+    """Protocol for data files."""
+
+    file: Any
+
+
 class DataGridWidget(VBox):
-    def __init__(self, file_uploader):
-        self.file_uploader = file_uploader
-        self.show_grid_button = Button(description="Show Data Grid")
-        self.grid_output = Output()
-        self.widget_children = [self.show_grid_button, self.grid_output]
+    """Widget to display a data grid."""
 
-        self.show_grid_button.on_click(self.__show_data_grid)
+    show_grid_button = Button(description="Show Data Grid")
+    grid_output = Output()
 
-        super().__init__(children=self.widget_children)
+    widget_children = [show_grid_button, grid_output]
 
-    def __show_data_grid(self, *args):
-        if self.file_uploader.file is not None:
-            with self.grid_output:
-                clear_output()
-                display(
-                    DataGrid(
-                        dataframe=self.file_uploader.file,
-                    )
-                )
-        else:
-            with self.grid_output:
-                clear_output()
-                print("Please, upload the file first!")
+    def __init__(self, data_file: File, **kwargs) -> None:
+        """Initialize the data grid widget window."""
+        self.show_grid_button.on_click(partial(show_data_grid, data_file=data_file))
+
+        super().__init__(children=self.widget_children, **kwargs)
+
+
+@DataGridWidget.grid_output.capture(clear_output=True, wait=True)
+def show_data_grid(*args, data_file: File) -> None:
+    """Show data grid of the given file."""
+    try:
+        DataGrid(dataframe=data_file.file)
+    except AttributeError:
+        print("Please, upload the file first!\u274C")
