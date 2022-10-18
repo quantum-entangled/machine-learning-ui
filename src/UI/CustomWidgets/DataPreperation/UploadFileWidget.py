@@ -1,6 +1,7 @@
 from functools import partial
 from typing import Any, Protocol
 
+import numpy as np
 import pandas as pd
 from ipyfilechooser import FileChooser
 from ipywidgets import Button, HBox, Label, Output, VBox
@@ -47,7 +48,10 @@ def upload_file(*args, data_file: File, file_chooser: FileChooser) -> None:
     """Read file to the pandas format and store it in the global object."""
     try:
         file_path = get_file_path(file_chooser)
-        data_file.file = pd.read_csv(file_path, sep="  ", engine="python")
+        data_file.file = np.loadtxt(file_path, skiprows=1)
+        data_file.headers = tuple(
+            pd.read_csv(file_path, nrows=1, header=0, sep="[ ]{1,}", engine="python")
+        )
 
         print("You're file is successfully uploaded!\u2705")
     except ValueError:

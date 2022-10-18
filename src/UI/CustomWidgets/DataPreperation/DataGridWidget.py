@@ -1,7 +1,8 @@
 from functools import partial
 from typing import Any, Protocol
 
-from ipydatagrid import DataGrid
+from ipyregulartable import RegularTableWidget
+from IPython.display import display
 from ipywidgets import Button, Output, VBox
 
 
@@ -30,6 +31,6 @@ class DataGridWidget(VBox):
 def show_data_grid(*args, data_file: File) -> None:
     """Show data grid of the given file."""
     try:
-        DataGrid(dataframe=data_file.file)
+        display(RegularTableWidget(datamodel=data_file.file))
     except AttributeError:
         print("Please, upload the file first!\u274C")
