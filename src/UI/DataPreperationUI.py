@@ -1,28 +1,30 @@
 from dataclasses import dataclass
-from ipywidgets import VBox, Layout
+from typing import Any
 
-from .DataPreperationWidgets import DataGridWidget, UploadFileWidget
+from ipywidgets import Accordion
+
+from .CustomWidgets.DataPreperation import UploadFileWidget
 
 
 @dataclass
 class DataFile:
-    file: object = None
+    """The data file container."""
+
+    file: Any = None
 
 
-@dataclass
-class WidgetLayout:
-    layout: object = Layout(
-        height="auto", width="auto", justify_items="center", align_items="center"
-    )
+class DataPreperationUI(Accordion):
+    """UI widgets for data preperation."""
 
+    data_file = DataFile()
 
-class DataPreperationUI(VBox):
-    def __init__(self, **kwargs):
-        data_file = DataFile()
-        widget_layout = WidgetLayout()
-        widget_children = [
-            UploadFileWidget(data_file, widget_layout),
-            # DataGridWidget(data_file, widget_layout),
-        ]
+    widget_children = [
+        UploadFileWidget(data_file),
+    ]
+    widget_titles = ("Upload File",)
 
-        super().__init__(children=widget_children, **kwargs)
+    def __init__(self, **kwargs) -> None:
+        """Initialize the main widget."""
+        super().__init__(
+            children=self.widget_children, titles=self.widget_titles, **kwargs
+        )
