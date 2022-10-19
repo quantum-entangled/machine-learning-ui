@@ -11,6 +11,7 @@ class File(Protocol):
     """Protocol for data files."""
 
     file: Any
+    headers: Any
 
 
 class UploadFileWidget(VBox):
@@ -49,10 +50,10 @@ def upload_file(*args, data_file: File, file_chooser: FileChooser) -> None:
     try:
         file_path = get_file_path(file_chooser)
         data_file.file = np.loadtxt(file_path, skiprows=1)
-        data_file.headers = tuple(
+        data_file.headers = list(
             pd.read_csv(file_path, nrows=1, header=0, sep="[ ]{1,}", engine="python")
         )
 
         print("You're file is successfully uploaded!\u2705")
     except ValueError:
-        print("You're file is not selected!\u274C")
+        print("Please, select the file first!\u274C")

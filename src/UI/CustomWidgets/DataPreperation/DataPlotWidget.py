@@ -11,6 +11,7 @@ class File(Protocol):
     """Protocol for data files."""
 
     file: Any
+    headers: Any
 
 
 class DataPlotWidget(VBox):
@@ -31,7 +32,7 @@ class DataPlotWidget(VBox):
 @DataPlotWidget.plot_output.capture(clear_output=True, wait=True)
 def show_plot(*args, data_file: File) -> None:
     """Show plot of the given file features."""
-    try:
+    if data_file.file is not None:
         headers = data_file.headers
         dropdown_options = [(header, pos) for pos, header in enumerate(headers)]
         x_dropdown = Dropdown(description="x", options=dropdown_options, value=0)
@@ -64,5 +65,5 @@ def show_plot(*args, data_file: File) -> None:
         )
 
         display(plot_window)
-    except AttributeError:
+    else:
         print("Please, upload the file first!\u274C")

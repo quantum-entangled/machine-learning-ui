@@ -30,7 +30,8 @@ class DataGridWidget(VBox):
 @DataGridWidget.grid_output.capture(clear_output=True, wait=True)
 def show_data_grid(*args, data_file: File) -> None:
     """Show data grid of the given file."""
-    try:
-        display(RegularTableWidget(datamodel=data_file.file))
-    except AttributeError:
+    if data_file.file is not None:
+        rt = RegularTableWidget(datamodel=data_file.file)
+        display(rt)
+    else:
         print("Please, upload the file first!\u274C")
