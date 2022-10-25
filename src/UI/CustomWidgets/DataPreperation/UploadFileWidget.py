@@ -19,7 +19,7 @@ class UploadFileWidget(VBox):
 
     file_chooser_label = Label(value="Please, select your data file:")
     file_chooser = FileChooser(
-        path="db/Datasets", sandbox_path="db", filter_pattern="*.txt"
+        path="../db/Datasets", sandbox_path="../db/Datasets", filter_pattern="*.txt"
     )
     upload_button = Button(description="Upload File")
     upload_status = Output()
@@ -54,6 +54,6 @@ def upload_file(*args, data_file: File, file_chooser: FileChooser) -> None:
             pd.read_csv(file_path, nrows=1, header=0, sep="[ ]{1,}", engine="python")
         )
 
-        print("You're file is successfully uploaded!\u2705")
+        print("Your file is successfully uploaded!\u2705")
     except ValueError:
         print("Please, select the file first!\u274C")
