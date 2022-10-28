@@ -83,3 +83,4 @@ class ManageLayersWidget(iw.VBox):
         )
 
         self._manager.show_model_summary(output_handler=self.model_summary_output)
+        self._current_layer_widget = self._current_layer.widget(manager=self._manager)

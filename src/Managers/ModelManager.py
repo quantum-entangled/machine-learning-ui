@@ -165,6 +165,29 @@ class ModelManager:
             print("\n")
             display(self._model.instance.summary())
 
+    def plot_model(self, output_handler: Any) -> None:
+        output_handler.clear_output(wait=True)
+
+        if not self._model.instance:
+            with output_handler:
+                print("Please, create or upload the model first!\u274C")
+            return
+
+        if not self._model.layers:
+            with output_handler:
+                print("Please, add some layers first!\u274C")
+            return
+
+        with output_handler:
+            display(
+                tf.keras.utils.plot_model(
+                    self._model.instance,
+                    to_file=f"../db/Images/{self._model.name}.png",
+                    show_shapes=True,
+                    dpi=250,
+                )
+            )
+
     @property
     def model(self) -> Model:
         return self._model
