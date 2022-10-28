@@ -48,7 +48,8 @@ class ModelManager:
         """Upload a model from the file via the given file chooser."""
         output_handler.clear_output(wait=True)
 
-        model_path = self.get_model_path(file_chooser)
+        model_path = self.get_model_path(file_chooser=file_chooser)
+        
         if model_path is None:
             with output_handler:
                 print("Please, select the model first!\u274C")

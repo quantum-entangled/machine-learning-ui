@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from ipywidgets import Accordion, VBox
+from Managers import DataManager
 
 from .CustomWidgets.DataPreperation import (
     DataGridWidget,
@@ -22,10 +23,11 @@ class DataPreperationUI(VBox):
     """UI widgets for data preperation."""
 
     data_file = DataFile()
+    manager = DataManager(data=data_file)
 
     widget_children = [
-        UploadFileWidget(data_file),
-        DataGridWidget(data_file),
+        UploadFileWidget(manager=manager),
+        DataGridWidget(manager=manager),
         DataPlotWidget(data_file),
     ]
     widget_titles = ["Upload File", "Show Data Grid", "Show Data Plot"]
