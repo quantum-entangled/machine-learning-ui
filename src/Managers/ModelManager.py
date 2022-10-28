@@ -99,7 +99,9 @@ class ModelManager:
 
         if not connect_to and not layer_type == "Input":
             with output_handler:
-                print("Please, choose the connection layer first!\u274C")
+                print(
+                    "Please, choose the connection layer first or set the Input layer!\u274C"
+                )
             return
 
         if connect_to and layer_type == "Input":

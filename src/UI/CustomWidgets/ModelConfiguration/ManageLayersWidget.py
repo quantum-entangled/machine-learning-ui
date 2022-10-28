@@ -1,9 +1,9 @@
 from abc import abstractmethod
-from multiprocessing.connection import wait
 from typing import Any, Protocol
 
 import ipywidgets as iw
 from Enums.Layers import layers
+from IPython.display import display
 
 
 class Manager(Protocol):
@@ -29,7 +29,7 @@ class ManageLayersWidget(iw.VBox):
     """Widget to add and pop model layers."""
 
     layer_type_dropdown = iw.Dropdown(
-        options=list(layers.keys()),
+        options=list(layers),
         description="Choose layer type:",
         style={"description_width": "initial"},
     )
@@ -45,10 +45,10 @@ class ManageLayersWidget(iw.VBox):
     def __init__(self, manager: Manager, **kwargs) -> None:
         """Initialize the manage layers widget window."""
         self._manager = manager
+        self._current_layer = layers[self.layer_type_dropdown.value]
+        self._current_layer_widget = self._current_layer.widget(manager=self._manager)
 
-        self.layer_widget_output.append_display_data(
-            layers[self.layer_type_dropdown.value].widget
-        )
+        self.layer_widget_output.append_display_data(self._current_layer_widget)
 
         self.layer_type_dropdown.observe(
             self._on_layer_type_dropdown_value_change, names="value"
@@ -66,20 +66,21 @@ class ManageLayersWidget(iw.VBox):
             **kwargs,
         )
 
+    @layer_widget_output.capture(clear_output=True, wait=True)
     def _on_layer_type_dropdown_value_change(self, change: Any) -> None:
-        self.layer_widget_output.clear_output(wait=True)
-        self.layer_widget_output.append_display_data(layers[change["new"]].widget)
+        self._current_layer = layers[change["new"]]
+        self._current_layer_widget = self._current_layer.widget(manager=self._manager)
+        display(self._current_layer_widget)
 
     def _on_add_layer_button_clicked(self, _) -> None:
         layer_type = self.layer_type_dropdown.value
-        layer = layers[layer_type]
 
         self._manager.add_layer(
             layer_type=layer_type,
-            instance=layer.instance,
+            instance=self._current_layer.instance,
             connect_to=self.connect_dropdown.value,
             output_handler=self.layer_status,
-            **layer.widget.params,
+            **self._current_layer_widget.params,
         )
 
         self.connect_dropdown.options = ("",) + tuple(self._manager.model.layers.keys())

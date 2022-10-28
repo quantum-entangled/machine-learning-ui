@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Any
 
 import tensorflow as tf
-from UI.CustomWidgets.Layers import InputLayerWidget
+from UI.CustomWidgets.Layers import DenseLayerWidget, InputLayerWidget
 
 
 @dataclass
@@ -12,6 +12,6 @@ class Layer:
 
 
 layers = {
-    "Input": Layer(instance=tf.keras.layers.Input, widget=InputLayerWidget()),
-    # "Dense": Layer(instance=tf.keras.layers.Dense, widget=DenseLayerWidget),
+    "Input": Layer(instance=tf.keras.layers.Input, widget=InputLayerWidget),
+    "Dense": Layer(instance=tf.keras.layers.Dense, widget=DenseLayerWidget),
 }

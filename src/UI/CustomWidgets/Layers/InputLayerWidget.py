@@ -1,4 +1,5 @@
 from typing import Any, Dict
+
 import ipywidgets as iw
 
 
@@ -18,7 +19,9 @@ class InputLayerWidget(iw.VBox):
         style={"description_width": "initial"},
     )
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, manager: Any, **kwargs) -> None:
+        self._manager = manager
+
         super().__init__(children=[self.layer_name, self.input_shape], **kwargs)
 
     @property
