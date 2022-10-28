@@ -49,7 +49,7 @@ class ModelManager:
         output_handler.clear_output(wait=True)
 
         model_path = self.get_model_path(file_chooser=file_chooser)
-        
+
         if model_path is None:
             with output_handler:
                 print("Please, select the model first!\u274C")
@@ -161,6 +161,9 @@ class ModelManager:
 
     def show_model_summary(self, output_handler: Any) -> None:
         output_handler.clear_output(wait=True)
+
+        if not self._model.instance:
+            return
 
         with output_handler:
             print("\n")
