@@ -1,10 +1,14 @@
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Dict, List
 
 import ipywidgets as iw
 from Managers import ModelManager
 
-from .CustomWidgets.ModelConfiguration import CreateModelWidget, UploadModelWidget
+from .CustomWidgets.ModelConfiguration import (
+    CreateModelWidget,
+    ManageLayersWidget,
+    UploadModelWidget,
+)
 
 
 @dataclass
@@ -13,20 +17,25 @@ class Model:
 
     name: str | None = None
     instance: Any = None
-    layers: dict | None = None
+    layers: Dict | None = None
 
 
 class ModelConfigurationUI(iw.VBox):
     """UI widgets for data preperation."""
 
-    model = Model()
+    model = Model(layers={})
     manager = ModelManager(model=model)
 
     widget_children = [
         CreateModelWidget(manager=manager),
-        UploadModelWidget(manager=manager),
+        # UploadModelWidget(manager=manager),
+        ManageLayersWidget(manager=manager),
     ]
-    widget_titles = ["Model: Create", "Model: Upload"]
+    widget_titles = [
+        "Model: Create",
+        # "Model: Upload",
+        "Manage Layers",
+    ]
     widget = iw.Accordion(children=widget_children)
     for i, title in enumerate(widget_titles):
         widget.set_title(i, title)

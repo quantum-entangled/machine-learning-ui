@@ -26,6 +26,7 @@ class UploadModelWidget(iw.VBox):
     def __init__(self, manager: Manager, **kwargs) -> None:
         """Initialize the upload model widget window."""
         self._manager = manager
+
         self.upload_model_button.on_click(self._on_upload_model_button_clicked)
 
         super().__init__(

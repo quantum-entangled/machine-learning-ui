@@ -1,7 +1,8 @@
 from functools import partial
 from typing import Any, Protocol
 
-from ipyregulartable import RegularTableWidget
+import pandas as pd
+from ipydatagrid import DataGrid
 from IPython.display import display
 from ipywidgets import Button, Output, VBox
 
@@ -10,6 +11,7 @@ class File(Protocol):
     """Protocol for data files."""
 
     file: Any
+    headers: Any
 
 
 class DataGridWidget(VBox):
@@ -31,7 +33,8 @@ class DataGridWidget(VBox):
 def show_data_grid(*args, data_file: File) -> None:
     """Show data grid of the given file."""
     if data_file.file is not None:
-        rt = RegularTableWidget(datamodel=data_file.file)
-        display(rt)
+        df = pd.DataFrame(data=data_file.file, columns=data_file.headers)
+        dg = DataGrid(dataframe=df)
+        display(dg)
     else:
         print("Please, upload the file first!\u274C")

@@ -1,2 +1,3 @@
 from .CreateModelWidget import CreateModelWidget
 from .UploadModelWidget import UploadModelWidget
+from .ManageLayersWidget import ManageLayersWidget
