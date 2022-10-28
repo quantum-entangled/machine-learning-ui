@@ -1,6 +1,7 @@
 from typing import Any, Dict, Protocol
 
 import tensorflow as tf
+from IPython.display import display
 
 
 class Model(Protocol):
@@ -156,6 +157,13 @@ class ModelManager:
                 outputs=[*self._model.instance.outputs, layer],
                 name=self._model.name,
             )
+
+    def show_model_summary(self, output_handler: Any) -> None:
+        output_handler.clear_output(wait=True)
+
+        with output_handler:
+            print("\n")
+            display(self._model.instance.summary())
 
     @property
     def model(self) -> Model:

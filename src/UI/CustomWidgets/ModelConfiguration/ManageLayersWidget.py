@@ -24,6 +24,10 @@ class Manager(Protocol):
     ) -> None:
         ...
 
+    @abstractmethod
+    def show_model_summary(self, output_handler: Any) -> None:
+        ...
+
 
 class ManageLayersWidget(iw.VBox):
     """Widget to add and pop model layers."""
@@ -36,6 +40,7 @@ class ManageLayersWidget(iw.VBox):
     layer_widget_output = iw.Output()
     add_layer_button = iw.Button(description="Add Layer")
     layer_status = iw.Output()
+    model_summary_output = iw.Output()
 
     def __init__(self, manager: Manager, **kwargs) -> None:
         """Initialize the manage layers widget window."""
@@ -54,8 +59,8 @@ class ManageLayersWidget(iw.VBox):
             children=[
                 self.layer_type_dropdown,
                 self.layer_widget_output,
-                self.add_layer_button,
-                self.layer_status,
+                iw.HBox(children=[self.add_layer_button, self.layer_status]),
+                self.model_summary_output,
             ],
             **kwargs,
         )
@@ -76,3 +81,5 @@ class ManageLayersWidget(iw.VBox):
             output_handler=self.layer_status,
             **self._current_layer_widget.params,
         )
+
+        self._manager.show_model_summary(output_handler=self.model_summary_output)
