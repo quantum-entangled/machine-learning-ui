@@ -34,11 +34,6 @@ class ManageLayersWidget(iw.VBox):
         style={"description_width": "initial"},
     )
     layer_widget_output = iw.Output()
-    connect_dropdown = iw.Dropdown(
-        options=("",),
-        description="Connect layer to:",
-        style={"description_width": "initial"},
-    )
     add_layer_button = iw.Button(description="Add Layer")
     layer_status = iw.Output()
 
@@ -59,7 +54,6 @@ class ManageLayersWidget(iw.VBox):
             children=[
                 self.layer_type_dropdown,
                 self.layer_widget_output,
-                self.connect_dropdown,
                 self.add_layer_button,
                 self.layer_status,
             ],
@@ -78,9 +72,7 @@ class ManageLayersWidget(iw.VBox):
         self._manager.add_layer(
             layer_type=layer_type,
             instance=self._current_layer.instance,
-            connect_to=self.connect_dropdown.value,
+            connect_to=self._current_layer_widget.connect,
             output_handler=self.layer_status,
             **self._current_layer_widget.params,
         )
-
-        self.connect_dropdown.options = ("",) + tuple(self._manager.model.layers.keys())

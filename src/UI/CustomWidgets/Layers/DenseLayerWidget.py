@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 import ipywidgets as iw
 from Enums.Activations import activations
@@ -24,12 +24,24 @@ class DenseLayerWidget(iw.VBox):
         description="Activation function:",
         style={"description_width": "initial"},
     )
+    connect_dropdown = iw.Dropdown(
+        description="Connect layer to:",
+        style={"description_width": "initial"},
+    )
 
     def __init__(self, manager: Any, **kwargs) -> None:
         self._manager = manager
 
+        self.connect_dropdown.options = tuple(self._manager.model.layers)
+
         super().__init__(
-            children=[self.layer_name, self.units_num, self.activation], **kwargs
+            children=[
+                self.layer_name,
+                self.units_num,
+                self.activation,
+                self.connect_dropdown,
+            ],
+            **kwargs,
         )
 
     @property
@@ -39,3 +51,7 @@ class DenseLayerWidget(iw.VBox):
             "units": self.units_num.value,
             "activation": activations[self.activation.value],
         }
+
+    @property
+    def connect(self) -> str | List | None:
+        return self.connect_dropdown.value

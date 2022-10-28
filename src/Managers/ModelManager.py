@@ -97,36 +97,35 @@ class ModelManager:
                 )
             return
 
-        if not connect_to and not layer_type == "Input":
+        if not connect_to and not self._model.layers and layer_type != "Input":
             with output_handler:
-                print(
-                    "Please, choose the connection layer first or set the Input layer!\u274C"
-                )
+                print("Please, add some layers first!\u274C")
             return
 
-        if connect_to and layer_type == "Input":
-            with output_handler:
-                print(
-                    "You can't connect Input layer to the other ones. Please, choose another layer type or unset the connection!\u274C"
-                )
-            return
-
-        if not connect_to and layer_type == "Input":
+        if not connect_to:
             self._model.layers.update({layer_name: instance(**kwargs)})
-            self.update_model(layer_type=layer_type, layer_name=layer_name)
+            self.update_model(
+                layer_type=layer_type, layer_name=layer_name, connect_to=connect_to
+            )
 
             with output_handler:
                 print(f"Layer '{layer_name}' is successfully added!\u2705")
             return
 
-        connect_to_layer = self._model.layers[connect_to]
-        self._model.layers.update({layer_name: instance(**kwargs)(connect_to_layer)})
-        self.update_model(layer_type=layer_type, layer_name=layer_name)
+        if isinstance(connect_to, str):
+            connection = self._model.layers[connect_to]
+        else:
+            connection = [self._model.layers[connect] for connect in connect_to]
+
+        self._model.layers.update({layer_name: instance(**kwargs)(connection)})
+        self.update_model(
+            layer_type=layer_type, layer_name=layer_name, connect_to=connect_to
+        )
 
         with output_handler:
             print(f"Layer '{layer_name}' is successfully added!\u2705")
 
-    def update_model(self, layer_type: Any, layer_name: Any) -> None:
+    def update_model(self, layer_type: Any, layer_name: Any, connect_to: Any) -> None:
         layer = self._model.layers[layer_name]
 
         if layer_type == "Input":
@@ -136,9 +135,25 @@ class ModelManager:
                 name=self._model.name,
             )
         else:
+            output_names = [output.name for output in self._model.instance.outputs]
+
+            if isinstance(connect_to, str):
+                mask = [connect_to in output_name for output_name in output_names]
+            else:
+                mask = [False for _ in range(len(output_names))]
+
+                for connect in connect_to:
+                    for i, output_name in enumerate(output_names):
+                        if connect == output_name:
+                            mask[i] = True
+
+            if True in mask:
+                pop_indices = [i for i, x in enumerate(mask) if x]
+                [self._model.instance.outputs.pop(i) for i in pop_indices]
+
             self._model.instance = tf.keras.Model(
                 inputs=self._model.instance.inputs,
-                outputs=[layer],
+                outputs=[*self._model.instance.outputs, layer],
                 name=self._model.name,
             )
 

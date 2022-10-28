@@ -1,2 +1,3 @@
-from .InputLayerWidget import InputLayerWidget
+from .ConcatenateLayerWidget import ConcatenateLayerWidget
 from .DenseLayerWidget import DenseLayerWidget
+from .InputLayerWidget import InputLayerWidget
