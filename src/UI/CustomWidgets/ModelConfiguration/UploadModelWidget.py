@@ -18,7 +18,9 @@ class UploadModelWidget(iw.VBox):
 
     file_chooser_label = iw.Label(value="Please, select your model:")
     file_chooser = FileChooser(
-        path="../db/Models", sandbox_path="../db/Models", filter_pattern="*.h5"
+        path="../db/Models/load",
+        sandbox_path="../db/Models/load",
+        filter_pattern="*.h5",
     )
     upload_model_button = iw.Button(description="Upload Model")
     upload_model_status = iw.Output()

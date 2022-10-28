@@ -188,6 +188,22 @@ class ModelManager:
                 )
             )
 
+    def save_model(self, output_handler: Any) -> None:
+
+        if not self._model.instance:
+            with output_handler:
+                print("Please, create or upload the model first!\u274C")
+            return
+
+        with output_handler:
+            self._model.instance.save(
+                filepath=f"../db/Models/save/{self._model.name}.h5",
+                save_format="h5",
+                include_optimizer=False,
+            )
+            output_handler.clear_output()
+            print("Your model is successfully saved!\u2705")
+
     @property
     def model(self) -> Model:
         return self._model

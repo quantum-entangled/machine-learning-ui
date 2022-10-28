@@ -8,6 +8,7 @@ from .CustomWidgets.ModelConfiguration import (
     CreateModelWidget,
     ManageLayersWidget,
     PlotModelWidget,
+    SaveModelWidget,
     UploadModelWidget,
 )
 
@@ -32,12 +33,14 @@ class ModelConfigurationUI(iw.VBox):
         # UploadModelWidget(manager=manager),
         ManageLayersWidget(manager=manager),
         PlotModelWidget(manager=manager),
+        SaveModelWidget(manager=manager),
     ]
     widget_titles = [
-        "Model: Create",
+        "Create Model",
         # "Model: Upload",
         "Manage Layers",
-        "Plot Model"
+        "Plot Model",
+        "Save Model",
     ]
     widget = iw.Accordion(children=widget_children)
     for i, title in enumerate(widget_titles):
