@@ -1,8 +1,8 @@
 from abc import abstractmethod
 from typing import Any, Protocol
 
+import ipywidgets as iw
 from ipydatagrid import DataGrid
-from ipywidgets import Button, Output, VBox
 
 
 class Manager(Protocol):
@@ -13,11 +13,11 @@ class Manager(Protocol):
         ...
 
 
-class DataGridWidget(VBox):
+class DataGridWidget(iw.VBox):
     """Widget to display a data grid."""
 
-    show_grid_button = Button(description="Show Data Grid")
-    grid_output = Output()
+    show_grid_button = iw.Button(description="Show Data Grid")
+    grid_output = iw.Output()
 
     def __init__(self, manager: Manager, **kwargs) -> None:
         """Initialize the data grid widget window."""

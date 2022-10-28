@@ -1,8 +1,8 @@
 from abc import abstractmethod
 from typing import Any, Protocol
 
+import ipywidgets as iw
 from ipyfilechooser import FileChooser
-from ipywidgets import Button, HBox, Label, Output, VBox
 
 
 class Manager(Protocol):
@@ -13,15 +13,15 @@ class Manager(Protocol):
         ...
 
 
-class UploadFileWidget(VBox):
+class UploadFileWidget(iw.VBox):
     """Widget to upload a file."""
 
-    file_chooser_label = Label(value="Please, select your data file:")
+    file_chooser_label = iw.Label(value="Please, select your data file:")
     file_chooser = FileChooser(
         path="../db/Datasets", sandbox_path="../db/Datasets", filter_pattern="*.txt"
     )
-    upload_button = Button(description="Upload File")
-    upload_status = Output()
+    upload_button = iw.Button(description="Upload File")
+    upload_status = iw.Output()
 
     def __init__(self, manager: Manager, **kwargs) -> None:
         """Initialize the upload file widget window."""
@@ -31,7 +31,7 @@ class UploadFileWidget(VBox):
 
         super().__init__(
             children=[
-                HBox([self.file_chooser_label, self.file_chooser]),
+                iw.HBox([self.file_chooser_label, self.file_chooser]),
                 self.upload_button,
                 self.upload_status,
             ],

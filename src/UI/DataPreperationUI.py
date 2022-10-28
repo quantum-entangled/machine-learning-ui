@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any
 
-from ipywidgets import Accordion, VBox
+import ipywidgets as iw
 from Managers import DataManager
 
 from .CustomWidgets.DataPreperation import (
@@ -19,7 +19,7 @@ class DataFile:
     headers: Any = None
 
 
-class DataPreperationUI(VBox):
+class DataPreperationUI(iw.VBox):
     """UI widgets for data preperation."""
 
     data_file = DataFile()
@@ -28,10 +28,10 @@ class DataPreperationUI(VBox):
     widget_children = [
         UploadFileWidget(manager=manager),
         DataGridWidget(manager=manager),
-        DataPlotWidget(data_file),
+        DataPlotWidget(manager=manager),
     ]
     widget_titles = ["Upload File", "Show Data Grid", "Show Data Plot"]
-    widget = Accordion(children=widget_children)
+    widget = iw.Accordion(children=widget_children)
     for i, title in enumerate(widget_titles):
         widget.set_title(i, title)
 
