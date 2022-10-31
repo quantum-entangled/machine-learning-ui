@@ -1,2 +1,2 @@
-from .DataPreperationUI import DataPreperationUI
+from .DataPreparationUI import DataPreparationUI
 from .ModelConfigurationUI import ModelConfigurationUI

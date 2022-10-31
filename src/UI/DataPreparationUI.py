@@ -4,7 +4,7 @@ from typing import Any
 import ipywidgets as iw
 from Managers import DataManager
 
-from .CustomWidgets.DataPreperation import (
+from .CustomWidgets.DataPreparation import (
     DataGridWidget,
     DataPlotWidget,
     UploadFileWidget,
@@ -19,7 +19,7 @@ class DataFile:
     headers: Any = None
 
 
-class DataPreperationUI(iw.VBox):
+class DataPreparationUI(iw.VBox):
     """UI widgets for data preperation."""
 
     data_file = DataFile()
