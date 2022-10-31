@@ -165,6 +165,9 @@ class ModelManager:
         if not self._model.instance:
             return
 
+        if not self._model.layers:
+            return
+
         with output_handler:
             print("\n")
             display(self._model.instance.summary())
