@@ -4,6 +4,9 @@ import ipywidgets as iw
 
 
 class ConcatenateLayerWidget(iw.VBox):
+
+    name = "Concatenate Layer"
+
     layer_name = iw.Text(
         value="",
         description="Layer name:",

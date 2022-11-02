@@ -15,6 +15,8 @@ class Manager(Protocol):
 class CreateModelWidget(iw.VBox):
     """Widget to create a model."""
 
+    name = "Create Model"
+
     model_name = iw.Text(
         value="",
         description="Model name:",
