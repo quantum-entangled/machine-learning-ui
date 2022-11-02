@@ -16,6 +16,8 @@ class Manager(Protocol):
 class DataGridWidget(iw.VBox):
     """Widget to display a data grid."""
 
+    name = "Show Data Grid"
+
     show_grid_button = iw.Button(description="Show Data Grid")
     grid_output = iw.Output()
 

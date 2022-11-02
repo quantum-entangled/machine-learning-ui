@@ -15,6 +15,8 @@ class Manager(Protocol):
 class PlotModelWidget(iw.VBox):
     """Widget to plot a model graph."""
 
+    name = "Plot Model"
+
     plot_model_button = iw.Button(description="Plot Model")
     plot_model_output = iw.Output()
 

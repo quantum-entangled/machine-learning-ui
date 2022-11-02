@@ -15,6 +15,8 @@ class Manager(Protocol):
 class SaveModelWidget(iw.VBox):
     """Widget to save a model."""
 
+    name = "Save Model"
+
     save_model_button = iw.Button(description="Save Model")
     save_model_output = iw.Output()
 

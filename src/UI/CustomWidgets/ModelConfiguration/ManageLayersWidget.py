@@ -32,6 +32,8 @@ class Manager(Protocol):
 class ManageLayersWidget(iw.VBox):
     """Widget to add and pop model layers."""
 
+    name = "Manage Layers"
+
     layer_type_dropdown = iw.Dropdown(
         options=list(layers),
         description="Choose layer type:",

@@ -1,2 +1,1 @@
-from .DataPreparationUI import DataPreparationUI
-from .ModelConfigurationUI import ModelConfigurationUI
+from .WidgetUI import WidgetUI

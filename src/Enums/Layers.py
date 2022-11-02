@@ -1,19 +1,10 @@
-from dataclasses import dataclass
-from typing import Any
-
 import tensorflow as tf
+from DataClasses import Layer
 from UI.CustomWidgets.Layers import (
     ConcatenateLayerWidget,
     DenseLayerWidget,
     InputLayerWidget,
 )
-
-
-@dataclass
-class Layer:
-    instance: Any = None
-    widget: Any = None
-
 
 layers = {
     "Input": Layer(instance=tf.keras.layers.Input, widget=InputLayerWidget),

@@ -16,6 +16,8 @@ class Manager(Protocol):
 class UploadModelWidget(iw.VBox):
     """Widget to upload a model."""
 
+    name = "Upload Model"
+
     file_chooser_label = iw.Label(value="Please, select your model:")
     file_chooser = FileChooser(
         path="../db/Models/load",
