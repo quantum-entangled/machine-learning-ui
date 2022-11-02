@@ -15,6 +15,8 @@ class Manager(Protocol):
 class DataPlotWidget(iw.VBox):
     """Widget to display a data plot."""
 
+    name = "Show Data Plot"
+
     show_plot_button = iw.Button(description="Show Data Plot")
     plot_output = iw.Output()
 

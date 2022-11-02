@@ -4,6 +4,9 @@ import ipywidgets as iw
 
 
 class InputLayerWidget(iw.VBox):
+
+    name = "Input Layer"
+
     layer_name = iw.Text(
         value="",
         description="Layer name:",

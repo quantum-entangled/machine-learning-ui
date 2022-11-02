@@ -5,6 +5,9 @@ from Enums.Activations import activations
 
 
 class DenseLayerWidget(iw.VBox):
+
+    name = "Dense Layer"
+
     layer_name = iw.Text(
         value="",
         description="Layer name:",

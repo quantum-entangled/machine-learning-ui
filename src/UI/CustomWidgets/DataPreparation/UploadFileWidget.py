@@ -16,6 +16,8 @@ class Manager(Protocol):
 class UploadFileWidget(iw.VBox):
     """Widget to upload a file."""
 
+    name = "Upload File"
+
     file_chooser_label = iw.Label(value="Please, select your data file:")
     file_chooser = FileChooser(
         path="../db/Datasets", sandbox_path="../db/Datasets", filter_pattern="*.txt"
