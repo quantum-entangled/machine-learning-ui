@@ -196,6 +196,7 @@ class ModelManager:
             )
 
     def save_model(self, output_handler: Any) -> None:
+        output_handler.clear_output()
 
         if not self._model.instance:
             with output_handler:
