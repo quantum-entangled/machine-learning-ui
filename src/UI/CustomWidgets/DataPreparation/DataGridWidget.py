@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from typing import Any, Protocol
 
 import ipywidgets as iw
@@ -8,7 +7,6 @@ from ipydatagrid import DataGrid
 class Manager(Protocol):
     """Protocol for data managers."""
 
-    @abstractmethod
     def show_data_grid(self, grid_class: Any, output_handler: Any) -> None:
         ...
 
@@ -29,7 +27,7 @@ class DataGridWidget(iw.VBox):
 
         super().__init__(children=[self.show_grid_button, self.grid_output], **kwargs)
 
-    def _on_show_grid_button_clicked(self, _):
+    def _on_show_grid_button_clicked(self, _) -> None:
         self._manager.show_data_grid(
             grid_class=DataGrid, output_handler=self.grid_output
         )

@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from typing import Any, Protocol
 
 import ipywidgets as iw
@@ -7,7 +6,6 @@ import ipywidgets as iw
 class Manager(Protocol):
     """Protocol for data managers."""
 
-    @abstractmethod
     def show_data_plot(self, output_handler: Any) -> None:
         ...
 
@@ -24,9 +22,9 @@ class DataPlotWidget(iw.VBox):
         """Initialize the data plot widget window."""
         self._manager = manager
 
-        self.show_plot_button.on_click(self._on_show_lot_button_clicked)
+        self.show_plot_button.on_click(self._on_show_plot_button_clicked)
 
         super().__init__(children=[self.show_plot_button, self.plot_output], **kwargs)
 
-    def _on_show_lot_button_clicked(self, _):
+    def _on_show_plot_button_clicked(self, _) -> None:
         self._manager.show_data_plot(output_handler=self.plot_output)

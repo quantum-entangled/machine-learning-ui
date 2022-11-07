@@ -8,7 +8,7 @@ from bqplot import pyplot as plt
 from IPython.display import display
 
 
-class File(Protocol):
+class Data(Protocol):
     """Protocol for data files."""
 
     file: Any
@@ -18,7 +18,7 @@ class File(Protocol):
 class DataManager:
     """Manager for data preperation."""
 
-    def __init__(self, data: File) -> None:
+    def __init__(self, data: Data) -> None:
         """Initialize the internal model object."""
         self._data = data
 
@@ -102,5 +102,5 @@ class DataManager:
             display(plot_window)
 
     @property
-    def data(self) -> File:
+    def data(self) -> Data:
         return self._data

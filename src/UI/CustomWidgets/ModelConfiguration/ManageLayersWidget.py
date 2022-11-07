@@ -1,19 +1,14 @@
-from abc import abstractmethod
 from typing import Any, Protocol
 
 import ipywidgets as iw
-from Enums.Layers import layers
 from IPython.display import display
+
+from Enums.Layers import layers
 
 
 class Manager(Protocol):
     """Protocol for model managers."""
 
-    @property
-    def model(self) -> Any:
-        ...
-
-    @abstractmethod
     def add_layer(
         self,
         layer_type: Any,
@@ -24,7 +19,6 @@ class Manager(Protocol):
     ) -> None:
         ...
 
-    @abstractmethod
     def show_model_summary(self, output_handler: Any) -> None:
         ...
 

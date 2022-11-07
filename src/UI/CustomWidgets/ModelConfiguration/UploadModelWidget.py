@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from typing import Any, Protocol
 
 import ipywidgets as iw
@@ -8,7 +7,6 @@ from ipyfilechooser import FileChooser
 class Manager(Protocol):
     """Protocol for model managers."""
 
-    @abstractmethod
     def upload_model(self, file_chooser: Any, output_handler: Any) -> None:
         ...
 
@@ -18,18 +16,18 @@ class UploadModelWidget(iw.VBox):
 
     name = "Upload Model"
 
-    file_chooser_label = iw.Label(value="Please, select your model:")
-    file_chooser = FileChooser(
-        path="../db/Models/load",
-        sandbox_path="../db/Models/load",
-        filter_pattern="*.h5",
-    )
-    upload_model_button = iw.Button(description="Upload Model")
-    upload_model_status = iw.Output()
-
     def __init__(self, manager: Manager, **kwargs) -> None:
         """Initialize the upload model widget window."""
         self._manager = manager
+
+        self.file_chooser_label = iw.Label(value="Please, select your model:")
+        self.file_chooser = FileChooser(
+            path="../db/Models",
+            sandbox_path="../db/Models",
+            filter_pattern="*.h5",
+        )
+        self.upload_model_button = iw.Button(description="Upload Model")
+        self.upload_model_status = iw.Output()
 
         self.upload_model_button.on_click(self._on_upload_model_button_clicked)
 
@@ -42,7 +40,7 @@ class UploadModelWidget(iw.VBox):
             **kwargs
         )
 
-    def _on_upload_model_button_clicked(self, _):
+    def _on_upload_model_button_clicked(self, _) -> None:
         """Callback for upload model button."""
         self._manager.upload_model(
             file_chooser=self.file_chooser, output_handler=self.upload_model_status
