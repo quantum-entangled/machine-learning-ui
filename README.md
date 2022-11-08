@@ -2,7 +2,7 @@
 
 Installation guide via built-in `venv` package.
 
-1) Install `Python 3.10` for yor system: [Download](https://www.python.org/downloads/release/python-3108/).
+1) Install `Python 3.10` for your system: [Download](https://www.python.org/downloads/release/python-3108/).
     - Make sure your system meets all the requirements (for Windows users: Win8 and higher).
     - Make sure to toggle "Add to PATH" checkbox in the installation menu if you have some.
     - **(Optional)** Delete other Python versions installed on your system or make sure to launch Jupyter via Python 3.10.
