@@ -25,7 +25,7 @@ class Manager(Protocol):
 
 class TrainingDataWidget(iw.VBox):
 
-    name = "Choose Training Data"
+    name = "Select Training Data"
 
     def __init__(self, manager: Manager, **kwargs) -> None:
         self._manager = manager
