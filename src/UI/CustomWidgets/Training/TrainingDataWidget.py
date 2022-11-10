@@ -4,7 +4,7 @@ import ipywidgets as iw
 
 
 class Manager(Protocol):
-    """Protocol for teaining managers."""
+    """Protocol for training managers."""
 
     @property
     def data(self) -> Any:

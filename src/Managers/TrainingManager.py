@@ -80,7 +80,7 @@ class TrainingManager:
 
             out_ind[layer_name] = sorted(out_ind[layer_name] + indices)
 
-    def is_model(self):
+    def is_model(self) -> bool:
         return True if self._model_manager.model.instance else False
 
     def select_optimizer(self, instance: Any, **kwargs) -> None:
