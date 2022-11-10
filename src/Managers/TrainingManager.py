@@ -6,6 +6,7 @@ class Config(Protocol):
 
     input_training_indices: Any
     output_training_indices: Any
+    optimizer: Any
 
 
 class DataManager(Protocol):
@@ -78,6 +79,12 @@ class TrainingManager:
                 out_ind[layer_name] = list()
 
             out_ind[layer_name] = sorted(out_ind[layer_name] + indices)
+
+    def is_model(self):
+        return True if self._model_manager.model.instance else False
+
+    def select_optimizer(self, instance: Any, **kwargs) -> None:
+        self._config.optimizer = instance(**kwargs)
 
     @property
     def data(self) -> Any:

@@ -3,8 +3,8 @@ from typing import Any
 
 
 @dataclass
-class Layer:
-    """Layer container."""
+class WidgetWrapper:
+    """Wrapper for different instances and widgets."""
 
     instance: Any = None
     widget: Any = None

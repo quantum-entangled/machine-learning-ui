@@ -1,1 +1,2 @@
+from .SelectOptimizerWidget import SelectOptimizerWidget
 from .TrainingDataWidget import TrainingDataWidget
