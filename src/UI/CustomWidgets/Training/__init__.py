@@ -1,2 +1,3 @@
+from .SelectLossesWidget import SelectLossesWidget
 from .SelectOptimizerWidget import SelectOptimizerWidget
 from .TrainingDataWidget import TrainingDataWidget

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 
@@ -6,6 +6,7 @@ from typing import Any
 class Config:
     """Config container."""
 
-    input_training_indices: dict | None
-    output_training_indices: dict | None
+    input_training_indices: dict[Any, Any] = field(default_factory=dict)
+    output_training_indices: dict[Any, Any] = field(default_factory=dict)
     optimizer: Any = None
+    losses: dict[Any, Any] = field(default_factory=dict)

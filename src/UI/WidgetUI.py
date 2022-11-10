@@ -1,7 +1,5 @@
 from typing import Any, Mapping, Protocol, Sequence
 
-from IPython.display import display
-
 
 class ChildWidget(Protocol):
     "Child widget protocol class."

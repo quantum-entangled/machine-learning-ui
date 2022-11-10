@@ -4,9 +4,10 @@ from typing import Any, Protocol
 class Config(Protocol):
     """Protocol for configs."""
 
-    input_training_indices: Any
-    output_training_indices: Any
+    input_training_indices: dict[Any, Any]
+    output_training_indices: dict[Any, Any]
     optimizer: Any
+    losses: dict[Any, Any]
 
 
 class DataManager(Protocol):
@@ -80,11 +81,11 @@ class TrainingManager:
 
             out_ind[layer_name] = sorted(out_ind[layer_name] + indices)
 
-    def is_model(self) -> bool:
-        return True if self._model_manager.model.instance else False
-
     def select_optimizer(self, instance: Any, **kwargs) -> None:
         self._config.optimizer = instance(**kwargs)
+
+    def add_loss(self, layer_name: str, loss: Any) -> None:
+        self._config.losses.update({layer_name: loss})
 
     @property
     def data(self) -> Any:

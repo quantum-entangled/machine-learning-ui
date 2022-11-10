@@ -1,4 +1,4 @@
-from typing import Any, Dict, Protocol
+from typing import Any, Protocol
 
 import tensorflow as tf
 from IPython.display import display
@@ -9,7 +9,8 @@ class Model(Protocol):
 
     name: str | None
     instance: Any
-    layers: Dict[str, Any]
+    layers: dict[Any, Any]
+    output_names: list[str]
 
 
 class ModelManager:
@@ -62,6 +63,7 @@ class ModelManager:
         self._model.layers = {
             layer.name: layer for layer in self._model.instance.layers
         }
+        self._model.output_names = self._model.instance.output_names
 
         with output_handler:
             print("Your model is successfully uploaded!\u2705")

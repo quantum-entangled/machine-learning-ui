@@ -1,5 +1,5 @@
-from dataclasses import dataclass
-from typing import Any, Dict
+from dataclasses import dataclass, field
+from typing import Any
 
 
 @dataclass
@@ -8,4 +8,5 @@ class Model:
 
     name: str | None = None
     instance: Any = None
-    layers: Dict | None = None
+    layers: dict[Any, Any] = field(default_factory=dict)
+    output_names: list[str] = field(default_factory=list)

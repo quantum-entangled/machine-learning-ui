@@ -9,9 +9,6 @@ from Enums.Optimizers import optimizers
 class Manager(Protocol):
     """Protocol for training managers."""
 
-    def is_model(self) -> bool:
-        ...
-
     def select_optimizer(self, instance: Any, **kwargs) -> None:
         ...
 
@@ -65,7 +62,7 @@ class SelectOptimizerWidget(iw.VBox):
     def _on_select_optimizer_button_clicked(self, _) -> None:
         self.optimizer_status.clear_output(wait=True)
 
-        if not self._manager.is_model():
+        if not self._manager.model.instance:
             with self.optimizer_status:
                 print("Please, upload the model first!\u274C")
             return
