@@ -9,6 +9,7 @@ class Config(Protocol):
     optimizer: Any
     losses: dict[Any, Any]
     metrics: dict[Any, Any]
+    callbacks: list[Any]
 
 
 class DataManager(Protocol):
@@ -90,6 +91,9 @@ class TrainingManager:
 
     def add_metric(self, layer_name: str, metric: Any) -> None:
         self._config.metrics.update({layer_name: metric})
+
+    def add_callback(self, instance: Any, **kwargs) -> None:
+        self._config.callbacks += [instance(**kwargs)]
 
     @property
     def data(self) -> Any:

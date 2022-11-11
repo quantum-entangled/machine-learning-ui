@@ -3,16 +3,26 @@ from typing import Any
 import tensorflow as tf
 
 from DataClasses import WidgetWrapper
+from UI.CustomWidgets.Callbacks import (
+    CSVLoggerWidget,
+    EarlyStoppingWidget,
+    ModelCheckpointWidget,
+    TensorBoardWidget,
+)
 
 callbacks: dict[str, Any] = {
-    "CSV Logger": WidgetWrapper(instance=tf.keras.callbacks.CSVLogger, widget=None),
+    "CSV Logger": WidgetWrapper(
+        instance=tf.keras.callbacks.CSVLogger, widget=CSVLoggerWidget
+    ),
     "Early Stopping": WidgetWrapper(
-        instance=tf.keras.callbacks.EarlyStopping, widget=...
+        instance=tf.keras.callbacks.EarlyStopping, widget=EarlyStoppingWidget
     ),
     "Model Checkpoint": WidgetWrapper(
-        instance=tf.keras.callbacks.ModelCheckpoint, widget=None
+        instance=tf.keras.callbacks.ModelCheckpoint, widget=ModelCheckpointWidget
     ),
-    "TensorBoard": WidgetWrapper(instance=tf.keras.callbacks.TensorBoard, widget=...),
+    "TensorBoard": WidgetWrapper(
+        instance=tf.keras.callbacks.TensorBoard, widget=TensorBoardWidget
+    ),
     "Terminate On NaN": WidgetWrapper(
         instance=tf.keras.callbacks.TerminateOnNaN, widget=None
     ),

@@ -9,6 +9,10 @@ from Enums.Optimizers import optimizers
 class Manager(Protocol):
     """Protocol for training managers."""
 
+    @property
+    def model(self) -> Any:
+        ...
+
     def select_optimizer(self, instance: Any, **kwargs) -> None:
         ...
 
@@ -54,9 +58,7 @@ class SelectOptimizerWidget(iw.VBox):
 
         with self.optimizer_widget:
             self._current_optimizer = optimizers[change["new"]]
-            self._current_optimizer_widget = self._current_optimizer.widget(
-                manager=self._manager
-            )
+            self._current_optimizer_widget = self._current_optimizer.widget()
             display(self._current_optimizer_widget)
 
     def _on_select_optimizer_button_clicked(self, _) -> None:
