@@ -4,7 +4,7 @@ import tensorflow as tf
 
 from DataClasses import WidgetWrapper
 
-optimizers: dict[str, Any] = {
+callbacks: dict[str, Any] = {
     "CSV Logger": WidgetWrapper(instance=tf.keras.callbacks.CSVLogger, widget=None),
     "Early Stopping": WidgetWrapper(
         instance=tf.keras.callbacks.EarlyStopping, widget=...
