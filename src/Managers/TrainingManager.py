@@ -8,6 +8,7 @@ class Config(Protocol):
     output_training_indices: dict[Any, Any]
     optimizer: Any
     losses: dict[Any, Any]
+    metrics: dict[Any, Any]
 
 
 class DataManager(Protocol):
@@ -86,6 +87,9 @@ class TrainingManager:
 
     def add_loss(self, layer_name: str, loss: Any) -> None:
         self._config.losses.update({layer_name: loss})
+
+    def add_metric(self, layer_name: str, metric: Any) -> None:
+        self._config.metrics.update({layer_name: metric})
 
     @property
     def data(self) -> Any:
