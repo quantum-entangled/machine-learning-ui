@@ -2,7 +2,7 @@ from typing import Any
 
 import tensorflow as tf
 
-losses: dict[Any, Any] = {
+losses: dict[str, Any] = {
     "Mean Absolute Error": tf.keras.losses.MeanAbsoluteError,
     "Mean Absolute Percentage Error": tf.keras.losses.MeanAbsolutePercentageError,
     "Mean Squared Error": tf.keras.losses.MeanSquaredError,

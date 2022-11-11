@@ -5,6 +5,7 @@ ipydatagrid
 ipyfilechooser
 bqplot
 tensorflow
+tensorflow-addons
 pydot
 numpy
 pandas

@@ -9,7 +9,7 @@ from UI.CustomWidgets.Layers import (
     InputLayerWidget,
 )
 
-layers: dict[Any, Any] = {
+layers: dict[str, Any] = {
     "Input": WidgetWrapper(instance=tf.keras.layers.Input, widget=InputLayerWidget),
     "Dense": WidgetWrapper(instance=tf.keras.layers.Dense, widget=DenseLayerWidget),
     "Concatenate": WidgetWrapper(
