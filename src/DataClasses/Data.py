@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 
@@ -7,4 +7,4 @@ class Data:
     """Data container."""
 
     file: Any = None
-    headers: Any = None
+    headers: list[Any] = field(default_factory=list)

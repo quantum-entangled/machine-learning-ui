@@ -10,6 +10,8 @@ class Model(Protocol):
     name: str | None
     instance: Any
     layers: dict[Any, Any]
+    layers_shapes: dict[Any, Any]
+    input_names: list[str]
     output_names: list[str]
 
 
@@ -63,6 +65,15 @@ class ModelManager:
         self._model.layers = {
             layer.name: layer for layer in self._model.instance.layers
         }
+        self._model.layers_shapes = {
+            layer.name: (
+                layer.output_shape[0][1]
+                if isinstance(layer.output_shape, list)
+                else layer.output_shape[1]
+            )
+            for layer in self._model.instance.layers
+        }
+        self._model.input_names = self._model.instance.input_names
         self._model.output_names = self._model.instance.output_names
 
         with output_handler:

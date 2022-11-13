@@ -69,6 +69,8 @@ class SelectMetricsWidget(iw.VBox):
             print(f"Metric has been successfully added!\u2705")
 
     def _on_widget_state_change(self) -> None:
+        self.metric_status.clear_output(wait=True)
+
         widget_index = self.children.index(self.layer_dropdown)
         widget = self.children[widget_index]
         options = self._manager.model.output_names

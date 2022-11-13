@@ -12,7 +12,7 @@ class Data(Protocol):
     """Protocol for data files."""
 
     file: Any
-    headers: Any
+    headers: list[Any]
 
 
 class DataManager:

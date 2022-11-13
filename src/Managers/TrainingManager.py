@@ -1,11 +1,30 @@
 from typing import Any, Protocol
 
 
+class Data(Protocol):
+    """Protocol for data files."""
+
+    file: Any
+    headers: list[Any]
+
+
+class Model(Protocol):
+    """Protocol for models."""
+
+    name: str | None
+    instance: Any
+    layers: dict[Any, Any]
+    layers_shapes: dict[Any, Any]
+    input_names: list[str]
+    output_names: list[str]
+
+
 class Config(Protocol):
     """Protocol for configs."""
 
-    input_training_indices: dict[Any, Any]
-    output_training_indices: dict[Any, Any]
+    num_headers_per_layer: dict[str, int]
+    input_training_columns: dict[Any, Any]
+    output_training_columns: dict[Any, Any]
     optimizer: Any
     losses: dict[Any, Any]
     metrics: dict[Any, Any]
@@ -16,7 +35,7 @@ class DataManager(Protocol):
     """Protocol for data managers."""
 
     @property
-    def data(self) -> Any:
+    def data(self) -> Data:
         ...
 
     def upload_file(self, file_chooser: Any, output_handler: Any) -> None:
@@ -27,7 +46,7 @@ class ModelManager(Protocol):
     """Protocol for model managers."""
 
     @property
-    def model(self) -> Any:
+    def model(self) -> Model:
         ...
 
     def upload_model(self, file_chooser: Any, output_handler: Any) -> None:
@@ -53,35 +72,36 @@ class TrainingManager:
             file_chooser=file_chooser, output_handler=output_handler
         )
 
-    def check_instances(self, output_handler: Any) -> bool:
-        output_handler.clear_output(wait=True)
+    def set_num_headers_per_layer(self, layer_name: str) -> None:
+        if layer_name not in self._config.num_headers_per_layer.keys():
+            self._config.num_headers_per_layer.update({layer_name: 0})
 
-        if (
-            self._data_manager.data.file is None
-            or self._model_manager.model.instance is None
-        ):
-            with output_handler:
-                print("Please, upload the model and/or data first!\u274C")
-                return False
-
-        return True
+    def update_num_headers_per_layer(self, layer_name: str, num_columns: int) -> None:
+        self._config.num_headers_per_layer[layer_name] += num_columns
 
     def add_training_columns(
-        self, layer_type: str, layer_name: str, indices: Any
+        self, layer_type: str, layer_name: str, from_column: Any, to_column: Any
     ) -> None:
-        inp_ind = self._config.input_training_indices
-        out_ind = self._config.output_training_indices
-
         if layer_type == "input":
-            if layer_name not in inp_ind.keys():
-                inp_ind[layer_name] = list()
+            if layer_name not in self._config.input_training_columns.keys():
+                self._config.input_training_columns[layer_name] = list()
 
-            inp_ind[layer_name] = sorted(inp_ind[layer_name] + indices)
+            self._config.input_training_columns[layer_name] = sorted(
+                set(
+                    self._config.input_training_columns[layer_name]
+                    + list(range(from_column, to_column))
+                )
+            )
         else:
-            if layer_name not in out_ind.keys():
-                out_ind[layer_name] = list()
+            if layer_name not in self._config.output_training_columns.keys():
+                self._config.output_training_columns[layer_name] = list()
 
-            out_ind[layer_name] = sorted(out_ind[layer_name] + indices)
+            self._config.output_training_columns[layer_name] = sorted(
+                set(
+                    self._config.output_training_columns[layer_name]
+                    + list(range(from_column, to_column))
+                )
+            )
 
     def select_optimizer(self, instance: Any, **kwargs) -> None:
         self._config.optimizer = instance(**kwargs)
@@ -96,11 +116,11 @@ class TrainingManager:
         self._config.callbacks += [instance(**kwargs)]
 
     @property
-    def data(self) -> Any:
+    def data(self) -> Data:
         return self._data_manager.data
 
     @property
-    def model(self) -> Any:
+    def model(self) -> Model:
         return self._model_manager.model
 
     @property

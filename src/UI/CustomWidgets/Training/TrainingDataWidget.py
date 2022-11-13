@@ -14,11 +14,18 @@ class Manager(Protocol):
     def model(self) -> Any:
         ...
 
-    def check_instances(self, output_handler: Any) -> bool:
+    @property
+    def config(self) -> Any:
+        ...
+
+    def set_num_headers_per_layer(self, layer_name: str) -> None:
+        ...
+
+    def update_num_headers_per_layer(self, layer_name: str, num_columns: int) -> None:
         ...
 
     def add_training_columns(
-        self, layer_type: str, layer_name: str, indices: Any
+        self, layer_type: str, layer_name: str, from_column: Any, to_column: Any
     ) -> None:
         ...
 
@@ -30,43 +37,6 @@ class TrainingDataWidget(iw.VBox):
     def __init__(self, manager: Manager, **kwargs) -> None:
         self._manager = manager
 
-        self.select_data_button = iw.Button(description="Select Training Data")
-        self.select_data_button.on_click(self._on_select_data_button_clicked)
-        self.select_data_output = iw.Output()
-
-        super().__init__(
-            children=[self.select_data_button, self.select_data_output], **kwargs
-        )
-
-    def _on_select_data_button_clicked(self, _):
-        status = self._manager.check_instances(output_handler=self.select_data_output)
-
-        if not status:
-            return
-
-        self.column_names = self._manager.data.headers
-        self.column_indices = list(range(len(self.column_names)))
-        self.input_layer_names = [
-            layer[0]
-            for layer in self._manager.model.instance.get_config()["input_layers"]
-        ]
-        self.output_layer_names = [
-            layer[0]
-            for layer in self._manager.model.instance.get_config()["output_layers"]
-        ]
-        self.layer_column_counters = {
-            name: 0 for name in self.input_layer_names + self.output_layer_names
-        }
-        self.input_layer_shapes = {
-            name: self._manager.model.instance.get_layer(name).input_shape[0][1]
-            for name in self.input_layer_names
-        }
-        self.output_layer_shapes = {
-            name: self._manager.model.instance.get_layer(name).output_shape[1]
-            for name in self.output_layer_names
-        }
-        self.layer_shapes = self.input_layer_shapes | self.output_layer_shapes
-
         self.layer_type_dropdown = iw.Dropdown(
             options=["input", "output"],
             value="input",
@@ -77,92 +47,142 @@ class TrainingDataWidget(iw.VBox):
             self._on_layer_type_dropdown_value_change, names="value"
         )
         self.layer_dropdown = iw.Dropdown(
-            options=self.input_layer_names,
+            options=self._manager.model.input_names,
             description="Choose layer:",
             style={"description_width": "initial"},
         )
         self.layer_dropdown.observe(self._on_layer_dropdown_value_change, names="value")
-        self.layer_shape_status = iw.Label(
-            value=f"Filled layer nodes: {self.layer_column_counters[self.layer_dropdown.value]}/{self.layer_shapes[self.layer_dropdown.value]}"
-        )
+        self.layer_shape_status = iw.Label(value="Filled layer nodes: None")
         self.columns_label = iw.Label(value="Choose data columns for this layer:")
         self.layer_from_dropdown = iw.Dropdown(
-            options=list(
-                zip(
-                    [self.column_names[i] for i in self.column_indices],
-                    self.column_indices,
-                )
-            ),
+            options=[
+                (header, pos) for pos, header in enumerate(self._manager.data.headers)
+            ],
             description="From:",
             style={"description_width": "initial"},
         )
         self.layer_from_dropdown.observe(
-            self._on_layer_from_dropdown_value_change, names="value"
+            self._on_layer_fromto_dropdown_value_change, names="value"
         )
         self.layer_to_dropdown = iw.Dropdown(
-            options=list(
-                zip(
-                    [self.column_names[i] for i in self.column_indices],
-                    self.column_indices,
-                )
-            ),
+            options=[
+                (header, pos) for pos, header in enumerate(self._manager.data.headers)
+            ],
             description="To:",
             style={"description_width": "initial"},
         )
         self.layer_to_dropdown.observe(
-            self._on_layer_to_dropdown_value_change, names="value"
+            self._on_layer_fromto_dropdown_value_change, names="value"
         )
-        self.selected_columns_num = iw.Label(
-            value=f"Selected: {abs(self.layer_to_dropdown.value - self.layer_from_dropdown.value) + 1} column(s)"
-        )
+        self.selected_columns_num = iw.Label(value="Selected: None")
         self.add_columns_button = iw.Button(description="Add Column(s)")
         self.add_columns_button.on_click(self._on_add_columns_button_clicked)
         self.add_columns_status = iw.Output()
 
-        self.children = [
-            self.layer_type_dropdown,
-            self.layer_dropdown,
-            self.layer_shape_status,
-            self.columns_label,
-            self.layer_from_dropdown,
-            self.layer_to_dropdown,
-            self.selected_columns_num,
-            self.add_columns_button,
-            self.add_columns_status,
-        ]
+        super().__init__(
+            children=[
+                self.layer_type_dropdown,
+                self.layer_dropdown,
+                self.layer_shape_status,
+                self.columns_label,
+                self.layer_from_dropdown,
+                self.layer_to_dropdown,
+                self.selected_columns_num,
+                self.add_columns_button,
+                self.add_columns_status,
+            ],
+            **kwargs,
+        )
+
+    def _update_layer_shape_status(self) -> None:
+        self.layer_shape_status.value = f"Filled layer nodes: {self._manager.config.num_headers_per_layer[self.layer_dropdown.value]}/{self._manager.model.layers_shapes[self.layer_dropdown.value]}"
+
+    def _get_selected_columns_num(self) -> Any:
+        columns = self._manager.data.headers
+        options = list(self.layer_from_dropdown.options)
+        value_from = self.layer_from_dropdown.value
+        value_to = self.layer_to_dropdown.value
+        pair_from = (columns[value_from], value_from)
+        pair_to = (columns[value_to], value_to)
+
+        if pair_to not in options:
+            return
+
+        return abs(options.index(pair_to) - options.index(pair_from)) + 1
+
+    def _update_selected_columns_num(self) -> None:
+        if (
+            self.layer_from_dropdown.value is None
+            or self.layer_to_dropdown.value is None
+        ):
+            self.selected_columns_num.value = "Selected: None"
+            return
+
+        self.selected_columns_num.value = (
+            f"Selected: {self._get_selected_columns_num()} column(s)"
+        )
 
     def _on_layer_type_dropdown_value_change(self, change: Any) -> None:
         if change["new"] == "input":
-            self.layer_dropdown.options = self.input_layer_names
+            self.layer_dropdown.options = self._manager.model.input_names
         else:
-            self.layer_dropdown.options = self.output_layer_names
+            self.layer_dropdown.options = self._manager.model.output_names
 
-        self.layer_shape_status.value = f"Filled layer nodes: {self.layer_column_counters[self.layer_dropdown.value]}/{self.layer_shapes[self.layer_dropdown.value]}"
+    def _on_layer_dropdown_value_change(self, _) -> None:
+        self._manager.set_num_headers_per_layer(layer_name=self.layer_dropdown.value)
+        self._update_layer_shape_status()
 
-    def _on_layer_dropdown_value_change(self, change: Any) -> None:
-        self.layer_shape_status.value = f"Filled layer nodes: {self.layer_column_counters[change['new']]}/{self.layer_shapes[change['new']]}"
+    def _on_layer_fromto_dropdown_value_change(self, _) -> None:
+        self._update_selected_columns_num()
 
-    def _on_layer_from_dropdown_value_change(self, change: Any) -> None:
-        if not change["new"]:
-            self.selected_columns_num.value = "Selected: 0 column(s)"
-            return
+    def _update_layer_fromto_dropdown_options(
+        self, from_column: Any, to_column: Any
+    ) -> None:
+        for pair in self.layer_from_dropdown.options:
+            if pair[1] in range(from_column, to_column):
+                tmp_1 = list(self.layer_from_dropdown.options)
+                tmp_2 = list(self.layer_to_dropdown.options)
+                tmp_1.remove(pair)
+                tmp_2.remove(pair)
 
-        self.selected_columns_num.value = f"Selected: {abs(self.layer_to_dropdown.value - change['new']) + 1} column(s)"
-
-    def _on_layer_to_dropdown_value_change(self, change: Any) -> None:
-        if not change["new"]:
-            self.selected_columns_num.value = "Selected: 0 column(s)"
-            return
-
-        self.selected_columns_num.value = f"Selected: {abs(change['new'] - self.layer_from_dropdown.value) + 1} column(s)"
+                self.layer_from_dropdown.options = tmp_1
+                self.layer_to_dropdown.options = tmp_2
 
     def _on_add_columns_button_clicked(self, _) -> None:
         self.add_columns_status.clear_output(wait=True)
 
+        if self._manager.data.file is None:
+            with self.add_columns_status:
+                print("Please, upload the file first!\u274C")
+            return
+
+        if self._manager.model.instance is None:
+            with self.add_columns_status:
+                print("Please, upload the model first!\u274C")
+            return
+
+        if not self._manager.model.layers:
+            with self.add_columns_status:
+                print("There are no layers in the model!\u274C")
+            return
+
+        if self.layer_dropdown.value is None:
+            with self.add_columns_status:
+                print("Please, choose the layer first!\u274C")
+            return
+
+        if (
+            self.layer_from_dropdown.value is None
+            or self.layer_to_dropdown.value is None
+        ):
+            with self.add_columns_status:
+                print("Please, choose the data columns first!\u274C")
+            return
+
         current_layer_type = self.layer_type_dropdown.value
         current_layer = self.layer_dropdown.value
-        current_counter = self.layer_column_counters[current_layer]
-        current_layer_shape = self.layer_shapes[current_layer]
+        current_counter = self._manager.config.num_headers_per_layer[current_layer]
+        current_layer_shape = self._manager.model.layers_shapes[current_layer]
         from_column = self.layer_from_dropdown.value
         to_column = self.layer_to_dropdown.value + 1
 
@@ -176,22 +196,31 @@ class TrainingDataWidget(iw.VBox):
                 print("You've selected more columns than the layer can accept!\u274C")
             return
 
-        self.column_indices = sorted(
-            set(self.column_indices) - set(range(from_column, to_column))
+        self._manager.update_num_headers_per_layer(
+            layer_name=current_layer, num_columns=self._get_selected_columns_num()
         )
         self._manager.add_training_columns(
             layer_type=current_layer_type,
             layer_name=current_layer,
-            indices=list(range(from_column, to_column)),
+            from_column=from_column,
+            to_column=to_column,
         )
-        self.layer_from_dropdown.options = self.layer_to_dropdown.options = list(
-            zip(
-                [self.column_names[i] for i in self.column_indices],
-                self.column_indices,
-            )
+        self._update_layer_fromto_dropdown_options(
+            from_column=from_column, to_column=to_column
         )
-        self.layer_column_counters[current_layer] = current_counter + new_range
-        self.layer_shape_status.value = f"Filled layer nodes: {self.layer_column_counters[current_layer]}/{self.layer_shapes[current_layer]}"
+        self._update_layer_shape_status()
 
         with self.add_columns_status:
             print("Your columns have been successfully added!\u2705")
+
+    def _on_widget_state_change(self):
+        self.add_columns_status.clear_output(wait=True)
+
+        if self.layer_type_dropdown.value == "input":
+            self.layer_dropdown.options = self._manager.model.input_names
+        else:
+            self.layer_dropdown.options = self._manager.model.output_names
+
+        self.layer_from_dropdown.options = self.layer_to_dropdown.options = [
+            (header, pos) for pos, header in enumerate(self._manager.data.headers)
+        ]
