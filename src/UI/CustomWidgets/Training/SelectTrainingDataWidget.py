@@ -30,7 +30,7 @@ class Manager(Protocol):
         ...
 
 
-class TrainingDataWidget(iw.VBox):
+class SelectTrainingDataWidget(iw.VBox):
 
     name = "Select Training Data"
 
