@@ -45,7 +45,7 @@ class ModelManager:
         self._model.layers = dict()
 
         with output_handler:
-            print("You're model is successfully created!\u2705")
+            print("Your model is successfully created!\u2705")
 
     def upload_model(self, file_chooser: Any, output_handler: Any) -> None:
         """Upload a model from the file via the given file chooser."""
@@ -159,12 +159,12 @@ class ModelManager:
 
                 for connect in connect_to:
                     for i, output_name in enumerate(output_names):
-                        if connect == output_name:
+                        if connect in output_name:
                             mask[i] = True
 
             if True in mask:
                 pop_indices = [i for i, x in enumerate(mask) if x]
-                [self._model.instance.outputs.pop(i) for i in pop_indices]
+                [self._model.instance.outputs.pop(i) for i in reversed(pop_indices)]
 
             self._model.instance = tf.keras.Model(
                 inputs=self._model.instance.inputs,
@@ -218,7 +218,7 @@ class ModelManager:
 
         with output_handler:
             self._model.instance.save(
-                filepath=f"../db/Models/save/{self._model.name}.h5",
+                filepath=f"../db/Models/{self._model.name}.h5",
                 save_format="h5",
                 include_optimizer=False,
             )

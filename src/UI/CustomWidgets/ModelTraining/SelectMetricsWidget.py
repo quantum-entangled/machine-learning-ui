@@ -62,7 +62,7 @@ class SelectMetricsWidget(iw.VBox):
 
         self._manager.add_metric(
             layer_name=self.layer_dropdown.value,
-            metric=metrics[self.metric_dropdown.value],
+            metric=metrics[self.metric_dropdown.value](),
         )
 
         with self.metric_status:

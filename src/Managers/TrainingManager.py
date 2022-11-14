@@ -29,6 +29,7 @@ class Config(Protocol):
     losses: dict[Any, Any]
     metrics: dict[Any, Any]
     callbacks: list[Any]
+    train_history: Any
 
 
 class DataManager(Protocol):
@@ -114,6 +115,47 @@ class TrainingManager:
 
     def add_callback(self, instance: Any, **kwargs) -> None:
         self._config.callbacks += [instance(**kwargs)]
+
+    def compile_model(self) -> None:
+        self._model_manager._model.instance.compile(
+            optimizer=self._config.optimizer,
+            loss=self._config.losses,
+            metrics=self._config.metrics,
+        )
+
+    def check_shapes(self) -> str:
+        for layer_name in list(
+            self._config.input_training_columns | self._config.output_training_columns
+        ):
+            if (
+                self._config.num_columns_per_layer[layer_name]
+                < self._model_manager.model.layers_shapes[layer_name]
+            ):
+                return layer_name
+
+        return str()
+
+    def fit_model(
+        self, batch_size: int, num_epochs: int, validation_split: float
+    ) -> None:
+        self._config.train_history = self._model_manager.model.instance.fit(
+            x={
+                layer_name: self._data_manager.data.file[
+                    :, self._config.input_training_columns[layer_name]
+                ]
+                for layer_name in self._config.input_training_columns.keys()
+            },
+            y={
+                layer_name: self._data_manager.data.file[
+                    :, self._config.output_training_columns[layer_name]
+                ]
+                for layer_name in self._config.output_training_columns.keys()
+            },
+            batch_size=batch_size,
+            epochs=num_epochs,
+            validation_split=validation_split,
+            verbose=1,
+        )
 
     @property
     def data(self) -> Data:

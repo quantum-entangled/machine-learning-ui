@@ -61,7 +61,8 @@ class SelectLossesWidget(iw.VBox):
             return
 
         self._manager.add_loss(
-            layer_name=self.layer_dropdown.value, loss=losses[self.loss_dropdown.value]
+            layer_name=self.layer_dropdown.value,
+            loss=losses[self.loss_dropdown.value](),
         )
 
         with self.loss_status:
