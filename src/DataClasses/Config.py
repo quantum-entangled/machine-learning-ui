@@ -7,7 +7,7 @@ from typing import Any
 class Config:
     """Config container."""
 
-    num_headers_per_layer: dict[str, int] = field(default_factory=dict)
+    num_columns_per_layer: dict[str, int] = field(default_factory=dict)
     input_training_columns: dict[Any, Any] = field(default_factory=dict)
     output_training_columns: dict[Any, Any] = field(default_factory=dict)
     optimizer: Any = None

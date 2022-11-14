@@ -18,10 +18,10 @@ class Manager(Protocol):
     def config(self) -> Any:
         ...
 
-    def set_num_headers_per_layer(self, layer_name: str) -> None:
+    def set_num_columns_per_layer(self, layer_name: str) -> None:
         ...
 
-    def update_num_headers_per_layer(self, layer_name: str, num_columns: int) -> None:
+    def update_num_columns_per_layer(self, layer_name: str, num_columns: int) -> None:
         ...
 
     def add_training_columns(
@@ -95,7 +95,7 @@ class TrainingDataWidget(iw.VBox):
         )
 
     def _update_layer_shape_status(self) -> None:
-        self.layer_shape_status.value = f"Filled layer nodes: {self._manager.config.num_headers_per_layer[self.layer_dropdown.value]}/{self._manager.model.layers_shapes[self.layer_dropdown.value]}"
+        self.layer_shape_status.value = f"Filled layer nodes: {self._manager.config.num_columns_per_layer[self.layer_dropdown.value]}/{self._manager.model.layers_shapes[self.layer_dropdown.value]}"
 
     def _get_selected_columns_num(self) -> Any:
         columns = self._manager.data.headers
@@ -129,7 +129,7 @@ class TrainingDataWidget(iw.VBox):
             self.layer_dropdown.options = self._manager.model.output_names
 
     def _on_layer_dropdown_value_change(self, _) -> None:
-        self._manager.set_num_headers_per_layer(layer_name=self.layer_dropdown.value)
+        self._manager.set_num_columns_per_layer(layer_name=self.layer_dropdown.value)
         self._update_layer_shape_status()
 
     def _on_layer_fromto_dropdown_value_change(self, _) -> None:
@@ -181,7 +181,7 @@ class TrainingDataWidget(iw.VBox):
 
         current_layer_type = self.layer_type_dropdown.value
         current_layer = self.layer_dropdown.value
-        current_counter = self._manager.config.num_headers_per_layer[current_layer]
+        current_counter = self._manager.config.num_columns_per_layer[current_layer]
         current_layer_shape = self._manager.model.layers_shapes[current_layer]
         from_column = self.layer_from_dropdown.value
         to_column = self.layer_to_dropdown.value + 1
@@ -196,7 +196,7 @@ class TrainingDataWidget(iw.VBox):
                 print("You've selected more columns than the layer can accept!\u274C")
             return
 
-        self._manager.update_num_headers_per_layer(
+        self._manager.update_num_columns_per_layer(
             layer_name=current_layer, num_columns=self._get_selected_columns_num()
         )
         self._manager.add_training_columns(

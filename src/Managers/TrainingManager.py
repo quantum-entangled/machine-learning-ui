@@ -22,7 +22,7 @@ class Model(Protocol):
 class Config(Protocol):
     """Protocol for configs."""
 
-    num_headers_per_layer: dict[str, int]
+    num_columns_per_layer: dict[str, int]
     input_training_columns: dict[Any, Any]
     output_training_columns: dict[Any, Any]
     optimizer: Any
@@ -72,12 +72,12 @@ class TrainingManager:
             file_chooser=file_chooser, output_handler=output_handler
         )
 
-    def set_num_headers_per_layer(self, layer_name: str) -> None:
-        if layer_name not in self._config.num_headers_per_layer.keys():
-            self._config.num_headers_per_layer.update({layer_name: 0})
+    def set_num_columns_per_layer(self, layer_name: str) -> None:
+        if layer_name not in self._config.num_columns_per_layer.keys():
+            self._config.num_columns_per_layer.update({layer_name: 0})
 
-    def update_num_headers_per_layer(self, layer_name: str, num_columns: int) -> None:
-        self._config.num_headers_per_layer[layer_name] += num_columns
+    def update_num_columns_per_layer(self, layer_name: str, num_columns: int) -> None:
+        self._config.num_columns_per_layer[layer_name] += num_columns
 
     def add_training_columns(
         self, layer_type: str, layer_name: str, from_column: Any, to_column: Any
