@@ -59,7 +59,7 @@ class SelectCallbackWidget(iw.VBox):
         with self.callback_widget:
             self._current_callback = callbacks[change["new"]]
 
-            if self._current_callback.widget:
+            if self._current_callback.widget is not None:
                 self._current_callback_widget = self._current_callback.widget()
                 display(self._current_callback_widget)
             else:
@@ -74,7 +74,7 @@ class SelectCallbackWidget(iw.VBox):
                 print("Please, upload the model first!\u274C")
             return
 
-        if self._current_callback_widget:
+        if self._current_callback_widget is not None:
             self._manager.add_callback(
                 instance=self._current_callback.instance,
                 **self._current_callback_widget.params,

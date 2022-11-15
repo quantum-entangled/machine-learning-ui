@@ -55,7 +55,7 @@ class TrainModelWidget(iw.VBox):
         )
         self.validation_split = iw.BoundedFloatText(
             value=0.15,
-            min=0,
+            min=0.01,
             max=1,
             step=0.01,
             description="Validation split:",
