@@ -154,6 +154,7 @@ class TrainingManager:
             batch_size=batch_size,
             epochs=num_epochs,
             validation_split=validation_split,
+            callbacks=self._config.callbacks,
             verbose=1,
         )
 
