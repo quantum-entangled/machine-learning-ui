@@ -73,7 +73,7 @@ class PlotHistoryWidget(iw.VBox):
                 y=history_type, color=line_color, same_figure=same_figure
             )
 
-    def _on_widget_state_change(self):
+    def _on_widget_state_change(self) -> None:
         self.plot_output.clear_output(wait=True)
 
         self.history_type_dropdown.options = list(self._manager.config.training_history)

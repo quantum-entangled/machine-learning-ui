@@ -15,14 +15,13 @@ class SaveModelWidget(iw.VBox):
 
     name = "Save Model"
 
-    save_model_button = iw.Button(description="Save Model")
-    save_model_output = iw.Output()
-
     def __init__(self, manager: Manager, **kwargs) -> None:
         """Initialize the save model widget window."""
         self._manager = manager
 
+        self.save_model_button = iw.Button(description="Save Model")
         self.save_model_button.on_click(self._on_save_model_button_clicked)
+        self.save_model_output = iw.Output()
 
         super().__init__(
             children=[self.save_model_button, self.save_model_output], **kwargs

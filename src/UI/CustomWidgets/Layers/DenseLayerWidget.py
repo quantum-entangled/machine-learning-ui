@@ -8,34 +8,33 @@ class DenseLayerWidget(iw.VBox):
 
     name = "Dense Layer"
 
-    layer_name = iw.Text(
-        value="",
-        description="Layer name:",
-        placeholder="Enter Layer Name",
-        style={"description_width": "initial"},
-    )
-    units_num = iw.BoundedIntText(
-        value=1,
-        min=1,
-        max=10_000,
-        step=1,
-        description="Number of units:",
-        style={"description_width": "initial"},
-    )
-    activation = iw.Dropdown(
-        options=list(activations),
-        description="Activation function:",
-        style={"description_width": "initial"},
-    )
-    connect_dropdown = iw.Dropdown(
-        description="Connect layer to:",
-        style={"description_width": "initial"},
-    )
-
     def __init__(self, manager: Any, **kwargs) -> None:
         self._manager = manager
 
-        self.connect_dropdown.options = tuple(self._manager.model.layers)
+        self.layer_name = iw.Text(
+            value="",
+            description="Layer name:",
+            placeholder="Enter Layer Name",
+            style={"description_width": "initial"},
+        )
+        self.units_num = iw.BoundedIntText(
+            value=1,
+            min=1,
+            max=10_000,
+            step=1,
+            description="Number of units:",
+            style={"description_width": "initial"},
+        )
+        self.activation = iw.Dropdown(
+            options=list(activations),
+            description="Activation function:",
+            style={"description_width": "initial"},
+        )
+        self.connect_dropdown = iw.Dropdown(
+            options=list(self._manager.model.layers),
+            description="Connect layer to:",
+            style={"description_width": "initial"},
+        )
 
         super().__init__(
             children=[

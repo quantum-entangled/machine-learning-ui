@@ -15,14 +15,13 @@ class PlotModelWidget(iw.VBox):
 
     name = "Plot Model"
 
-    plot_model_button = iw.Button(description="Plot Model")
-    plot_model_output = iw.Output()
-
     def __init__(self, manager: Manager, **kwargs) -> None:
         """Initialize the plot model widget window."""
         self._manager = manager
 
+        self.plot_model_button = iw.Button(description="Plot Model")
         self.plot_model_button.on_click(self._on_plot_model_button_clicked)
+        self.plot_model_output = iw.Output()
 
         super().__init__(
             children=[self.plot_model_button, self.plot_model_output], **kwargs

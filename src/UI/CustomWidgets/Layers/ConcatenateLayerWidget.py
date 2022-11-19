@@ -7,21 +7,20 @@ class ConcatenateLayerWidget(iw.VBox):
 
     name = "Concatenate Layer"
 
-    layer_name = iw.Text(
-        value="",
-        description="Layer name:",
-        placeholder="Enter Layer Name",
-        style={"description_width": "initial"},
-    )
-    concatenate = iw.SelectMultiple(
-        description="Select layers (at least 2):",
-        style={"description_width": "initial"},
-    )
-
     def __init__(self, manager: Any, **kwargs) -> None:
         self._manager = manager
 
-        self.concatenate.options = tuple(self._manager.model.layers)
+        self.layer_name = iw.Text(
+            value="",
+            description="Layer name:",
+            placeholder="Enter Layer Name",
+            style={"description_width": "initial"},
+        )
+        self.concatenate = iw.SelectMultiple(
+            options=list(self._manager.model.layers),
+            description="Select layers (at least 2):",
+            style={"description_width": "initial"},
+        )
 
         super().__init__(children=[self.layer_name, self.concatenate], **kwargs)
 

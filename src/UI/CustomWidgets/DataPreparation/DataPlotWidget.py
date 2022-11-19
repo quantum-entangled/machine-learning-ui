@@ -15,13 +15,12 @@ class DataPlotWidget(iw.VBox):
 
     name = "Show Data Plot"
 
-    show_plot_button = iw.Button(description="Show Data Plot")
-    plot_output = iw.Output()
-
     def __init__(self, manager: Manager, **kwargs) -> None:
         """Initialize the data plot widget window."""
         self._manager = manager
 
+        self.show_plot_button = iw.Button(description="Show Data Plot")
+        self.plot_output = iw.Output()
         self.show_plot_button.on_click(self._on_show_plot_button_clicked)
 
         super().__init__(children=[self.show_plot_button, self.plot_output], **kwargs)

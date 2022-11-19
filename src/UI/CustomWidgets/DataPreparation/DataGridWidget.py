@@ -16,13 +16,12 @@ class DataGridWidget(iw.VBox):
 
     name = "Show Data Grid"
 
-    show_grid_button = iw.Button(description="Show Data Grid")
-    grid_output = iw.Output()
-
     def __init__(self, manager: Manager, **kwargs) -> None:
         """Initialize the data grid widget window."""
         self._manager = manager
 
+        self.show_grid_button = iw.Button(description="Show Data Grid")
+        self.grid_output = iw.Output()
         self.show_grid_button.on_click(self._on_show_grid_button_clicked)
 
         super().__init__(children=[self.show_grid_button, self.grid_output], **kwargs)

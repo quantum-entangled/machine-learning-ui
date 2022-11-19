@@ -27,9 +27,8 @@ class UploadModelWidget(iw.VBox):
             filter_pattern="*.h5",
         )
         self.upload_model_button = iw.Button(description="Upload Model")
-        self.upload_model_status = iw.Output()
-
         self.upload_model_button.on_click(self._on_upload_model_button_clicked)
+        self.upload_model_status = iw.Output()
 
         super().__init__(
             children=[

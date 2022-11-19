@@ -28,28 +28,27 @@ class ManageLayersWidget(iw.VBox):
 
     name = "Manage Layers"
 
-    layer_type_dropdown = iw.Dropdown(
-        options=list(layers),
-        description="Choose layer type:",
-        style={"description_width": "initial"},
-    )
-    layer_widget_output = iw.Output()
-    add_layer_button = iw.Button(description="Add Layer")
-    layer_status = iw.Output()
-    model_summary_output = iw.Output()
-
     def __init__(self, manager: Manager, **kwargs) -> None:
         """Initialize the manage layers widget window."""
         self._manager = manager
-        self._current_layer = layers[self.layer_type_dropdown.value]
-        self._current_layer_widget = self._current_layer.widget(manager=self._manager)
 
-        self.layer_widget_output.append_display_data(self._current_layer_widget)
-
+        self.layer_type_dropdown = iw.Dropdown(
+            options=list(layers),
+            description="Choose layer type:",
+            style={"description_width": "initial"},
+        )
         self.layer_type_dropdown.observe(
             self._on_layer_type_dropdown_value_change, names="value"
         )
+        self.layer_widget_output = iw.Output()
+        self.add_layer_button = iw.Button(description="Add Layer")
         self.add_layer_button.on_click(self._on_add_layer_button_clicked)
+        self.layer_status = iw.Output()
+        self.model_summary_output = iw.Output()
+
+        self._current_layer = layers[self.layer_type_dropdown.value]
+        self._current_layer_widget = self._current_layer.widget(manager=self._manager)
+        self.layer_widget_output.append_display_data(self._current_layer_widget)
 
         super().__init__(
             children=[
@@ -61,11 +60,15 @@ class ManageLayersWidget(iw.VBox):
             **kwargs,
         )
 
-    @layer_widget_output.capture(clear_output=True, wait=True)
     def _on_layer_type_dropdown_value_change(self, change: Any) -> None:
-        self._current_layer = layers[change["new"]]
-        self._current_layer_widget = self._current_layer.widget(manager=self._manager)
-        display(self._current_layer_widget)
+        self.layer_widget_output.clear_output(wait=True)
+
+        with self.layer_widget_output:
+            self._current_layer = layers[change["new"]]
+            self._current_layer_widget = self._current_layer.widget(
+                manager=self._manager
+            )
+            display(self._current_layer_widget)
 
     def _on_add_layer_button_clicked(self, _) -> None:
         layer_type = self.layer_type_dropdown.value

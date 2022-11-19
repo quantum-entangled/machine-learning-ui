@@ -15,19 +15,18 @@ class CreateModelWidget(iw.VBox):
 
     name = "Create Model"
 
-    model_name = iw.Text(
-        value="",
-        description="Model name:",
-        placeholder="Enter Model Name",
-    )
-    create_model_button = iw.Button(description="Create Model")
-    create_model_status = iw.Output()
-
     def __init__(self, manager: Manager, **kwargs) -> None:
         """Initialize the create model widget window."""
         self._manager = manager
 
+        self.model_name = iw.Text(
+            value="",
+            description="Model name:",
+            placeholder="Enter Model Name",
+        )
+        self.create_model_button = iw.Button(description="Create Model")
         self.create_model_button.on_click(self._on_create_model_button_clicked)
+        self.create_model_status = iw.Output()
 
         super().__init__(
             children=[
