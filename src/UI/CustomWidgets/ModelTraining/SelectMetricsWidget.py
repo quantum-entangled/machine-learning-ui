@@ -71,10 +71,8 @@ class SelectMetricsWidget(iw.VBox):
     def _on_widget_state_change(self) -> None:
         self.metric_status.clear_output(wait=True)
 
-        widget_index = self.children.index(self.layer_dropdown)
-        widget = self.children[widget_index]
         options = self._manager.model.output_names
 
-        widget.options = options
         if options:
-            widget.value = options[0]
+            self.layer_dropdown.options = options
+            self.layer_dropdown.value = options[0]
