@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from typing import Any, Protocol
 
 import ipywidgets as iw
@@ -7,7 +6,6 @@ import ipywidgets as iw
 class Manager(Protocol):
     """Protocol for model managers."""
 
-    @abstractmethod
     def create_model(self, model_name: Any, output_handler: Any) -> None:
         ...
 
