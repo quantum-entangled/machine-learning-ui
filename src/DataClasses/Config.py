@@ -13,4 +13,4 @@ class Config:
     losses: dict[Any, Any] = field(default_factory=dict)
     metrics: dict[Any, Any] = field(default_factory=dict)
     callbacks: list[Any] = field(default_factory=list)
-    train_history: Any = None
+    training_history: dict[Any, Any] = field(default_factory=dict)

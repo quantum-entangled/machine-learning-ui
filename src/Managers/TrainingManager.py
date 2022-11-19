@@ -1,5 +1,8 @@
 from typing import Any, Protocol
 
+from bqplot import Axis, Figure, LinearScale, Lines, Toolbar
+from bqplot import pyplot as bqplt
+
 
 class Data(Protocol):
     """Protocol for data files."""
@@ -29,7 +32,7 @@ class Config(Protocol):
     losses: dict[Any, Any]
     metrics: dict[Any, Any]
     callbacks: list[Any]
-    train_history: Any
+    training_history: dict[Any, Any]
 
 
 class DataManager(Protocol):
@@ -138,7 +141,7 @@ class TrainingManager:
     def fit_model(
         self, batch_size: int, num_epochs: int, validation_split: float
     ) -> None:
-        self._config.train_history = self._model_manager.model.instance.fit(
+        history = self._model_manager.model.instance.fit(
             x={
                 layer_name: self._data_manager.data.file[
                     :, self._config.input_training_columns[layer_name]
@@ -157,6 +160,27 @@ class TrainingManager:
             callbacks=self._config.callbacks,
             verbose=1,
         )
+
+        self._config.training_history = history.history
+
+    def plot_history(self, y: Any, color: Any, same_figure: bool) -> None:
+        y_data = self._config.training_history[y]
+        x_data = [i + 1 for i, _ in enumerate(y_data)]
+
+        if same_figure:
+            fig = bqplt.current_figure()
+        else:
+            fig = bqplt.figure()
+
+        fig.min_aspect_ratio = 1
+        fig.max_aspect_ratio = 1
+        fig.fig_margin = {"top": 5, "bottom": 35, "left": 40, "right": 5}
+
+        bqplt.plot(x=x_data, y=y_data, colors=[color], labels=[y], figure=fig)
+        bqplt.xlabel("Epoch")
+        bqplt.xlim(min=min(x_data) - 1, max=max(x_data) + 1)
+        bqplt.legend()
+        bqplt.show()
 
     @property
     def data(self) -> Data:
