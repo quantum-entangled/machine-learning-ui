@@ -1,13 +1,12 @@
-from typing import Any, Protocol
+from typing import Protocol
 
 import ipywidgets as iw
-from ipydatagrid import DataGrid
 
 
 class DataManager(Protocol):
     """Protocol for data managers."""
 
-    def show_data_grid(self, grid_class: Any, output_handler: Any) -> None:
+    def show_data_grid(self) -> None:
         ...
 
 
@@ -24,9 +23,14 @@ class DataGridWidget(iw.VBox):
         self.grid_output = iw.Output()
         self.show_grid_button.on_click(self._on_show_grid_button_clicked)
 
-        super().__init__(children=[self.show_grid_button, self.grid_output], **kwargs)
+        super().__init__(children=[self.show_grid_button, self.grid_output])
 
     def _on_show_grid_button_clicked(self, _) -> None:
-        self.data_manager.show_data_grid(
-            grid_class=DataGrid, output_handler=self.grid_output
-        )
+        """Callback for show_grid_button."""
+        self.grid_output.clear_output()
+
+        with self.grid_output:
+            self.data_manager.show_data_grid()
+
+    def _on_widget_state_change(self) -> None:
+        self.grid_output.clear_output()

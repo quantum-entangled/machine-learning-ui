@@ -5,9 +5,12 @@ import numpy as np
 import pandas as pd
 from bqplot import Toolbar
 from bqplot import pyplot as plt
+from ipydatagrid import DataGrid
 from IPython.display import display
 
 from DataClasses import Data, Model
+from Enums.ErrorMessages import Error
+from Enums.SuccessMessages import Success
 
 
 class DataManager:
@@ -41,18 +44,16 @@ class DataManager:
         """Get a data file path via the given file chooser."""
         return file_chooser.selected
 
-    def show_data_grid(self, grid_class: Any, output_handler: Any) -> None:
+    def show_data_grid(self) -> None:
         """Show the file data grid."""
-        output_handler.clear_output(wait=True)
 
-        with output_handler:
-            if self._data.file is None:
-                print("Please, upload the file first!\u274C")
-                return
+        if self._data.file is None:
+            print(Error.NO_FILE_UPLOADED)
+            return
 
-            df = pd.DataFrame(data=self._data.file, columns=self._data.columns)
-            dg = grid_class(dataframe=df)
-            display(dg)
+        df = pd.DataFrame(data=self._data.file, columns=self._data.columns)
+        dg = DataGrid(dataframe=df)
+        display(dg)
 
     def show_data_plot(self, output_handler: Any) -> None:
         """Show data plot."""
