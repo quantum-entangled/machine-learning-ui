@@ -73,4 +73,4 @@ class SelectOptimizerWidget(iw.VBox):
         )
 
         with self.optimizer_status:
-            print(f"Optimizer has been successfully selected!\u2705")
+            print("Optimizer has been successfully selected!\u2705")
