@@ -3,11 +3,11 @@ from typing import Any, Protocol
 import ipywidgets as iw
 
 
-class Manager(Protocol):
+class ModelManager(Protocol):
     """Protocol for training managers."""
 
     @property
-    def config(self) -> Any:
+    def model(self) -> Any:
         ...
 
     def plot_history(self, y: Any, color: Any, same_figure: bool) -> None:
@@ -18,11 +18,11 @@ class PlotHistoryWidget(iw.VBox):
 
     name = "Plot Training History"
 
-    def __init__(self, manager: Manager, **kwargs):
-        self._manager = manager
+    def __init__(self, model_manager: ModelManager, **kwargs):
+        self.model_manager = model_manager
 
         self.history_type_dropdown = iw.Dropdown(
-            options=list(self._manager.config.training_history),
+            options=list(self.model_manager.model.training_history),
             description="Choose history type:",
             style={"description_width": "initial"},
         )
@@ -54,7 +54,7 @@ class PlotHistoryWidget(iw.VBox):
     def _on_plot_button_clicked(self, _) -> None:
         self.plot_output.clear_output(wait=True)
 
-        if not self._manager.config.training_history:
+        if not self.model_manager.model.training_history:
             with self.plot_output:
                 print("Please, train the model first!\u274C")
             return
@@ -69,11 +69,13 @@ class PlotHistoryWidget(iw.VBox):
             return
 
         with self.plot_output:
-            self._manager.plot_history(
+            self.model_manager.plot_history(
                 y=history_type, color=line_color, same_figure=same_figure
             )
 
     def _on_widget_state_change(self) -> None:
         self.plot_output.clear_output(wait=True)
 
-        self.history_type_dropdown.options = list(self._manager.config.training_history)
+        self.history_type_dropdown.options = list(
+            self.model_manager.model.training_history
+        )

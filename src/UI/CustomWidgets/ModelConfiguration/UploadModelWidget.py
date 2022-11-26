@@ -4,7 +4,7 @@ import ipywidgets as iw
 from ipyfilechooser import FileChooser
 
 
-class Manager(Protocol):
+class ModelManager(Protocol):
     """Protocol for model managers."""
 
     def upload_model(self, file_chooser: Any, output_handler: Any) -> None:
@@ -16,9 +16,9 @@ class UploadModelWidget(iw.VBox):
 
     name = "Upload Model"
 
-    def __init__(self, manager: Manager, **kwargs) -> None:
+    def __init__(self, model_manager: ModelManager, **kwargs) -> None:
         """Initialize the upload model widget window."""
-        self._manager = manager
+        self.model_manager = model_manager
 
         self.file_chooser_label = iw.Label(value="Please, select your model:")
         self.file_chooser = FileChooser(
@@ -41,6 +41,6 @@ class UploadModelWidget(iw.VBox):
 
     def _on_upload_model_button_clicked(self, _) -> None:
         """Callback for upload model button."""
-        self._manager.upload_model(
+        self.model_manager.upload_model(
             file_chooser=self.file_chooser, output_handler=self.upload_model_status
         )

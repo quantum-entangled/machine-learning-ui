@@ -1,26 +1,18 @@
-from typing import Any, Protocol
+from typing import Any
 
 import tensorflow as tf
+from bqplot import pyplot as bqplt
 from IPython.display import display
 
-
-class Model(Protocol):
-    """Protocol for models."""
-
-    name: str | None
-    instance: Any
-    layers: dict[Any, Any]
-    input_shapes: dict[Any, Any]
-    output_shapes: dict[Any, Any]
-    input_names: list[str]
-    output_names: list[str]
+from DataClasses import Data, Model
 
 
 class ModelManager:
     """Manager for operating the model configuration."""
 
-    def __init__(self, model: Model) -> None:
+    def __init__(self, data: Data, model: Model) -> None:
         """Initialize the internal model object."""
+        self._data = data
         self._model = model
 
     def create_model(self, model_name: str, output_handler: Any) -> None:
@@ -223,6 +215,83 @@ class ModelManager:
             )
             output_handler.clear_output()
             print("Your model is successfully saved!\u2705")
+
+    def select_optimizer(self, instance: Any, **kwargs) -> None:
+        self._model.optimizer = instance(**kwargs)
+
+    def add_loss(self, layer_name: str, loss: Any) -> None:
+        self._model.losses.update({layer_name: loss})
+
+    def add_metric(self, layer_name: str, metric: Any) -> None:
+        self._model.metrics.update({layer_name: metric})
+
+    def add_callback(self, instance: Any, **kwargs) -> None:
+        self._model.callbacks += [instance(**kwargs)]
+
+    def compile_model(self) -> None:
+        self._model.instance.compile(
+            optimizer=self._model.optimizer,
+            loss=self._model.losses,
+            metrics=self._model.metrics,
+        )
+
+    def check_shapes(self) -> str:
+        for layer_name in list(
+            self._data.input_training_columns | self._data.output_training_columns
+        ):
+            if layer_name in self._model.input_shapes:
+                shape = self._model.input_shapes[layer_name]
+            else:
+                shape = self._model.output_shapes[layer_name]
+
+            if self._data.num_columns_per_layer[layer_name] < shape:
+                return layer_name
+
+        return str()
+
+    def fit_model(
+        self, batch_size: int, num_epochs: int, validation_split: float
+    ) -> None:
+        history = self._model.instance.fit(
+            x={
+                layer_name: self._data.file[
+                    :, self._data.input_training_columns[layer_name]
+                ]
+                for layer_name in self._data.input_training_columns.keys()
+            },
+            y={
+                layer_name: self._data.file[
+                    :, self._data.output_training_columns[layer_name]
+                ]
+                for layer_name in self._data.output_training_columns.keys()
+            },
+            batch_size=batch_size,
+            epochs=num_epochs,
+            validation_split=validation_split,
+            callbacks=self._model.callbacks,
+            verbose=1,
+        )
+
+        self._model.training_history = history.history
+
+    def plot_history(self, y: Any, color: Any, same_figure: bool) -> None:
+        y_data = self._model.training_history[y]
+        x_data = [i + 1 for i, _ in enumerate(y_data)]
+
+        if same_figure:
+            fig = bqplt.current_figure()
+        else:
+            fig = bqplt.figure()
+
+        fig.min_aspect_ratio = 1
+        fig.max_aspect_ratio = 1
+        fig.fig_margin = {"top": 5, "bottom": 35, "left": 40, "right": 5}
+
+        bqplt.plot(x=x_data, y=y_data, colors=[color], labels=[y], figure=fig)
+        bqplt.xlabel("Epoch")
+        bqplt.xlim(min=min(x_data) - 1, max=max(x_data) + 1)
+        bqplt.legend()
+        bqplt.show()
 
     @property
     def model(self) -> Model:

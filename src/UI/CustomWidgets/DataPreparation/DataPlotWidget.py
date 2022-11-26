@@ -3,7 +3,7 @@ from typing import Any, Protocol
 import ipywidgets as iw
 
 
-class Manager(Protocol):
+class DataManager(Protocol):
     """Protocol for data managers."""
 
     def show_data_plot(self, output_handler: Any) -> None:
@@ -15,9 +15,9 @@ class DataPlotWidget(iw.VBox):
 
     name = "Show Data Plot"
 
-    def __init__(self, manager: Manager, **kwargs) -> None:
+    def __init__(self, data_manager: DataManager, **kwargs) -> None:
         """Initialize the data plot widget window."""
-        self._manager = manager
+        self.data_manager = data_manager
 
         self.show_plot_button = iw.Button(description="Show Data Plot")
         self.plot_output = iw.Output()
@@ -26,4 +26,4 @@ class DataPlotWidget(iw.VBox):
         super().__init__(children=[self.show_plot_button, self.plot_output], **kwargs)
 
     def _on_show_plot_button_clicked(self, _) -> None:
-        self._manager.show_data_plot(output_handler=self.plot_output)
+        self.data_manager.show_data_plot(output_handler=self.plot_output)

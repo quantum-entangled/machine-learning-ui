@@ -3,7 +3,7 @@ from typing import Any, Protocol
 import ipywidgets as iw
 
 
-class Manager(Protocol):
+class ModelManager(Protocol):
     """Protocol for model managers."""
 
     def create_model(self, model_name: Any, output_handler: Any) -> None:
@@ -15,9 +15,9 @@ class CreateModelWidget(iw.VBox):
 
     name = "Create Model"
 
-    def __init__(self, manager: Manager, **kwargs) -> None:
+    def __init__(self, model_manager: ModelManager, **kwargs) -> None:
         """Initialize the create model widget window."""
-        self._manager = manager
+        self.model_manager = model_manager
 
         self.model_name = iw.Text(
             value="",
@@ -39,6 +39,6 @@ class CreateModelWidget(iw.VBox):
 
     def _on_create_model_button_clicked(self, _) -> None:
         """Callback for create model button."""
-        self._manager.create_model(
+        self.model_manager.create_model(
             model_name=self.model_name.value, output_handler=self.create_model_status
         )

@@ -8,9 +8,7 @@ class DenseLayerWidget(iw.VBox):
 
     name = "Dense Layer"
 
-    def __init__(self, manager: Any, **kwargs) -> None:
-        self._manager = manager
-
+    def __init__(self, **kwargs) -> None:
         self.layer_name = iw.Text(
             value="",
             description="Layer name:",
@@ -31,7 +29,7 @@ class DenseLayerWidget(iw.VBox):
             style={"description_width": "initial"},
         )
         self.connect_dropdown = iw.Dropdown(
-            options=list(self._manager.model.layers),
+            options=list(kwargs["model_layers"]),
             description="Connect layer to:",
             style={"description_width": "initial"},
         )

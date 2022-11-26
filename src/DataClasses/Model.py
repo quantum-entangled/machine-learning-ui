@@ -13,3 +13,8 @@ class Model:
     output_shapes: dict[Any, Any] = field(default_factory=dict)
     input_names: list[str] = field(default_factory=list)
     output_names: list[str] = field(default_factory=list)
+    optimizer: Any = None
+    losses: dict[Any, Any] = field(default_factory=dict)
+    metrics: dict[Any, Any] = field(default_factory=dict)
+    callbacks: list[Any] = field(default_factory=list)
+    training_history: dict[Any, Any] = field(default_factory=dict)

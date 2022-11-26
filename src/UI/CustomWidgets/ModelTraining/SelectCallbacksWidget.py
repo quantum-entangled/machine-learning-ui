@@ -6,7 +6,7 @@ from IPython.display import display
 from Enums.Callbacks import callbacks
 
 
-class Manager(Protocol):
+class ModelManager(Protocol):
     """Protocol for training managers."""
 
     @property
@@ -21,8 +21,8 @@ class SelectCallbackWidget(iw.VBox):
 
     name = "Select Model Callbacks"
 
-    def __init__(self, manager: Manager, **kwargs):
-        self._manager = manager
+    def __init__(self, model_manager: ModelManager, **kwargs):
+        self.model_manager = model_manager
 
         self.callback_dropdown = iw.Dropdown(
             options=list(callbacks),
@@ -39,7 +39,7 @@ class SelectCallbackWidget(iw.VBox):
 
         self._current_callback = callbacks[self.callback_dropdown.value]
         self._current_callback_widget = self._current_callback.widget(
-            manager=self._manager
+            manager=self.model_manager
         )
         self.callback_widget.append_display_data(self._current_callback_widget)
 
@@ -69,18 +69,18 @@ class SelectCallbackWidget(iw.VBox):
     def _on_add_callback_button_clicked(self, _) -> None:
         self.callback_status.clear_output(wait=True)
 
-        if not self._manager.model.instance:
+        if not self.model_manager.model.instance:
             with self.callback_status:
                 print("Please, upload the model first!\u274C")
             return
 
         if self._current_callback_widget is not None:
-            self._manager.add_callback(
+            self.model_manager.add_callback(
                 instance=self._current_callback.instance,
                 **self._current_callback_widget.params,
             )
         else:
-            self._manager.add_callback(
+            self.model_manager.add_callback(
                 instance=self._current_callback.instance,
             )
 

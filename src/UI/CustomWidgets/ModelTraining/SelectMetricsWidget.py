@@ -5,7 +5,7 @@ import ipywidgets as iw
 from Enums.Metrics import metrics
 
 
-class Manager(Protocol):
+class ModelManager(Protocol):
     """Protocol for training managers."""
 
     @property
@@ -20,11 +20,11 @@ class SelectMetricsWidget(iw.VBox):
 
     name = "Select Model Metrics"
 
-    def __init__(self, manager: Manager, **kwargs):
-        self._manager = manager
+    def __init__(self, model_manager: ModelManager, **kwargs):
+        self.model_manager = model_manager
 
         self.layer_dropdown = iw.Dropdown(
-            options=list(self._manager.model.output_names),
+            options=list(self.model_manager.model.output_names),
             description="Choose layer:",
             style={"description_width": "initial"},
         )
@@ -50,7 +50,7 @@ class SelectMetricsWidget(iw.VBox):
     def _on_add_metric_button_clicked(self, _) -> None:
         self.metric_status.clear_output(wait=True)
 
-        if not self._manager.model.instance:
+        if not self.model_manager.model.instance:
             with self.metric_status:
                 print("Please, upload the model first!\u274C")
             return
@@ -60,7 +60,7 @@ class SelectMetricsWidget(iw.VBox):
                 print("There are no output layers in the model!\u274C")
             return
 
-        self._manager.add_metric(
+        self.model_manager.add_metric(
             layer_name=self.layer_dropdown.value,
             metric=metrics[self.metric_dropdown.value](),
         )
@@ -71,7 +71,7 @@ class SelectMetricsWidget(iw.VBox):
     def _on_widget_state_change(self) -> None:
         self.metric_status.clear_output(wait=True)
 
-        options = self._manager.model.output_names
+        options = self.model_manager.model.output_names
 
         if options:
             self.layer_dropdown.options = options

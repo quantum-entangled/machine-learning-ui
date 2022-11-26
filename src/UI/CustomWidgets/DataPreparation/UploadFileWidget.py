@@ -4,7 +4,7 @@ import ipywidgets as iw
 from ipyfilechooser import FileChooser
 
 
-class Manager(Protocol):
+class DataManager(Protocol):
     """Protocol for data managers."""
 
     def upload_file(self, file_chooser: Any, output_handler: Any) -> None:
@@ -16,9 +16,9 @@ class UploadFileWidget(iw.VBox):
 
     name = "Upload File"
 
-    def __init__(self, manager: Manager, **kwargs) -> None:
+    def __init__(self, data_manager: DataManager, **kwargs) -> None:
         """Initialize the upload file widget window."""
-        self._manager = manager
+        self.data_manager = data_manager
 
         self.file_chooser_label = iw.Label(value="Please, select your data file:")
         self.file_chooser = FileChooser(
@@ -40,6 +40,6 @@ class UploadFileWidget(iw.VBox):
 
     def _on_upload_button_clicked(self, _) -> None:
         """Callback for upload file button."""
-        self._manager.upload_file(
+        self.data_manager.upload_file(
             file_chooser=self.file_chooser, output_handler=self.upload_status
         )

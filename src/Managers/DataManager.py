@@ -1,4 +1,4 @@
-from typing import Any, Protocol
+from typing import Any
 
 import ipywidgets as iw
 import numpy as np
@@ -7,20 +7,16 @@ from bqplot import Toolbar
 from bqplot import pyplot as plt
 from IPython.display import display
 
-
-class Data(Protocol):
-    """Protocol for data files."""
-
-    file: Any
-    headers: list[Any]
+from DataClasses import Data, Model
 
 
 class DataManager:
     """Manager for data preperation."""
 
-    def __init__(self, data: Data) -> None:
-        """Initialize the internal model object."""
+    def __init__(self, data: Data, model: Model) -> None:
+        """Initialize the internal data object."""
         self._data = data
+        self._model = model
 
     def upload_file(self, file_chooser: Any, output_handler: Any) -> None:
         """Read file to the pandas format and store it."""
@@ -100,6 +96,39 @@ class DataManager:
 
         with output_handler:
             display(plot_window)
+
+    def get_num_columns_per_layer(self, layer_name: str) -> int:
+        if layer_name not in self._data.num_columns_per_layer.keys():
+            self._data.num_columns_per_layer.update({layer_name: 0})
+
+        return self._data.num_columns_per_layer[layer_name]
+
+    def set_num_columns_per_layer(self, layer_name: str, num_columns: int) -> None:
+        self._data.num_columns_per_layer[layer_name] += num_columns
+
+    def add_model_columns(
+        self, layer_type: str, layer_name: str, from_column: Any, to_column: Any
+    ) -> None:
+        if layer_type == "input":
+            if layer_name not in self._data.input_training_columns.keys():
+                self._data.input_training_columns[layer_name] = list()
+
+            self._data.input_training_columns[layer_name] = sorted(
+                set(
+                    self._data.input_training_columns[layer_name]
+                    + list(range(from_column, to_column))
+                )
+            )
+        else:
+            if layer_name not in self._data.output_training_columns.keys():
+                self._data.output_training_columns[layer_name] = list()
+
+            self._data.output_training_columns[layer_name] = sorted(
+                set(
+                    self._data.output_training_columns[layer_name]
+                    + list(range(from_column, to_column))
+                )
+            )
 
     @property
     def data(self) -> Data:

@@ -6,8 +6,12 @@ from IPython.display import display
 from Enums.Layers import layers
 
 
-class Manager(Protocol):
+class ModelManager(Protocol):
     """Protocol for model managers."""
+
+    @property
+    def model(self) -> Any:
+        ...
 
     def add_layer(
         self,
@@ -28,9 +32,9 @@ class ManageLayersWidget(iw.VBox):
 
     name = "Manage Layers"
 
-    def __init__(self, manager: Manager, **kwargs) -> None:
+    def __init__(self, model_manager: ModelManager, **kwargs) -> None:
         """Initialize the manage layers widget window."""
-        self._manager = manager
+        self.model_manager = model_manager
 
         self.layer_type_dropdown = iw.Dropdown(
             options=list(layers),
@@ -47,7 +51,9 @@ class ManageLayersWidget(iw.VBox):
         self.model_summary_output = iw.Output()
 
         self._current_layer = layers[self.layer_type_dropdown.value]
-        self._current_layer_widget = self._current_layer.widget(manager=self._manager)
+        self._current_layer_widget = self._current_layer.widget(
+            model_layers=self.model_manager.model.layers
+        )
         self.layer_widget_output.append_display_data(self._current_layer_widget)
 
         super().__init__(
@@ -66,14 +72,14 @@ class ManageLayersWidget(iw.VBox):
         with self.layer_widget_output:
             self._current_layer = layers[change["new"]]
             self._current_layer_widget = self._current_layer.widget(
-                manager=self._manager
+                model_layers=self.model_manager.model.layers
             )
             display(self._current_layer_widget)
 
     def _on_add_layer_button_clicked(self, _) -> None:
         layer_type = self.layer_type_dropdown.value
 
-        self._manager.add_layer(
+        self.model_manager.add_layer(
             layer_type=layer_type,
             instance=self._current_layer.instance,
             connect_to=self._current_layer_widget.connect,
@@ -81,12 +87,12 @@ class ManageLayersWidget(iw.VBox):
             **self._current_layer_widget.params,
         )
 
-        self._manager.show_model_summary(output_handler=self.model_summary_output)
+        self.model_manager.show_model_summary(output_handler=self.model_summary_output)
 
         self.layer_widget_output.clear_output(wait=True)
 
         with self.layer_widget_output:
             self._current_layer_widget = self._current_layer.widget(
-                manager=self._manager
+                model_layers=self.model_manager.model.layers
             )
             display(self._current_layer_widget)

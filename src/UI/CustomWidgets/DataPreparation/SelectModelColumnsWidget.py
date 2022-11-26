@@ -7,15 +7,16 @@ class SelectModelColumnsWidget(iw.VBox):
 
     name = "Select Model Columns"
 
-    def __init__(self, manager: Any, **kwargs) -> None:
-        self.manager = manager
+    def __init__(self, data_manager: Any, model_manager: Any, **kwargs) -> None:
+        self.data_manager = data_manager
+        self.model_manager = model_manager
 
         self.layer_type_dropdown = iw.Dropdown(
             description="Choose layer type:",
             style={"description_width": "initial"},
         )
         self.layer_dropdown = iw.Dropdown(
-            options=self.manager.model.input_names,
+            options=self.model_manager.model.input_names,
             description="Choose layer:",
             style={"description_width": "initial"},
         )
@@ -23,14 +24,16 @@ class SelectModelColumnsWidget(iw.VBox):
         self.columns_label = iw.Label(value="Choose data columns for this layer:")
         self.from_column_dropdown = iw.Dropdown(
             options=[
-                (header, pos) for pos, header in enumerate(self.manager.data.headers)
+                (header, pos)
+                for pos, header in enumerate(self.data_manager.data.headers)
             ],
             description="From:",
             style={"description_width": "initial"},
         )
         self.to_column_dropdown = iw.Dropdown(
             options=[
-                (header, pos) for pos, header in enumerate(self.manager.data.headers)
+                (header, pos)
+                for pos, header in enumerate(self.data_manager.data.headers)
             ],
             description="To:",
             style={"description_width": "initial"},
@@ -69,12 +72,12 @@ class SelectModelColumnsWidget(iw.VBox):
         self.layer = self.layer_dropdown.value
 
     def _set_layer_shape_status(self) -> None:
-        if self.layer in self.manager.model.input_shapes:
-            shape = self.manager.model.input_shapes[self.layer]
+        if self.layer in self.model_manager.model.input_shapes:
+            shape = self.model_manager.model.input_shapes[self.layer]
         else:
-            shape = self.manager.model.output_shapes[self.layer]
+            shape = self.model_manager.model.output_shapes[self.layer]
 
-        self.layer_shape_status.value = f"Filled layer nodes: {self.manager.get_num_columns_per_layer(self.layer)}/{shape}"
+        self.layer_shape_status.value = f"Filled layer nodes: {self.data_manager.get_num_columns_per_layer(self.layer)}/{shape}"
 
     def _get_selected_columns_num(self) -> int:
         options_from = list(self.from_column_dropdown.options)
@@ -84,11 +87,11 @@ class SelectModelColumnsWidget(iw.VBox):
             return 0
 
         pair_from = (
-            self.manager.data.headers[self.from_column_dropdown.value],
+            self.data_manager.data.headers[self.from_column_dropdown.value],
             self.from_column_dropdown.value,
         )
         pair_to = (
-            self.manager.data.headers[self.to_column_dropdown.value],
+            self.data_manager.data.headers[self.to_column_dropdown.value],
             self.to_column_dropdown.value,
         )
 
@@ -101,11 +104,11 @@ class SelectModelColumnsWidget(iw.VBox):
 
     def _on_layer_type_dropdown_value_change(self, change: Any) -> None:
         if change["new"] == "input":
-            self.layer_dropdown.options = self.manager.model.input_names
-            self.layer_dropdown.value = self.manager.model.input_names[0]
+            self.layer_dropdown.options = self.model_manager.model.input_names
+            self.layer_dropdown.value = self.model_manager.model.input_names[0]
         else:
-            self.layer_dropdown.options = self.manager.model.output_names
-            self.layer_dropdown.value = self.manager.model.output_names[0]
+            self.layer_dropdown.options = self.model_manager.model.output_names
+            self.layer_dropdown.value = self.model_manager.model.output_names[0]
 
     def _on_layer_dropdown_value_change(self, change: Any) -> None:
         self.layer = change["new"]
@@ -129,17 +132,17 @@ class SelectModelColumnsWidget(iw.VBox):
     def _on_add_columns_button_clicked(self, _) -> None:
         self.add_columns_status.clear_output(wait=True)
 
-        if self.manager.data.file is None:
+        if self.data_manager.data.file is None:
             with self.add_columns_status:
                 print("Please, upload the file first!\u274C")
             return
 
-        if self.manager.model.instance is None:
+        if self.model_manager.model.instance is None:
             with self.add_columns_status:
                 print("Please, upload the model first!\u274C")
             return
 
-        if not self.manager.model.layers:
+        if not self.model_manager.model.layers:
             with self.add_columns_status:
                 print("There are no layers in the model!\u274C")
             return
@@ -160,25 +163,28 @@ class SelectModelColumnsWidget(iw.VBox):
         if to_index < from_index:
             from_index, to_index = to_index, from_index
 
-        if self.layer in self.manager.model.input_shapes:
-            shape = self.manager.model.input_shapes[self.layer]
+        if self.layer in self.model_manager.model.input_shapes:
+            shape = self.model_manager.model.input_shapes[self.layer]
         else:
-            shape = self.manager.model.output_shapes[self.layer]
+            shape = self.model_manager.model.output_shapes[self.layer]
 
         columns_range = to_index - from_index + 1
 
-        if columns_range + self.manager.get_num_columns_per_layer(self.layer) > shape:
+        if (
+            columns_range + self.data_manager.get_num_columns_per_layer(self.layer)
+            > shape
+        ):
             with self.add_columns_status:
                 print("You've selected more columns than the layer can accept!\u274C")
             return
 
-        self.manager.add_model_columns(
+        self.data_manager.add_model_columns(
             layer_type=self.layer_type_dropdown.value,
             layer_name=self.layer,
             from_column=from_index,
             to_column=to_index + 1,
         )
-        self.manager.set_num_columns_per_layer(
+        self.data_manager.set_num_columns_per_layer(
             layer_name=self.layer, num_columns=columns_range
         )
 
@@ -192,17 +198,17 @@ class SelectModelColumnsWidget(iw.VBox):
         self.add_columns_status.clear_output()
 
         if (
-            not self.manager.data.headers
-            or not self.manager.model.input_names
-            or not self.manager.model.output_names
+            not self.data_manager.data.headers
+            or not self.model_manager.model.input_names
+            or not self.model_manager.model.output_names
         ):
             return
 
-        if sum(self.manager.config.num_columns_per_layer.values()) > 0:
+        if sum(self.data_manager.data.num_columns_per_layer.values()) > 0:
             return
 
         from_to_options = [
-            (header, pos) for pos, header in enumerate(self.manager.data.headers)
+            (header, pos) for pos, header in enumerate(self.data_manager.data.headers)
         ]
 
         self.layer_type_dropdown.options = ["input", "output"]

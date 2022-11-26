@@ -7,9 +7,7 @@ class InputLayerWidget(iw.VBox):
 
     name = "Input Layer"
 
-    def __init__(self, manager: Any, **kwargs) -> None:
-        self._manager = manager
-
+    def __init__(self, **kwargs) -> None:
         self.layer_name = iw.Text(
             value="",
             description="Layer name:",

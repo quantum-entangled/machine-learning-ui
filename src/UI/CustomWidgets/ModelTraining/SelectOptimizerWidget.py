@@ -6,7 +6,7 @@ from IPython.display import display
 from Enums.Optimizers import optimizers
 
 
-class Manager(Protocol):
+class ModelManager(Protocol):
     """Protocol for training managers."""
 
     @property
@@ -21,8 +21,8 @@ class SelectOptimizerWidget(iw.VBox):
 
     name = "Select Model Optimizer"
 
-    def __init__(self, manager: Manager, **kwargs):
-        self._manager = manager
+    def __init__(self, model_manager: ModelManager, **kwargs):
+        self.model_manager = model_manager
 
         self.optimizer_dropdown = iw.Dropdown(
             options=list(optimizers),
@@ -38,9 +38,7 @@ class SelectOptimizerWidget(iw.VBox):
         self.optimizer_status = iw.Output()
 
         self._current_optimizer = optimizers[self.optimizer_dropdown.value]
-        self._current_optimizer_widget = self._current_optimizer.widget(
-            manager=self._manager
-        )
+        self._current_optimizer_widget = self._current_optimizer.widget()
         self.optimizer_widget.append_display_data(self._current_optimizer_widget)
 
         super().__init__(
@@ -64,12 +62,12 @@ class SelectOptimizerWidget(iw.VBox):
     def _on_select_optimizer_button_clicked(self, _) -> None:
         self.optimizer_status.clear_output(wait=True)
 
-        if not self._manager.model.instance:
+        if not self.model_manager.model.instance:
             with self.optimizer_status:
                 print("Please, upload the model first!\u274C")
             return
 
-        self._manager.select_optimizer(
+        self.model_manager.select_optimizer(
             instance=self._current_optimizer.instance,
             **self._current_optimizer_widget.params,
         )

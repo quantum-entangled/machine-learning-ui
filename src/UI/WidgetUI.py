@@ -1,4 +1,4 @@
-from typing import Any, Mapping, Protocol, Sequence
+from typing import Any, Protocol
 
 
 class ChildWidget(Protocol):
@@ -29,8 +29,8 @@ class WidgetUI:
     def __init__(
         self,
         widget: Widget,
-        widget_children: Sequence[ChildWidget],
-        widget_params: Mapping[str, Any],
+        widget_children: list[ChildWidget],
+        widget_params: dict[str, Any],
         **kwargs
     ) -> None:
         """Initialize the UI."""

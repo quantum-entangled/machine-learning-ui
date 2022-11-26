@@ -4,7 +4,7 @@ import ipywidgets as iw
 from ipydatagrid import DataGrid
 
 
-class Manager(Protocol):
+class DataManager(Protocol):
     """Protocol for data managers."""
 
     def show_data_grid(self, grid_class: Any, output_handler: Any) -> None:
@@ -16,9 +16,9 @@ class DataGridWidget(iw.VBox):
 
     name = "Show Data Grid"
 
-    def __init__(self, manager: Manager, **kwargs) -> None:
+    def __init__(self, data_manager: DataManager, **kwargs) -> None:
         """Initialize the data grid widget window."""
-        self._manager = manager
+        self.data_manager = data_manager
 
         self.show_grid_button = iw.Button(description="Show Data Grid")
         self.grid_output = iw.Output()
@@ -27,6 +27,6 @@ class DataGridWidget(iw.VBox):
         super().__init__(children=[self.show_grid_button, self.grid_output], **kwargs)
 
     def _on_show_grid_button_clicked(self, _) -> None:
-        self._manager.show_data_grid(
+        self.data_manager.show_data_grid(
             grid_class=DataGrid, output_handler=self.grid_output
         )
