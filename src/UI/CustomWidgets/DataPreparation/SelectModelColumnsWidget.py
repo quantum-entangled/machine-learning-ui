@@ -25,7 +25,7 @@ class SelectModelColumnsWidget(iw.VBox):
         self.from_column_dropdown = iw.Dropdown(
             options=[
                 (header, pos)
-                for pos, header in enumerate(self.data_manager.data.headers)
+                for pos, header in enumerate(self.data_manager.data.columns)
             ],
             description="From:",
             style={"description_width": "initial"},
@@ -33,7 +33,7 @@ class SelectModelColumnsWidget(iw.VBox):
         self.to_column_dropdown = iw.Dropdown(
             options=[
                 (header, pos)
-                for pos, header in enumerate(self.data_manager.data.headers)
+                for pos, header in enumerate(self.data_manager.data.columns)
             ],
             description="To:",
             style={"description_width": "initial"},
@@ -87,11 +87,11 @@ class SelectModelColumnsWidget(iw.VBox):
             return 0
 
         pair_from = (
-            self.data_manager.data.headers[self.from_column_dropdown.value],
+            self.data_manager.data.columns[self.from_column_dropdown.value],
             self.from_column_dropdown.value,
         )
         pair_to = (
-            self.data_manager.data.headers[self.to_column_dropdown.value],
+            self.data_manager.data.columns[self.to_column_dropdown.value],
             self.to_column_dropdown.value,
         )
 
@@ -198,7 +198,7 @@ class SelectModelColumnsWidget(iw.VBox):
         self.add_columns_status.clear_output()
 
         if (
-            not self.data_manager.data.headers
+            not self.data_manager.data.columns
             or not self.model_manager.model.input_names
             or not self.model_manager.model.output_names
         ):
@@ -208,7 +208,7 @@ class SelectModelColumnsWidget(iw.VBox):
             return
 
         from_to_options = [
-            (header, pos) for pos, header in enumerate(self.data_manager.data.headers)
+            (header, pos) for pos, header in enumerate(self.data_manager.data.columns)
         ]
 
         self.layer_type_dropdown.options = ["input", "output"]

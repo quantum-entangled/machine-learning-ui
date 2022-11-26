@@ -30,7 +30,7 @@ class DataManager:
             return
 
         self._data.file = np.loadtxt(file_path, skiprows=1)
-        self._data.headers = list(
+        self._data.columns = list(
             pd.read_csv(file_path, nrows=1, header=0, sep="[ ]{1,}", engine="python")
         )
 
@@ -50,7 +50,7 @@ class DataManager:
                 print("Please, upload the file first!\u274C")
                 return
 
-            df = pd.DataFrame(data=self._data.file, columns=self._data.headers)
+            df = pd.DataFrame(data=self._data.file, columns=self._data.columns)
             dg = grid_class(dataframe=df)
             display(dg)
 
@@ -63,8 +63,8 @@ class DataManager:
                 print("Please, upload the file first!\u274C")
             return
 
-        headers = self._data.headers
-        dropdown_options = [(header, pos) for pos, header in enumerate(headers)]
+        columns = self._data.columns
+        dropdown_options = [(header, pos) for pos, header in enumerate(columns)]
         x_dropdown = iw.Dropdown(description="x", options=dropdown_options, value=0)
         y_dropdown = iw.Dropdown(description="y", options=dropdown_options, value=0)
 
@@ -74,14 +74,14 @@ class DataManager:
             self._data.file[:, y_dropdown.value],
             figure=fig,
         )
-        plt.xlabel(headers[x_dropdown.value])
-        plt.ylabel(headers[y_dropdown.value])
+        plt.xlabel(columns[x_dropdown.value])
+        plt.ylabel(columns[y_dropdown.value])
 
         def on_dropdown_value_change(*args):
             plt.current_figure().marks[0].x = self._data.file[:, x_dropdown.value]
             plt.current_figure().marks[0].y = self._data.file[:, y_dropdown.value]
-            plt.xlabel(headers[x_dropdown.value])
-            plt.ylabel(headers[y_dropdown.value])
+            plt.xlabel(columns[x_dropdown.value])
+            plt.ylabel(columns[y_dropdown.value])
 
         x_dropdown.observe(on_dropdown_value_change, names="value")
         y_dropdown.observe(on_dropdown_value_change, names="value")
