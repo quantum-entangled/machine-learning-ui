@@ -9,6 +9,7 @@ class Model:
     name: str | None = None
     instance: Any = None
     layers: dict[Any, Any] = field(default_factory=dict)
-    layers_shapes: dict[Any, Any] = field(default_factory=dict)
+    input_shapes: dict[Any, Any] = field(default_factory=dict)
+    output_shapes: dict[Any, Any] = field(default_factory=dict)
     input_names: list[str] = field(default_factory=list)
     output_names: list[str] = field(default_factory=list)

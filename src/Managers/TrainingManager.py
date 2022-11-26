@@ -17,7 +17,8 @@ class Model(Protocol):
     name: str | None
     instance: Any
     layers: dict[Any, Any]
-    layers_shapes: dict[Any, Any]
+    input_shapes: dict[Any, Any]
+    output_shapes: dict[Any, Any]
     input_names: list[str]
     output_names: list[str]
 
@@ -76,14 +77,16 @@ class TrainingManager:
             file_chooser=file_chooser, output_handler=output_handler
         )
 
-    def set_num_columns_per_layer(self, layer_name: str) -> None:
+    def get_num_columns_per_layer(self, layer_name: str) -> int:
         if layer_name not in self._config.num_columns_per_layer.keys():
             self._config.num_columns_per_layer.update({layer_name: 0})
 
-    def update_num_columns_per_layer(self, layer_name: str, num_columns: int) -> None:
+        return self._config.num_columns_per_layer[layer_name]
+
+    def set_num_columns_per_layer(self, layer_name: str, num_columns: int) -> None:
         self._config.num_columns_per_layer[layer_name] += num_columns
 
-    def add_training_columns(
+    def add_model_columns(
         self, layer_type: str, layer_name: str, from_column: Any, to_column: Any
     ) -> None:
         if layer_type == "input":
@@ -120,7 +123,7 @@ class TrainingManager:
         self._config.callbacks += [instance(**kwargs)]
 
     def compile_model(self) -> None:
-        self._model_manager._model.instance.compile(
+        self._model_manager.model.instance.compile(
             optimizer=self._config.optimizer,
             loss=self._config.losses,
             metrics=self._config.metrics,
@@ -130,10 +133,12 @@ class TrainingManager:
         for layer_name in list(
             self._config.input_training_columns | self._config.output_training_columns
         ):
-            if (
-                self._config.num_columns_per_layer[layer_name]
-                < self._model_manager.model.layers_shapes[layer_name]
-            ):
+            if layer_name in self._model_manager.model.input_shapes:
+                shape = self._model_manager.model.input_shapes[layer_name]
+            else:
+                shape = self._model_manager.model.output_shapes[layer_name]
+
+            if self._config.num_columns_per_layer[layer_name] < shape:
                 return layer_name
 
         return str()
