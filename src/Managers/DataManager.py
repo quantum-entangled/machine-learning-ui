@@ -6,6 +6,7 @@ import pandas as pd
 from bqplot import Toolbar
 from bqplot import pyplot as plt
 from ipydatagrid import DataGrid
+from ipyfilechooser import FileChooser
 from IPython.display import display
 
 from DataClasses import Data, Model
@@ -21,28 +22,21 @@ class DataManager:
         self._data = data
         self._model = model
 
-    def upload_file(self, file_chooser: Any, output_handler: Any) -> None:
+    def upload_file(self, file_chooser: FileChooser) -> None:
         """Read file to the pandas format and store it."""
-        output_handler.clear_output(wait=True)
 
-        file_path = self.get_file_path(file_chooser=file_chooser)
+        file_path = file_chooser.selected
 
         if file_path is None:
-            with output_handler:
-                print("Please, select the file first!\u274C")
+            print(Error.NO_FILE_PATH)
             return
 
-        self._data.file = np.loadtxt(file_path, skiprows=1)
-        self._data.columns = list(
-            pd.read_csv(file_path, nrows=1, header=0, sep="[ ]{1,}", engine="python")
+        self._data.file = pd.read_csv(
+            filepath_or_buffer=file_path, header=0, skipinitialspace=True
         )
+        self._data.columns = list(self._data.file.columns)
 
-        with output_handler:
-            print("Your file is successfully uploaded!\u2705")
-
-    def get_file_path(self, file_chooser: Any) -> Any:
-        """Get a data file path via the given file chooser."""
-        return file_chooser.selected
+        print(Success.FILE_UPLOADED)
 
     def show_data_grid(self) -> None:
         """Show the file data grid."""
@@ -51,9 +45,7 @@ class DataManager:
             print(Error.NO_FILE_UPLOADED)
             return
 
-        df = pd.DataFrame(data=self._data.file, columns=self._data.columns)
-        dg = DataGrid(dataframe=df)
-        display(dg)
+        display(DataGrid(dataframe=self._data.file))
 
     def show_data_plot(self, output_handler: Any) -> None:
         """Show data plot."""

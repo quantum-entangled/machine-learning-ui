@@ -1,4 +1,4 @@
-from typing import Any, Protocol
+from typing import Protocol
 
 import ipywidgets as iw
 from ipyfilechooser import FileChooser
@@ -7,7 +7,7 @@ from ipyfilechooser import FileChooser
 class DataManager(Protocol):
     """Protocol for data managers."""
 
-    def upload_file(self, file_chooser: Any, output_handler: Any) -> None:
+    def upload_file(self, file_chooser: FileChooser) -> None:
         ...
 
 
@@ -20,26 +20,30 @@ class UploadFileWidget(iw.VBox):
         """Initialize the upload file widget window."""
         self.data_manager = data_manager
 
-        self.file_chooser_label = iw.Label(value="Please, select your data file:")
+        # Widgets
         self.file_chooser = FileChooser(
-            path="../db/Datasets", sandbox_path="../db/Datasets", filter_pattern="*.txt"
+            title="Please, select the data file:",
+            path="../db/Datasets",
+            sandbox_path="../db/Datasets",
+            filter_pattern=["*.csv", "*.tsv"],
         )
         self.upload_button = iw.Button(description="Upload File")
         self.upload_status = iw.Output()
 
+        # Callbacks
         self.upload_button.on_click(self._on_upload_button_clicked)
 
         super().__init__(
-            children=[
-                iw.HBox([self.file_chooser_label, self.file_chooser]),
-                self.upload_button,
-                self.upload_status,
-            ],
-            **kwargs
+            children=[self.file_chooser, self.upload_button, self.upload_status]
         )
 
     def _on_upload_button_clicked(self, _) -> None:
         """Callback for upload file button."""
-        self.data_manager.upload_file(
-            file_chooser=self.file_chooser, output_handler=self.upload_status
-        )
+        self.upload_status.clear_output()
+
+        with self.upload_status:
+            self.data_manager.upload_file(file_chooser=self.file_chooser)
+
+    def _on_widget_state_change(self) -> None:
+        """Callback for parent widget ensemble."""
+        self.upload_status.clear_output()
