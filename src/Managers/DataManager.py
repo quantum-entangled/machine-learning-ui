@@ -1,10 +1,8 @@
 from typing import Any
 
-import ipywidgets as iw
 import numpy as np
 import pandas as pd
-from bqplot import Toolbar
-from bqplot import pyplot as plt
+from bqplot import pyplot as bqplt
 from ipydatagrid import DataGrid
 from ipyfilechooser import FileChooser
 from IPython.display import display
@@ -41,54 +39,30 @@ class DataManager:
     def show_data_grid(self) -> None:
         """Show the file data grid."""
 
-        if self._data.file is None:
+        if self._data.file.empty:
             print(Error.NO_FILE_UPLOADED)
             return
 
         display(DataGrid(dataframe=self._data.file))
 
-    def show_data_plot(self, output_handler: Any) -> None:
+    def show_data_plot(self, x: Any, y: Any) -> None:
         """Show data plot."""
-        output_handler.clear_output(wait=True)
 
-        if self._data.file is None:
-            with output_handler:
-                print("Please, upload the file first!\u274C")
+        if self._data.file.empty:
+            print(Error.NO_FILE_UPLOADED)
             return
 
-        columns = self._data.columns
-        dropdown_options = [(header, pos) for pos, header in enumerate(columns)]
-        x_dropdown = iw.Dropdown(description="x", options=dropdown_options, value=0)
-        y_dropdown = iw.Dropdown(description="y", options=dropdown_options, value=0)
+        x_data = self._data.file[x]
+        y_data = self._data.file[y]
 
-        fig = plt.figure()
-        plt.plot(
-            self._data.file[:, x_dropdown.value],
-            self._data.file[:, y_dropdown.value],
-            figure=fig,
-        )
-        plt.xlabel(columns[x_dropdown.value])
-        plt.ylabel(columns[y_dropdown.value])
+        fig = bqplt.figure()
+        fig.min_aspect_ratio = 1
+        fig.max_aspect_ratio = 1
 
-        def on_dropdown_value_change(*args):
-            plt.current_figure().marks[0].x = self._data.file[:, x_dropdown.value]
-            plt.current_figure().marks[0].y = self._data.file[:, y_dropdown.value]
-            plt.xlabel(columns[x_dropdown.value])
-            plt.ylabel(columns[y_dropdown.value])
-
-        x_dropdown.observe(on_dropdown_value_change, names="value")
-        y_dropdown.observe(on_dropdown_value_change, names="value")
-
-        plot_window = iw.TwoByTwoLayout(
-            top_left=iw.VBox([x_dropdown, y_dropdown]),
-            top_right=iw.VBox([fig, Toolbar(figure=fig)]),
-            align_items="center",
-            height="auto",
-            width="auto",
-        )
-
-        with output_handler:
-            display(plot_window)
+        bqplt.plot(x=x_data, y=y_data, figure=fig)
+        bqplt.xlabel(x)
+        bqplt.ylabel(y)
+        bqplt.show()
 
     def get_num_columns_per_layer(self, layer_name: str) -> int:
         if layer_name not in self._data.num_columns_per_layer.keys():
@@ -126,3 +100,7 @@ class DataManager:
     @property
     def data(self) -> Data:
         return self._data
+
+    @property
+    def columns(self) -> list:
+        return self._data.columns
