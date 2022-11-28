@@ -3,6 +3,9 @@ from typing import Protocol
 import ipywidgets as iw
 from ipyfilechooser import FileChooser
 
+from Enums.ErrorMessages import Error
+from Enums.SuccessMessages import Success
+
 
 class DataManager(Protocol):
     """Protocol for data managers."""
@@ -18,6 +21,7 @@ class UploadFileWidget(iw.VBox):
 
     def __init__(self, data_manager: DataManager, **kwargs) -> None:
         """Initialize the upload file widget window."""
+        # Managers
         self.data_manager = data_manager
 
         # Widgets
@@ -42,7 +46,15 @@ class UploadFileWidget(iw.VBox):
         self.upload_status.clear_output()
 
         with self.upload_status:
-            self.data_manager.upload_file(file_chooser=self.file_chooser)
+            file_path = self.file_chooser.selected
+
+            if not file_path:
+                print(Error.NO_FILE_PATH)
+                return
+
+            self.data_manager.upload_file(file_path=file_path)
+
+            print(Success.FILE_UPLOADED)
 
     def _on_widget_state_change(self) -> None:
         """Callback for parent widget ensemble."""

@@ -66,6 +66,15 @@ class ModelManager:
         }
         self._model.input_names = self._model.instance.input_names
         self._model.output_names = self._model.instance.output_names
+        self._model.input_model_columns = {
+            name: list() for name in self._model.input_names
+        }
+        self._model.output_model_columns = {
+            name: list() for name in self._model.output_names
+        }
+        self._model.layers_fullness = {
+            name: 0 for name in self._model.input_names + self._model.output_names
+        }
 
         with output_handler:
             print("Your model is successfully uploaded!\u2705")
@@ -293,6 +302,59 @@ class ModelManager:
         bqplt.legend()
         bqplt.show()
 
+    def add_columns_to_model(
+        self, layer_type: str, layer_name: str, columns: Any
+    ) -> None:
+        if layer_type == "input":
+            self._model.input_model_columns[layer_name].extend(columns)
+        else:
+            self._model.output_model_columns[layer_name].extend(columns)
+
+        self._model.layers_fullness[layer_name] += len(columns)
+
+    def check_layer_capacity(
+        self, layer_type: str, layer_name: str, num_columns: int
+    ) -> bool:
+        if layer_type == "input":
+            shape = self._model.input_shapes[layer_name]
+        else:
+            shape = self._model.output_shapes[layer_name]
+
+        current_num_columns = self._model.layers_fullness[layer_name]
+
+        return False if num_columns + current_num_columns > shape else True
+
+    def model_exists(self) -> bool:
+        return True if self._model.instance else False
+
     @property
     def model(self) -> Model:
         return self._model
+
+    @property
+    def input_names(self) -> list[str]:
+        return self._model.input_names
+
+    @property
+    def output_names(self) -> list[str]:
+        return self._model.output_names
+
+    @property
+    def input_shapes(self) -> dict[str, int]:
+        return self._model.input_shapes
+
+    @property
+    def output_shapes(self) -> dict[str, int]:
+        return self._model.output_shapes
+
+    @property
+    def input_model_columns(self) -> dict[str, list[str]]:
+        return self._model.input_model_columns
+
+    @property
+    def output_model_columns(self) -> dict[str, list[str]]:
+        return self._model.output_model_columns
+
+    @property
+    def layers_fullness(self) -> dict[str, int]:
+        return self._model.layers_fullness

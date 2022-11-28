@@ -2,9 +2,14 @@ from typing import Any, Protocol
 
 import ipywidgets as iw
 
+from Enums.ErrorMessages import Error
+
 
 class DataManager(Protocol):
     """Protocol for data managers."""
+
+    def file_exists(self) -> bool:
+        ...
 
     def show_data_plot(self, x: Any, y: Any) -> None:
         ...
@@ -21,6 +26,7 @@ class DataPlotWidget(iw.VBox):
 
     def __init__(self, data_manager: DataManager, **kwargs) -> None:
         """Initialize the data plot widget window."""
+        # Managers
         self.data_manager = data_manager
 
         # Widgets
@@ -43,25 +49,29 @@ class DataPlotWidget(iw.VBox):
 
     def _on_show_plot_button_clicked(self, _) -> None:
         """Callback for show data plot button."""
-        self.plot_output.clear_output()
-
-        x = self.x_dropdown.value
-        y = self.y_dropdown.value
+        self.plot_output.clear_output(wait=True)
 
         with self.plot_output:
+            if not self.data_manager.file_exists():
+                print(Error.NO_FILE_UPLOADED)
+                return
+
+            x = self.x_dropdown.value
+            y = self.y_dropdown.value
+
             self.data_manager.show_data_plot(x=x, y=y)
 
     def _on_widget_state_change(self) -> None:
         """Callback for parent widget ensemble."""
         self.plot_output.clear_output()
 
+        if not self.data_manager.file_exists():
+            return
+
         if self.x_dropdown.options:
             return
 
         x_y_options = self.data_manager.columns
-
-        if not x_y_options:
-            return
 
         self.x_dropdown.options = self.y_dropdown.options = x_y_options
         self.x_dropdown.value = self.y_dropdown.value = x_y_options[0]

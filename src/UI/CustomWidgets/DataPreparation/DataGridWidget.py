@@ -2,9 +2,14 @@ from typing import Protocol
 
 import ipywidgets as iw
 
+from Enums.ErrorMessages import Error
+
 
 class DataManager(Protocol):
     """Protocol for data managers."""
+
+    def file_exists(self) -> bool:
+        ...
 
     def show_data_grid(self) -> None:
         ...
@@ -17,6 +22,7 @@ class DataGridWidget(iw.VBox):
 
     def __init__(self, data_manager: DataManager, **kwargs) -> None:
         """Initialize the data grid widget window."""
+        # Managers
         self.data_manager = data_manager
 
         # Widgets
@@ -30,9 +36,13 @@ class DataGridWidget(iw.VBox):
 
     def _on_show_grid_button_clicked(self, _) -> None:
         """Callback for show data grid button."""
-        self.grid_output.clear_output()
+        self.grid_output.clear_output(wait=True)
 
         with self.grid_output:
+            if not self.data_manager.file_exists():
+                print(Error.NO_FILE_UPLOADED)
+                return
+
             self.data_manager.show_data_grid()
 
     def _on_widget_state_change(self) -> None:

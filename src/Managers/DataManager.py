@@ -4,12 +4,9 @@ import numpy as np
 import pandas as pd
 from bqplot import pyplot as bqplt
 from ipydatagrid import DataGrid
-from ipyfilechooser import FileChooser
 from IPython.display import display
 
 from DataClasses import Data, Model
-from Enums.ErrorMessages import Error
-from Enums.SuccessMessages import Success
 
 
 class DataManager:
@@ -20,38 +17,19 @@ class DataManager:
         self._data = data
         self._model = model
 
-    def upload_file(self, file_chooser: FileChooser) -> None:
+    def upload_file(self, file_path: Any) -> None:
         """Read file to the pandas format and store it."""
-
-        file_path = file_chooser.selected
-
-        if file_path is None:
-            print(Error.NO_FILE_PATH)
-            return
-
         self._data.file = pd.read_csv(
             filepath_or_buffer=file_path, header=0, skipinitialspace=True
         )
         self._data.columns = list(self._data.file.columns)
 
-        print(Success.FILE_UPLOADED)
-
     def show_data_grid(self) -> None:
         """Show the file data grid."""
-
-        if self._data.file.empty:
-            print(Error.NO_FILE_UPLOADED)
-            return
-
         display(DataGrid(dataframe=self._data.file))
 
     def show_data_plot(self, x: Any, y: Any) -> None:
         """Show data plot."""
-
-        if self._data.file.empty:
-            print(Error.NO_FILE_UPLOADED)
-            return
-
         x_data = self._data.file[x]
         y_data = self._data.file[y]
 
@@ -64,43 +42,17 @@ class DataManager:
         bqplt.ylabel(y)
         bqplt.show()
 
-    def get_num_columns_per_layer(self, layer_name: str) -> int:
-        if layer_name not in self._data.num_columns_per_layer.keys():
-            self._data.num_columns_per_layer.update({layer_name: 0})
-
-        return self._data.num_columns_per_layer[layer_name]
-
-    def set_num_columns_per_layer(self, layer_name: str, num_columns: int) -> None:
-        self._data.num_columns_per_layer[layer_name] += num_columns
-
-    def add_model_columns(
-        self, layer_type: str, layer_name: str, from_column: Any, to_column: Any
-    ) -> None:
-        if layer_type == "input":
-            if layer_name not in self._data.input_training_columns.keys():
-                self._data.input_training_columns[layer_name] = list()
-
-            self._data.input_training_columns[layer_name] = sorted(
-                set(
-                    self._data.input_training_columns[layer_name]
-                    + list(range(from_column, to_column))
-                )
-            )
-        else:
-            if layer_name not in self._data.output_training_columns.keys():
-                self._data.output_training_columns[layer_name] = list()
-
-            self._data.output_training_columns[layer_name] = sorted(
-                set(
-                    self._data.output_training_columns[layer_name]
-                    + list(range(from_column, to_column))
-                )
-            )
+    def file_exists(self) -> bool:
+        return False if self._data.file.empty else True
 
     @property
     def data(self) -> Data:
         return self._data
 
     @property
-    def columns(self) -> list:
+    def file(self) -> pd.DataFrame:
+        return self._data.file
+
+    @property
+    def columns(self) -> list[str]:
         return self._data.columns

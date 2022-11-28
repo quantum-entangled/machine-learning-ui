@@ -24,6 +24,7 @@ class Error(Enum):
     LAYER_UNDERFILLED = "Please, fill all layers with data columns first!\u274C"
     NO_OPTIMIZER = "Please, select the optimizer first!\u274C"
     NO_LOSS = "Please, select the loss function(s) first!\u274C"
+    NO_COLUMNS_SELECTED = "Please, select the data columns first!\u274C"
 
     def __str__(self):
         return f"{self.value}"
