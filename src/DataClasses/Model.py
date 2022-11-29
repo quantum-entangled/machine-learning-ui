@@ -6,9 +6,9 @@ from typing import Any
 class Model:
     """Model container."""
 
-    name: str | None = None
+    name: str = ""
     instance: Any = None
-    layers: dict[Any, Any] = field(default_factory=dict)
+    layers: dict[str, Any] = field(default_factory=dict)
     input_shapes: dict[str, int] = field(default_factory=dict)
     output_shapes: dict[str, int] = field(default_factory=dict)
     input_names: list[str] = field(default_factory=list)

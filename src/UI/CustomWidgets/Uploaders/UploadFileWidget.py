@@ -1,4 +1,4 @@
-from typing import Protocol
+from typing import Any, Protocol
 
 import ipywidgets as iw
 from ipyfilechooser import FileChooser
@@ -10,7 +10,7 @@ from Enums.SuccessMessages import Success
 class DataManager(Protocol):
     """Protocol for data managers."""
 
-    def upload_file(self, file_chooser: FileChooser) -> None:
+    def upload_file(self, file_path: Any) -> None:
         ...
 
 
@@ -20,7 +20,7 @@ class UploadFileWidget(iw.VBox):
     name = "Upload File"
 
     def __init__(self, data_manager: DataManager, **kwargs) -> None:
-        """Initialize the upload file widget window."""
+        """Initialize widget window."""
         # Managers
         self.data_manager = data_manager
 

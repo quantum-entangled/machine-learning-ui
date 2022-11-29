@@ -25,6 +25,8 @@ class Error(Enum):
     NO_OPTIMIZER = "Please, select the optimizer first!\u274C"
     NO_LOSS = "Please, select the loss function(s) first!\u274C"
     NO_COLUMNS_SELECTED = "Please, select the data columns first!\u274C"
+    NO_MODEL = "Please, create or upload the model first!\u274C"
+    NO_CONNECT_TO = "Please, select the layer(s) to connect!\u274C"
 
     def __str__(self):
         return f"{self.value}"

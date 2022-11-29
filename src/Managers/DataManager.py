@@ -13,19 +13,19 @@ class DataManager:
     """Manager for data preperation."""
 
     def __init__(self, data: Data, model: Model) -> None:
-        """Initialize the internal data object."""
+        """Initialize data object."""
         self._data = data
         self._model = model
 
     def upload_file(self, file_path: Any) -> None:
-        """Read file to the pandas format and store it."""
+        """Read file to pandas format."""
         self._data.file = pd.read_csv(
             filepath_or_buffer=file_path, header=0, skipinitialspace=True
         )
         self._data.columns = list(self._data.file.columns)
 
     def show_data_grid(self) -> None:
-        """Show the file data grid."""
+        """Show data grid."""
         display(DataGrid(dataframe=self._data.file))
 
     def show_data_plot(self, x: Any, y: Any) -> None:

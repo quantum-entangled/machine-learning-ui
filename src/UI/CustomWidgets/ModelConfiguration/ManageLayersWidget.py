@@ -1,29 +1,23 @@
 from typing import Any, Protocol
 
 import ipywidgets as iw
-from IPython.display import display
 
+from Enums.ErrorMessages import Error
 from Enums.Layers import layers
+from Enums.SuccessMessages import Success
 
 
 class ModelManager(Protocol):
     """Protocol for model managers."""
 
+    def model_exists(self) -> bool:
+        ...
+
+    def add_layer(self, layer_instance: Any, connect_to: Any, **kwargs) -> None:
+        ...
+
     @property
-    def model(self) -> Any:
-        ...
-
-    def add_layer(
-        self,
-        layer_type: Any,
-        instance: Any,
-        connect_to: Any,
-        output_handler: Any,
-        **kwargs,
-    ) -> None:
-        ...
-
-    def show_model_summary(self, output_handler: Any) -> None:
+    def layers(self) -> dict[str, Any]:
         ...
 
 
@@ -33,66 +27,78 @@ class ManageLayersWidget(iw.VBox):
     name = "Manage Layers"
 
     def __init__(self, model_manager: ModelManager, **kwargs) -> None:
-        """Initialize the manage layers widget window."""
+        """Initialize widget window."""
+        # Managers
         self.model_manager = model_manager
 
+        # Widgets
         self.layer_type_dropdown = iw.Dropdown(
             options=list(layers),
             description="Choose layer type:",
             style={"description_width": "initial"},
         )
-        self.layer_type_dropdown.observe(
-            self._on_layer_type_dropdown_value_change, names="value"
+        self.layers_stack = iw.Stack(
+            children=[
+                layer.widget(model_manager=self.model_manager)
+                for layer in layers.values()
+            ]
         )
-        self.layer_widget_output = iw.Output()
         self.add_layer_button = iw.Button(description="Add Layer")
-        self.add_layer_button.on_click(self._on_add_layer_button_clicked)
         self.layer_status = iw.Output()
-        self.model_summary_output = iw.Output()
 
-        self._current_layer = layers[self.layer_type_dropdown.value]
-        self._current_layer_widget = self._current_layer.widget(
-            model_layers=self.model_manager.model.layers
+        # Callbacks
+        self.add_layer_button.on_click(self._on_add_layer_button_clicked)
+        iw.jslink(
+            (self.layer_type_dropdown, "index"), (self.layers_stack, "selected_index")
         )
-        self.layer_widget_output.append_display_data(self._current_layer_widget)
 
         super().__init__(
             children=[
                 self.layer_type_dropdown,
-                self.layer_widget_output,
-                iw.HBox(children=[self.add_layer_button, self.layer_status]),
-                self.model_summary_output,
-            ],
-            **kwargs,
+                self.layers_stack,
+                self.add_layer_button,
+                self.layer_status,
+            ]
         )
-
-    def _on_layer_type_dropdown_value_change(self, change: Any) -> None:
-        self.layer_widget_output.clear_output(wait=True)
-
-        with self.layer_widget_output:
-            self._current_layer = layers[change["new"]]
-            self._current_layer_widget = self._current_layer.widget(
-                model_layers=self.model_manager.model.layers
-            )
-            display(self._current_layer_widget)
 
     def _on_add_layer_button_clicked(self, _) -> None:
-        layer_type = self.layer_type_dropdown.value
+        """Callback for add layer button."""
+        self.layer_status.clear_output(wait=True)
 
-        self.model_manager.add_layer(
-            layer_type=layer_type,
-            instance=self._current_layer.instance,
-            connect_to=self._current_layer_widget.connect,
-            output_handler=self.layer_status,
-            **self._current_layer_widget.params,
-        )
+        with self.layer_status:
+            if not self.model_manager.model_exists():
+                print(Error.NO_MODEL)
+                return
 
-        self.model_manager.show_model_summary(output_handler=self.model_summary_output)
+            layer_widget = self.layers_stack.children[self.layer_type_dropdown.index]
+            layer_name = layer_widget.params["name"]
+            layer = layers[self.layer_type_dropdown.value]
+            connect_to = layer_widget.connect
 
-        self.layer_widget_output.clear_output(wait=True)
+            if not layer_name:
+                print(Error.NO_LAYER_NAME)
+                return
 
-        with self.layer_widget_output:
-            self._current_layer_widget = self._current_layer.widget(
-                model_layers=self.model_manager.model.layers
+            if layer_name in self.model_manager.layers:
+                print(Error.SAME_LAYER_NAME)
+                return
+
+            if connect_to == 0:
+                print(Error.NO_CONNECT_TO)
+                return
+
+            self.model_manager.add_layer(
+                layer_instance=layer.instance,
+                connect_to=connect_to,
+                **layer_widget.params,
             )
-            display(self._current_layer_widget)
+
+            for layer_widget in self.layers_stack.children:
+                if callable(getattr(layer_widget, "_on_widget_state_change", None)):
+                    layer_widget._on_widget_state_change()
+
+            print(Success.LAYER_ADDED)
+
+    def _on_widget_state_change(self) -> None:
+        """Callback for parent widget ensemble."""
+        self.layer_status.clear_output()

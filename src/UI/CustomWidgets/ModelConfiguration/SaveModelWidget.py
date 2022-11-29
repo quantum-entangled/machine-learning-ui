@@ -1,12 +1,18 @@
-from typing import Any, Protocol
+from typing import Protocol
 
 import ipywidgets as iw
+
+from Enums.ErrorMessages import Error
+from Enums.SuccessMessages import Success
 
 
 class ModelManager(Protocol):
     """Protocol for model managers."""
 
-    def save_model(self, output_handler: Any) -> None:
+    def model_exists(self) -> bool:
+        ...
+
+    def save_model(self) -> None:
         ...
 
 
@@ -16,17 +22,32 @@ class SaveModelWidget(iw.VBox):
     name = "Save Model"
 
     def __init__(self, model_manager: ModelManager, **kwargs) -> None:
-        """Initialize the save model widget window."""
+        """Initialize widget window."""
+        # Managers
         self.model_manager = model_manager
 
+        # Widgets
         self.save_model_button = iw.Button(description="Save Model")
-        self.save_model_button.on_click(self._on_save_model_button_clicked)
-        self.save_model_output = iw.Output()
+        self.save_status = iw.Output()
 
-        super().__init__(
-            children=[self.save_model_button, self.save_model_output], **kwargs
-        )
+        # Callbacks
+        self.save_model_button.on_click(self._on_save_model_button_clicked)
+
+        super().__init__(children=[self.save_model_button, self.save_status])
 
     def _on_save_model_button_clicked(self, _) -> None:
         """Callback for save model button."""
-        self.model_manager.save_model(output_handler=self.save_model_output)
+        self.save_status.clear_output(wait=True)
+
+        with self.save_status:
+            if not self.model_manager.model_exists():
+                print(Error.NO_MODEL)
+                return
+
+            self.model_manager.save_model()
+
+            print(Success.MODEL_SAVED)
+
+    def _on_widget_state_change(self) -> None:
+        """Callback for parent widget ensemble."""
+        self.save_status.clear_output()
