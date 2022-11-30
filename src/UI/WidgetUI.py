@@ -1,8 +1,11 @@
 from typing import Any, Protocol
 
+from Managers.DataManager import DataManager
+from Managers.ModelManager import ModelManager
+
 
 class ChildWidget(Protocol):
-    "Child widget protocol class."
+    """Child widget protocol class."""
 
     name: str
 
@@ -11,15 +14,12 @@ class ChildWidget(Protocol):
 
 
 class Widget(Protocol):
-    "Main widget protocol class."
+    """Main widget protocol class."""
+
     children: Any
     titles: Any
-    selected_index: Any
 
     def __call__(self, *args, **kwargs) -> Any:
-        ...
-
-    def observe(self, names: Any, *args, **kwargs) -> Any:
         ...
 
 
@@ -30,20 +30,22 @@ class WidgetUI:
         self,
         widget: Widget,
         widget_children: list[ChildWidget],
-        widget_params: dict[str, Any],
+        data_manager: DataManager,
+        model_manager: ModelManager,
         **kwargs
     ) -> None:
         """Initialize the UI."""
+        # Widgets
         self.ui = widget(
             children=[
-                child_widget(**widget_params) for child_widget in widget_children
+                child_widget(
+                    data_manager=data_manager, model_manager=model_manager, **kwargs
+                )
+                for child_widget in widget_children
             ],
             titles=[child_widget.name for child_widget in widget_children],
-            **kwargs
         )
-        self.ui.observe(self._on_widget_selected_index_change, names="selected_index")
 
-    def _on_widget_selected_index_change(self, _) -> None:
-        for child_widget in self.ui.children:
-            if callable(getattr(child_widget, "_on_widget_state_change", None)):
-                child_widget._on_widget_state_change()
+        # Callbacks
+        data_manager.watchers.extend(self.ui.children)
+        model_manager.watchers.extend(self.ui.children)

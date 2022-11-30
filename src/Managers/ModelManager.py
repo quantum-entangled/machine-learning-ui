@@ -5,6 +5,7 @@ from bqplot import pyplot as bqplt
 from IPython.display import display
 
 from DataClasses import Data, Model
+from Enums.WatchTypes import Watch
 
 
 class ModelManager:
@@ -14,84 +15,85 @@ class ModelManager:
         """Initialize model object."""
         self._data = data
         self._model = model
+        self._watchers = list()
 
     def create_model(self, model_name: str) -> None:
         """Create model from scratch."""
         self._model.instance = tf.keras.Model(
             inputs=list(), outputs=list(), name=model_name
         )
-        self._model.name = model_name
+
+        self.refresh_model()
+        self.callback_watchers(callback_type=Watch.MODEL)
 
     def upload_model(self, model_path: Any) -> None:
         """Upload TensorFlow model."""
         self._model.instance = tf.keras.models.load_model(
             filepath=model_path, compile=False
         )
+
+        self.refresh_model()
+        self.callback_watchers(callback_type=Watch.MODEL)
+
+    def refresh_model(self) -> None:
         self._model.name = self._model.instance.name
-        self._model.layers = {
-            layer.name: layer for layer in self._model.instance.layers
+        self._model.input_layers = {
+            name: layer
+            for name, layer in zip(
+                self._model.instance.input_names, self._model.instance.inputs
+            )
         }
+        self._model.output_layers = {
+            name: layer
+            for name, layer in zip(
+                self._model.instance.output_names, self._model.instance.outputs
+            )
+        }
+        self._model.layers = self._model.input_layers | self._model.output_layers
         self._model.input_shapes = {
             layer.name: layer.shape[1] for layer in self._model.instance.inputs
         }
         self._model.output_shapes = {
             layer_name: 1 for layer_name in self._model.instance.output_names
         }
-        self._model.input_names = self._model.instance.input_names
-        self._model.output_names = self._model.instance.output_names
         self._model.input_model_columns = {
-            name: list() for name in self._model.input_names
+            name: list() for name in self._model.input_layers
         }
         self._model.output_model_columns = {
-            name: list() for name in self._model.output_names
+            name: list() for name in self._model.output_layers
         }
         self._model.layers_fullness = {
-            name: 0 for name in self._model.input_names + self._model.output_names
+            name: 0 for name in self._model.input_layers | self._model.output_layers
         }
 
     def add_layer(self, layer_instance: Any, connect_to: Any, **kwargs) -> None:
         if not connect_to:
-            self._model.layers.update({kwargs["name"]: layer_instance(**kwargs)})
-            return
+            layer = {kwargs["name"]: layer_instance(**kwargs)}
 
-        if isinstance(connect_to, str):
-            connect = self._model.layers[connect_to]
+            self._model.input_layers.update(layer)
         else:
-            connect = [self._model.layers[name] for name in connect_to]
-
-        self._model.layers.update({kwargs["name"]: layer_instance(**kwargs)(connect)})
-
-    def update_model(self, layer_type: Any, layer_name: Any, connect_to: Any) -> None:
-        layer = self._model.layers[layer_name]
-
-        if layer_type == "Input":
-            self._model.instance = tf.keras.Model(
-                inputs=[*self._model.instance.inputs, layer],
-                outputs=self._model.instance.outputs,
-                name=self._model.name,
-            )
-        else:
-            output_names = [output.name for output in self._model.instance.outputs]
-
             if isinstance(connect_to, str):
-                mask = [connect_to in output_name for output_name in output_names]
+                connect = self._model.layers[connect_to]
             else:
-                mask = [False for _ in range(len(output_names))]
+                connect = [self._model.layers[name] for name in connect_to]
 
-                for connect in connect_to:
-                    for i, output_name in enumerate(output_names):
-                        if connect in output_name:
-                            mask[i] = True
+            layer = {kwargs["name"]: layer_instance(**kwargs)(connect)}
 
-            if True in mask:
-                pop_indices = [i for i, x in enumerate(mask) if x]
-                [self._model.instance.outputs.pop(i) for i in reversed(pop_indices)]
+        self._model.layers.update(layer)
+        self.callback_watchers(callback_type=Watch.LAYER_ADDED)
 
-            self._model.instance = tf.keras.Model(
-                inputs=self._model.instance.inputs,
-                outputs=[*self._model.instance.outputs, layer],
-                name=self._model.name,
-            )
+    def set_model_outputs(self, outputs_names: Any) -> None:
+        self._model.output_layers = {
+            name: self._model.layers[name] for name in outputs_names
+        }
+        self._model.instance = tf.keras.Model(
+            inputs=self._model.input_layers,
+            outputs=self._model.output_layers,
+            name=self._model.name,
+        )
+
+        self.refresh_model()
+        self.callback_watchers(callback_type=Watch.OUTPUTS_SET)
 
     def show_model_summary(self, output_handler: Any) -> None:
         output_handler.clear_output(wait=True)
@@ -202,9 +204,7 @@ class ModelManager:
         bqplt.legend()
         bqplt.show()
 
-    def add_columns_to_model(
-        self, layer_type: str, layer_name: str, columns: Any
-    ) -> None:
+    def add_columns(self, layer_type: str, layer_name: str, columns: Any) -> None:
         if layer_type == "input":
             self._model.input_model_columns[layer_name].extend(columns)
         else:
@@ -224,6 +224,13 @@ class ModelManager:
 
         return False if num_columns + current_num_columns > shape else True
 
+    def callback_watchers(self, callback_type: str) -> None:
+        for watcher in self._watchers:
+            callback = getattr(watcher, callback_type, None)
+
+            if callable(callback):
+                callback()
+
     def model_exists(self) -> bool:
         return True if self._model.instance else False
 
@@ -236,16 +243,16 @@ class ModelManager:
         return self._model.name
 
     @property
+    def input_layers(self) -> dict[str, Any]:
+        return self._model.input_layers
+
+    @property
+    def output_layers(self) -> dict[str, Any]:
+        return self._model.output_layers
+
+    @property
     def layers(self) -> dict[str, Any]:
         return self._model.layers
-
-    @property
-    def input_names(self) -> list[str]:
-        return self._model.input_names
-
-    @property
-    def output_names(self) -> list[str]:
-        return self._model.output_names
 
     @property
     def input_shapes(self) -> dict[str, int]:
@@ -266,3 +273,11 @@ class ModelManager:
     @property
     def layers_fullness(self) -> dict[str, int]:
         return self._model.layers_fullness
+
+    @property
+    def watchers(self) -> list[Any]:
+        return self._watchers
+
+    @watchers.setter
+    def watchers(self, watchers_list: list[Any]) -> None:
+        self._watchers = watchers_list

@@ -27,7 +27,7 @@ class ConcatenateLayerWidget(iw.VBox):
         super().__init__(children=[self.layer_name, self.concatenate])
 
     def _on_widget_state_change(self) -> None:
-        """Callback for parent widget ensemble."""
+        """Callback for widget change."""
         self.concatenate.options = list(self.model_manager.layers)
 
     @property

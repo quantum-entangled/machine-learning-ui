@@ -61,15 +61,9 @@ class DataPlotWidget(iw.VBox):
 
             self.data_manager.show_data_plot(x=x, y=y)
 
-    def _on_widget_state_change(self) -> None:
-        """Callback for parent widget ensemble."""
+    def _on_file_uploaded(self) -> None:
+        """Callback for file upload."""
         self.plot_output.clear_output()
-
-        if not self.data_manager.file_exists():
-            return
-
-        if self.x_dropdown.options:
-            return
 
         x_y_options = self.data_manager.columns
 

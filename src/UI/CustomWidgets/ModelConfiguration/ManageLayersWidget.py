@@ -61,6 +61,11 @@ class ManageLayersWidget(iw.VBox):
             ]
         )
 
+    def _update_layer_widget(self) -> None:
+        for layer_widget in self.layers_stack.children:
+            if callable(getattr(layer_widget, "_on_widget_state_change", None)):
+                layer_widget._on_widget_state_change()
+
     def _on_add_layer_button_clicked(self, _) -> None:
         """Callback for add layer button."""
         self.layer_status.clear_output(wait=True)
@@ -92,13 +97,12 @@ class ManageLayersWidget(iw.VBox):
                 connect_to=connect_to,
                 **layer_widget.params,
             )
-
-            for layer_widget in self.layers_stack.children:
-                if callable(getattr(layer_widget, "_on_widget_state_change", None)):
-                    layer_widget._on_widget_state_change()
+            self._update_layer_widget()
 
             print(Success.LAYER_ADDED)
 
-    def _on_widget_state_change(self) -> None:
-        """Callback for parent widget ensemble."""
+    def _on_model_instantiated(self) -> None:
+        """Callback for model instantiation."""
         self.layer_status.clear_output()
+
+        self._update_layer_widget()

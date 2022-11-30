@@ -1,4 +1,4 @@
-from typing import Any, Protocol
+from typing import Protocol
 
 import ipywidgets as iw
 
@@ -65,7 +65,3 @@ class CreateModelWidget(iw.VBox):
             self.model_manager.create_model(model_name=model_name)
 
             print(Success.MODEL_CREATED)
-
-    def _on_widget_state_change(self) -> None:
-        """Callback for parent widget ensemble."""
-        self.model_status.clear_output()

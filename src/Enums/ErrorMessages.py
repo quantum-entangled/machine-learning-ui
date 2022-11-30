@@ -14,7 +14,7 @@ class Error(Enum):
     SAME_LAYER_NAME = (
         "Layer with this name already exists. Please, enter a different name!\u274C"
     )
-    NO_LAYERS = "There are no layers in the model!\u274C"
+    NO_LAYERS = "Please, select the layer(s) first!\u274C"
     NO_MODEL_UPLOADED = "Please, upload the model first!\u274C"
     LAYER_OVERFILLED = "You've selected more columns than the layer can accept!\u274C"
     MODEL_NOT_TRAINED = "Please, train the model first!\u274C"
@@ -27,6 +27,7 @@ class Error(Enum):
     NO_COLUMNS_SELECTED = "Please, select the data columns first!\u274C"
     NO_MODEL = "Please, create or upload the model first!\u274C"
     NO_CONNECT_TO = "Please, select the layer(s) to connect!\u274C"
+    NO_MODEL_OUTPUTS = "Please, select the outputs first!\u274C"
 
     def __str__(self):
         return f"{self.value}"

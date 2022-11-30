@@ -48,6 +48,6 @@ class SaveModelWidget(iw.VBox):
 
             print(Success.MODEL_SAVED)
 
-    def _on_widget_state_change(self) -> None:
-        """Callback for parent widget ensemble."""
+    def _on_model_instantiated(self) -> None:
+        """Callback for model instantiation."""
         self.save_status.clear_output()

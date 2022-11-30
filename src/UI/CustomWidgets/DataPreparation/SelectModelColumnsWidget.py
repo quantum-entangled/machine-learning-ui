@@ -28,17 +28,15 @@ class ModelManager(Protocol):
     ) -> bool:
         ...
 
-    def add_columns_to_model(
-        self, layer_type: str, layer_name: str, columns: Any
-    ) -> None:
+    def add_columns(self, layer_type: str, layer_name: str, columns: Any) -> None:
         ...
 
     @property
-    def input_names(self) -> list[str]:
+    def input_layers(self) -> dict[str, Any]:
         ...
 
     @property
-    def output_names(self) -> list[str]:
+    def output_layers(self) -> dict[str, Any]:
         ...
 
     @property
@@ -135,18 +133,24 @@ class SelectModelColumnsWidget(iw.VBox):
         self.layer_type = change["new"]
 
         if change["new"] == "input":
-            self.layer_dropdown.options = self.model_manager.input_names
-            self.layer_dropdown.value = self.model_manager.input_names[0]
+            options = list(self.model_manager.input_layers)
+
+            self.layer_dropdown.options = options
+            self.layer_dropdown.value = options[0] if options else None
         else:
-            self.layer_dropdown.options = self.model_manager.output_names
-            self.layer_dropdown.value = self.model_manager.output_names[0]
+            options = list(self.model_manager.output_layers)
+
+            self.layer_dropdown.options = options
+            self.layer_dropdown.value = options[0] if options else None
 
     def _on_layer_dropdown_value_change(self, change: Any) -> None:
         self.layer = change["new"]
+
         self._set_layer_fullness_status()
 
     def _on_columns_select_value_change(self, change: Any) -> None:
         self.selected_columns = change["new"]
+
         self._set_selected_columns_num()
 
     def _on_add_columns_button_clicked(self, _) -> None:
@@ -165,6 +169,10 @@ class SelectModelColumnsWidget(iw.VBox):
                 print(Error.NO_COLUMNS_SELECTED)
                 return
 
+            if not self.layer:
+                print(Error.NO_LAYERS)
+                return
+
             if not self.model_manager.check_layer_capacity(
                 layer_type=self.layer_type,
                 layer_name=self.layer,
@@ -173,12 +181,11 @@ class SelectModelColumnsWidget(iw.VBox):
                 print(Error.LAYER_OVERFILLED)
                 return
 
-            with self.columns_status:
-                self.model_manager.add_columns_to_model(
-                    layer_type=self.layer_type,
-                    layer_name=self.layer,
-                    columns=self.selected_columns,
-                )
+            self.model_manager.add_columns(
+                layer_type=self.layer_type,
+                layer_name=self.layer,
+                columns=self.selected_columns,
+            )
 
             self._set_columns_select_options()
             self._set_selected_columns_num()
@@ -186,18 +193,15 @@ class SelectModelColumnsWidget(iw.VBox):
 
             print(Success.COLUMNS_ADDED)
 
-    def _on_widget_state_change(self):
+    def _on_file_uploaded(self) -> None:
+        """Callback for file upload."""
         self.columns_status.clear_output()
 
-        if not self.data_manager.file_exists():
-            return
+        self.columns_select.options = self.data_manager.columns
 
-        if not self.model_manager.model_exists():
-            return
-
-        if sum(self.model_manager.layers_fullness.values()) > 0:
-            return
+    def _on_model_instantiated(self) -> None:
+        """Callback for model instantiation."""
+        self.columns_status.clear_output()
 
         self.layer_type_dropdown.options = ["input", "output"]
         self.layer_type_dropdown.value = "input"
-        self.columns_select.options = self.data_manager.columns

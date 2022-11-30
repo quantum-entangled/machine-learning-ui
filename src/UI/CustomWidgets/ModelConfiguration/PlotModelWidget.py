@@ -15,7 +15,7 @@ class ModelManager(Protocol):
         ...
 
     @property
-    def layers(self) -> dict[str, Any]:
+    def output_layers(self) -> dict[str, Any]:
         ...
 
 
@@ -47,12 +47,16 @@ class PlotModelWidget(iw.VBox):
                 print(Error.NO_MODEL)
                 return
 
-            if not self.model_manager.layers:
-                print(Error.NO_LAYERS)
+            if not self.model_manager.output_layers:
+                print(Error.NO_MODEL_OUTPUTS)
                 return
 
             self.model_manager.plot_model()
 
-    def _on_widget_state_change(self) -> None:
-        """Callback for parent widget ensemble."""
+    def _on_model_instantiated(self) -> None:
+        """Callback for model instantiation."""
+        self.plot_output.clear_output()
+
+    def _on_outputs_set(self) -> None:
+        """Callback for setting outputs."""
         self.plot_output.clear_output()

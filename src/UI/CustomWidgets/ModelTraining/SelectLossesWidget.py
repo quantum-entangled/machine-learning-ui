@@ -24,7 +24,7 @@ class SelectLossesWidget(iw.VBox):
         self.model_manager = model_manager
 
         self.layer_dropdown = iw.Dropdown(
-            options=list(self.model_manager.model.output_names),
+            options=list(self.model_manager.output_layers),
             description="Choose layer:",
             style={"description_width": "initial"},
         )
@@ -71,7 +71,7 @@ class SelectLossesWidget(iw.VBox):
     def _on_widget_state_change(self) -> None:
         self.loss_status.clear_output(wait=True)
 
-        options = self.model_manager.model.output_names
+        options = self.model_manager.output_layers
 
         if options:
             self.layer_dropdown.options = options

@@ -8,11 +8,11 @@ class Model:
 
     name: str = ""
     instance: Any = None
+    input_layers: dict[str, Any] = field(default_factory=dict)
+    output_layers: dict[str, Any] = field(default_factory=dict)
     layers: dict[str, Any] = field(default_factory=dict)
     input_shapes: dict[str, int] = field(default_factory=dict)
     output_shapes: dict[str, int] = field(default_factory=dict)
-    input_names: list[str] = field(default_factory=list)
-    output_names: list[str] = field(default_factory=list)
     input_model_columns: dict[str, list[str]] = field(default_factory=dict)
     output_model_columns: dict[str, list[str]] = field(default_factory=dict)
     layers_fullness: dict[str, int] = field(default_factory=dict)

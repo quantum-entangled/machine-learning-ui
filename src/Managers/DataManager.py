@@ -1,12 +1,12 @@
 from typing import Any
 
-import numpy as np
 import pandas as pd
 from bqplot import pyplot as bqplt
 from ipydatagrid import DataGrid
 from IPython.display import display
 
 from DataClasses import Data, Model
+from Enums.WatchTypes import Watch
 
 
 class DataManager:
@@ -16,6 +16,7 @@ class DataManager:
         """Initialize data object."""
         self._data = data
         self._model = model
+        self._watchers = list()
 
     def upload_file(self, file_path: Any) -> None:
         """Read file to pandas format."""
@@ -23,6 +24,8 @@ class DataManager:
             filepath_or_buffer=file_path, header=0, skipinitialspace=True
         )
         self._data.columns = list(self._data.file.columns)
+
+        self.callback_watchers(callback_type=Watch.FILE)
 
     def show_data_grid(self) -> None:
         """Show data grid."""
@@ -42,6 +45,13 @@ class DataManager:
         bqplt.ylabel(y)
         bqplt.show()
 
+    def callback_watchers(self, callback_type: Any) -> None:
+        for watcher in self._watchers:
+            callback = getattr(watcher, callback_type, None)
+
+            if callable(callback):
+                callback()
+
     def file_exists(self) -> bool:
         return False if self._data.file.empty else True
 
@@ -56,3 +66,11 @@ class DataManager:
     @property
     def columns(self) -> list[str]:
         return self._data.columns
+
+    @property
+    def watchers(self) -> list[Any]:
+        return self._watchers
+
+    @watchers.setter
+    def watchers(self, watchers_list: list[Any]) -> None:
+        self._watchers = watchers_list

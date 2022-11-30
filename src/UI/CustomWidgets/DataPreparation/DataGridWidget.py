@@ -45,6 +45,6 @@ class DataGridWidget(iw.VBox):
 
             self.data_manager.show_data_grid()
 
-    def _on_widget_state_change(self) -> None:
-        """Callback for parent widget ensemble."""
+    def _on_file_uploaded(self) -> None:
+        """Callback for file upload."""
         self.grid_output.clear_output()
