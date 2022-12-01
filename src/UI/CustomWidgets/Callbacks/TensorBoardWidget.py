@@ -7,6 +7,7 @@ class TensorBoardWidget(iw.VBox):
     name = "TensorBoard Callback"
 
     def __init__(self, **kwargs):
+        # Widgets
         self.write_graph = iw.Checkbox(value=True, description="Write graph")
         self.histogram_frequency = iw.BoundedIntText(
             value=1,
@@ -19,8 +20,7 @@ class TensorBoardWidget(iw.VBox):
         self.write_images = iw.Checkbox(value=False, description="Write images")
 
         super().__init__(
-            children=[self.write_graph, self.histogram_frequency, self.write_images],
-            **kwargs
+            children=[self.write_graph, self.histogram_frequency, self.write_images]
         )
 
     @property

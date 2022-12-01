@@ -15,7 +15,7 @@ class ModelManager:
         """Initialize model object."""
         self._data = data
         self._model = model
-        self._watchers = list()
+        self._observers = list()
 
     def create_model(self, model_name: str) -> None:
         """Create model from scratch."""
@@ -24,7 +24,7 @@ class ModelManager:
         )
 
         self.refresh_model()
-        self.callback_watchers(callback_type=Watch.MODEL)
+        self.notify_observers(callback_type=Watch.MODEL)
 
     def upload_model(self, model_path: Any) -> None:
         """Upload TensorFlow model."""
@@ -33,7 +33,7 @@ class ModelManager:
         )
 
         self.refresh_model()
-        self.callback_watchers(callback_type=Watch.MODEL)
+        self.notify_observers(callback_type=Watch.MODEL)
 
     def refresh_model(self) -> None:
         self._model.name = self._model.instance.name
@@ -65,6 +65,8 @@ class ModelManager:
         self._model.layers_fullness = {
             name: 0 for name in self._model.input_layers | self._model.output_layers
         }
+        self._model.losses = {name: list() for name in self._model.output_layers}
+        self._model.metrics = {name: list() for name in self._model.output_layers}
 
     def add_layer(self, layer_instance: Any, connect_to: Any, **kwargs) -> None:
         if not connect_to:
@@ -80,7 +82,7 @@ class ModelManager:
             layer = {kwargs["name"]: layer_instance(**kwargs)(connect)}
 
         self._model.layers.update(layer)
-        self.callback_watchers(callback_type=Watch.LAYER_ADDED)
+        self.notify_observers(callback_type=Watch.LAYER_ADDED)
 
     def set_model_outputs(self, outputs_names: Any) -> None:
         self._model.output_layers = {
@@ -93,7 +95,7 @@ class ModelManager:
         )
 
         self.refresh_model()
-        self.callback_watchers(callback_type=Watch.OUTPUTS_SET)
+        self.notify_observers(callback_type=Watch.OUTPUTS_SET)
 
     def show_model_summary(self, output_handler: Any) -> None:
         output_handler.clear_output(wait=True)
@@ -127,19 +129,28 @@ class ModelManager:
             save_format="h5",
         )
 
-    def select_optimizer(self, instance: Any, **kwargs) -> None:
-        self._model.optimizer = instance(**kwargs)
+    def select_optimizer(self, optimizer: Any, **kwargs) -> None:
+        """Instantiate model optimizer."""
+        self._model.optimizer = optimizer(**kwargs)
 
-    def add_loss(self, layer_name: str, loss: Any) -> None:
-        self._model.losses.update({layer_name: loss})
+        self.notify_observers(callback_type=Watch.OPTIMIZER_SELECTED)
 
-    def add_metric(self, layer_name: str, metric: Any) -> None:
-        self._model.metrics.update({layer_name: metric})
+    def add_loss(self, layer: str, loss: Any) -> None:
+        """Instantiate model losses."""
+        self._model.losses[layer] = loss()
 
-    def add_callback(self, instance: Any, **kwargs) -> None:
-        self._model.callbacks += [instance(**kwargs)]
+        self.notify_observers(callback_type=Watch.LOSSES_SELECTED)
+
+    def add_metric(self, layer: str, metric: Any) -> None:
+        """Instantiate model metrics."""
+        self._model.metrics[layer].append(metric())
+
+    def add_callback(self, callback: Any, **kwargs) -> None:
+        """Instantiate model callbacks."""
+        self._model.callbacks.append(callback(**kwargs))
 
     def compile_model(self) -> None:
+        """Compile model."""
         self._model.instance.compile(
             optimizer=self._model.optimizer,
             loss=self._model.losses,
@@ -224,9 +235,9 @@ class ModelManager:
 
         return False if num_columns + current_num_columns > shape else True
 
-    def callback_watchers(self, callback_type: str) -> None:
-        for watcher in self._watchers:
-            callback = getattr(watcher, callback_type, None)
+    def notify_observers(self, callback_type: str) -> None:
+        for observer in self._observers:
+            callback = getattr(observer, callback_type, None)
 
             if callable(callback):
                 callback()
@@ -275,9 +286,25 @@ class ModelManager:
         return self._model.layers_fullness
 
     @property
-    def watchers(self) -> list[Any]:
-        return self._watchers
+    def optimizer(self) -> Any:
+        return self._model.optimizer
 
-    @watchers.setter
-    def watchers(self, watchers_list: list[Any]) -> None:
-        self._watchers = watchers_list
+    @property
+    def losses(self) -> dict[str, Any]:
+        return self._model.losses
+
+    @property
+    def metrics(self) -> dict[str, list[Any]]:
+        return self._model.metrics
+
+    @property
+    def callbacks(self) -> list[Any]:
+        return self._model.callbacks
+
+    @property
+    def observers(self) -> list[Any]:
+        return self._observers
+
+    @observers.setter
+    def observers(self, observers_list: list[Any]) -> None:
+        self._observers = observers_list

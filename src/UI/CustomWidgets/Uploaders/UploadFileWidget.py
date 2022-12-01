@@ -55,7 +55,3 @@ class UploadFileWidget(iw.VBox):
             self.data_manager.upload_file(file_path=file_path)
 
             print(Success.FILE_UPLOADED)
-
-    def _on_widget_state_change(self) -> None:
-        """Callback for parent widget ensemble."""
-        self.upload_status.clear_output()

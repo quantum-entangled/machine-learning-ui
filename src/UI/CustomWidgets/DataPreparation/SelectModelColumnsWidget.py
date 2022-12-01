@@ -100,7 +100,7 @@ class SelectModelColumnsWidget(iw.VBox):
             ]
         )
 
-        # Current state
+        # Current State
         self.layer_type = self.layer_type_dropdown.value
         self.layer = self.layer_dropdown.value
         self.selected_columns = self.columns_select.value

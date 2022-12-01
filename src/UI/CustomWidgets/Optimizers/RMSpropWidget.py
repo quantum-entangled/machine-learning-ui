@@ -7,6 +7,7 @@ class RMSpropWidget(iw.VBox):
     name = "RMSprop Optimizer"
 
     def __init__(self, **kwargs):
+        # Widgets
         self.learning_rate = iw.BoundedFloatText(
             value=0.001,
             min=0,
@@ -32,9 +33,7 @@ class RMSpropWidget(iw.VBox):
             style={"description_width": "initial"},
         )
 
-        super().__init__(
-            children=[self.learning_rate, self.rho, self.momentum], **kwargs
-        )
+        super().__init__(children=[self.learning_rate, self.rho, self.momentum])
 
     @property
     def params(self) -> dict[str, Any]:

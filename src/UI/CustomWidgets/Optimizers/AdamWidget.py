@@ -7,6 +7,7 @@ class AdamWidget(iw.VBox):
     name = "Adam Optimizer"
 
     def __init__(self, **kwargs):
+        # Widgets
         self.learning_rate = iw.BoundedFloatText(
             value=0.001,
             min=0,
@@ -32,9 +33,7 @@ class AdamWidget(iw.VBox):
             style={"description_width": "initial"},
         )
 
-        super().__init__(
-            children=[self.learning_rate, self.beta_1, self.beta_2], **kwargs
-        )
+        super().__init__(children=[self.learning_rate, self.beta_1, self.beta_2])
 
     @property
     def params(self) -> dict[str, Any]:

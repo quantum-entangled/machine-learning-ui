@@ -75,9 +75,9 @@ class ManageLayersWidget(iw.VBox):
                 print(Error.NO_MODEL)
                 return
 
+            layer = layers[self.layer_type_dropdown.value]
             layer_widget = self.layers_stack.children[self.layer_type_dropdown.index]
             layer_name = layer_widget.params["name"]
-            layer = layers[self.layer_type_dropdown.value]
             connect_to = layer_widget.connect
 
             if not layer_name:

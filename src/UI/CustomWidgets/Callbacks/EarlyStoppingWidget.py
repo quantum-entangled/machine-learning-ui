@@ -7,6 +7,7 @@ class EarlyStoppingWidget(iw.VBox):
     name = "EarlyStopping Callback"
 
     def __init__(self, **kwargs):
+        # Widgets
         self.min_delta = iw.BoundedFloatText(
             value=0,
             min=0,
@@ -24,7 +25,7 @@ class EarlyStoppingWidget(iw.VBox):
             style={"description_width": "initial"},
         )
 
-        super().__init__(children=[self.min_delta, self.patience], **kwargs)
+        super().__init__(children=[self.min_delta, self.patience])
 
     @property
     def params(self) -> dict[str, Any]:

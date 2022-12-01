@@ -13,6 +13,7 @@ class Success(Enum):
     METRIC_ADDED = "Metric has been successfully added!\u2705"
     OPTIMIZER_SELECTED = "Optimizer has been successfully selected!\u2705"
     OUTPUTS_SET = "Model outputs have been successfully set!\u2705"
+    MODEL_COMPILED = "Model has been successfully compiled!\u2705"
 
     def __str__(self):
         return f"{self.value}"

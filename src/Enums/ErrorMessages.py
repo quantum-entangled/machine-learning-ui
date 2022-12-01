@@ -22,12 +22,14 @@ class Error(Enum):
     DATA_NOT_SPLITTED = "Please, split the data first!\u274C"
     NO_MODEL_COLUMNS = "Please, select the model columns first!\u274C"
     LAYER_UNDERFILLED = "Please, fill all layers with data columns first!\u274C"
-    NO_OPTIMIZER = "Please, select the optimizer first!\u274C"
-    NO_LOSS = "Please, select the loss function(s) first!\u274C"
+    NO_OPTIMIZER = "Please, select the model optimizer first!\u274C"
+    NO_LOSS = "Please, select the loss function for each layer first!\u274C"
     NO_COLUMNS_SELECTED = "Please, select the data columns first!\u274C"
     NO_MODEL = "Please, create or upload the model first!\u274C"
     NO_CONNECT_TO = "Please, select the layer(s) to connect!\u274C"
     NO_MODEL_OUTPUTS = "Please, select the outputs first!\u274C"
+    SAME_METRIC = "Metric has already been added to this layer!\u274C"
+    SAME_CALLBACK = "Callback has already been added!\u274C"
 
     def __str__(self):
         return f"{self.value}"

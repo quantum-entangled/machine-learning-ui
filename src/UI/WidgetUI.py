@@ -47,5 +47,5 @@ class WidgetUI:
         )
 
         # Callbacks
-        data_manager.watchers.extend(self.ui.children)
-        model_manager.watchers.extend(self.ui.children)
+        data_manager.observers.extend(self.ui.children)
+        model_manager.observers.extend(self.ui.children)

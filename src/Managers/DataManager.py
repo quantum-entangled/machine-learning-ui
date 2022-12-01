@@ -16,7 +16,7 @@ class DataManager:
         """Initialize data object."""
         self._data = data
         self._model = model
-        self._watchers = list()
+        self._observers = list()
 
     def upload_file(self, file_path: Any) -> None:
         """Read file to pandas format."""
@@ -25,7 +25,7 @@ class DataManager:
         )
         self._data.columns = list(self._data.file.columns)
 
-        self.callback_watchers(callback_type=Watch.FILE)
+        self.notify_observers(callback_type=Watch.FILE)
 
     def show_data_grid(self) -> None:
         """Show data grid."""
@@ -45,9 +45,9 @@ class DataManager:
         bqplt.ylabel(y)
         bqplt.show()
 
-    def callback_watchers(self, callback_type: Any) -> None:
-        for watcher in self._watchers:
-            callback = getattr(watcher, callback_type, None)
+    def notify_observers(self, callback_type: Any) -> None:
+        for observer in self._observers:
+            callback = getattr(observer, callback_type, None)
 
             if callable(callback):
                 callback()
@@ -68,9 +68,9 @@ class DataManager:
         return self._data.columns
 
     @property
-    def watchers(self) -> list[Any]:
-        return self._watchers
+    def observers(self) -> list[Any]:
+        return self._observers
 
-    @watchers.setter
-    def watchers(self, watchers_list: list[Any]) -> None:
-        self._watchers = watchers_list
+    @observers.setter
+    def observers(self, observers_list: list[Any]) -> None:
+        self._observers = observers_list

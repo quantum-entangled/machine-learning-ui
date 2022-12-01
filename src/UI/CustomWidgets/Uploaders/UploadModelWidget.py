@@ -59,7 +59,3 @@ class UploadModelWidget(iw.VBox):
             self.model_manager.upload_model(model_path=model_path)
 
             print(Success.MODEL_UPLOADED)
-
-    def _on_widget_state_change(self) -> None:
-        """Callback for parent widget ensemble."""
-        self.upload_status.clear_output()

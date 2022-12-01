@@ -17,7 +17,7 @@ class Model:
     output_model_columns: dict[str, list[str]] = field(default_factory=dict)
     layers_fullness: dict[str, int] = field(default_factory=dict)
     optimizer: Any = None
-    losses: dict[Any, Any] = field(default_factory=dict)
-    metrics: dict[Any, Any] = field(default_factory=dict)
+    losses: dict[str, Any] = field(default_factory=dict)
+    metrics: dict[str, list[Any]] = field(default_factory=dict)
     callbacks: list[Any] = field(default_factory=list)
-    training_history: dict[Any, Any] = field(default_factory=dict)
+    training_history: dict[str, Any] = field(default_factory=dict)

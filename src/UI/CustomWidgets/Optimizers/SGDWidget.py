@@ -7,6 +7,7 @@ class SGDWidget(iw.VBox):
     name = "SGD Optimizer"
 
     def __init__(self, **kwargs):
+        # Widgets
         self.learning_rate = iw.BoundedFloatText(
             value=0.001,
             min=0,
@@ -24,7 +25,7 @@ class SGDWidget(iw.VBox):
             style={"description_width": "initial"},
         )
 
-        super().__init__(children=[self.learning_rate, self.momentum], **kwargs)
+        super().__init__(children=[self.learning_rate, self.momentum])
 
     @property
     def params(self) -> dict[str, Any]:
