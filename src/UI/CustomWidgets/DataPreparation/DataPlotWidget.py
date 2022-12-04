@@ -25,7 +25,7 @@ class DataPlotWidget(iw.VBox):
     name = "Show Data Plot"
 
     def __init__(self, data_manager: DataManager, **kwargs) -> None:
-        """Initialize the data plot widget window."""
+        """Initialize widget window."""
         # Managers
         self.data_manager = data_manager
 

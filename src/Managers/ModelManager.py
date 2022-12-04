@@ -5,7 +5,7 @@ from bqplot import pyplot as bqplt
 from IPython.display import display
 
 from DataClasses import Data, Model
-from Enums.WatchTypes import Watch
+from Enums.ObserveTypes import Observe
 
 
 class ModelManager:
@@ -22,18 +22,16 @@ class ModelManager:
         self._model.instance = tf.keras.Model(
             inputs=list(), outputs=list(), name=model_name
         )
-
         self.refresh_model()
-        self.notify_observers(callback_type=Watch.MODEL)
+        self.notify_observers(callback_type=Observe.MODEL)
 
     def upload_model(self, model_path: Any) -> None:
         """Upload TensorFlow model."""
         self._model.instance = tf.keras.models.load_model(
             filepath=model_path, compile=False
         )
-
         self.refresh_model()
-        self.notify_observers(callback_type=Watch.MODEL)
+        self.notify_observers(callback_type=Observe.MODEL)
 
     def refresh_model(self) -> None:
         self._model.name = self._model.instance.name
@@ -56,15 +54,6 @@ class ModelManager:
         self._model.output_shapes = {
             layer_name: 1 for layer_name in self._model.instance.output_names
         }
-        self._model.input_model_columns = {
-            name: list() for name in self._model.input_layers
-        }
-        self._model.output_model_columns = {
-            name: list() for name in self._model.output_layers
-        }
-        self._model.layers_fullness = {
-            name: 0 for name in self._model.input_layers | self._model.output_layers
-        }
         self._model.losses = {name: list() for name in self._model.output_layers}
         self._model.metrics = {name: list() for name in self._model.output_layers}
 
@@ -82,7 +71,7 @@ class ModelManager:
             layer = {kwargs["name"]: layer_instance(**kwargs)(connect)}
 
         self._model.layers.update(layer)
-        self.notify_observers(callback_type=Watch.LAYER_ADDED)
+        self.notify_observers(callback_type=Observe.LAYER_ADDED)
 
     def set_model_outputs(self, outputs_names: Any) -> None:
         self._model.output_layers = {
@@ -95,20 +84,10 @@ class ModelManager:
         )
 
         self.refresh_model()
-        self.notify_observers(callback_type=Watch.OUTPUTS_SET)
+        self.notify_observers(callback_type=Observe.OUTPUTS_SET)
 
-    def show_model_summary(self, output_handler: Any) -> None:
-        output_handler.clear_output(wait=True)
-
-        if not self._model.instance:
-            return
-
-        if not self._model.layers:
-            return
-
-        with output_handler:
-            print("\n")
-            display(self._model.instance.summary())
+    def show_model_summary(self) -> None:
+        display(self._model.instance.summary())
 
     def plot_model(self) -> None:
         """Plot TensorFlow model graph."""
@@ -132,14 +111,12 @@ class ModelManager:
     def select_optimizer(self, optimizer: Any, **kwargs) -> None:
         """Instantiate model optimizer."""
         self._model.optimizer = optimizer(**kwargs)
-
-        self.notify_observers(callback_type=Watch.OPTIMIZER_SELECTED)
+        self.notify_observers(callback_type=Observe.OPTIMIZER_SELECTED)
 
     def add_loss(self, layer: str, loss: Any) -> None:
         """Instantiate model losses."""
         self._model.losses[layer] = loss()
-
-        self.notify_observers(callback_type=Watch.LOSSES_SELECTED)
+        self.notify_observers(callback_type=Observe.LOSSES_SELECTED)
 
     def add_metric(self, layer: str, metric: Any) -> None:
         """Instantiate model metrics."""
@@ -157,35 +134,21 @@ class ModelManager:
             metrics=self._model.metrics,
         )
 
-    def check_shapes(self) -> str:
-        for layer_name in list(
-            self._data.input_training_columns | self._data.output_training_columns
-        ):
-            if layer_name in self._model.input_shapes:
-                shape = self._model.input_shapes[layer_name]
-            else:
-                shape = self._model.output_shapes[layer_name]
-
-            if self._data.num_columns_per_layer[layer_name] < shape:
-                return layer_name
-
-        return str()
-
     def fit_model(
         self, batch_size: int, num_epochs: int, validation_split: float
     ) -> None:
         history = self._model.instance.fit(
             x={
                 layer_name: self._data.file[
-                    :, self._data.input_training_columns[layer_name]
+                    :, self._data.input_training_data[layer_name]
                 ]
-                for layer_name in self._data.input_training_columns.keys()
+                for layer_name in self._data.input_training_data.keys()
             },
             y={
                 layer_name: self._data.file[
-                    :, self._data.output_training_columns[layer_name]
+                    :, self._data.output_training_data[layer_name]
                 ]
-                for layer_name in self._data.output_training_columns.keys()
+                for layer_name in self._data.output_training_data.keys()
             },
             batch_size=batch_size,
             epochs=num_epochs,
@@ -215,23 +178,15 @@ class ModelManager:
         bqplt.legend()
         bqplt.show()
 
-    def add_columns(self, layer_type: str, layer_name: str, columns: Any) -> None:
-        if layer_type == "input":
-            self._model.input_model_columns[layer_name].extend(columns)
-        else:
-            self._model.output_model_columns[layer_name].extend(columns)
-
-        self._model.layers_fullness[layer_name] += len(columns)
-
     def check_layer_capacity(
-        self, layer_type: str, layer_name: str, num_columns: int
+        self, layer_type: str, layer: str, num_columns: int
     ) -> bool:
         if layer_type == "input":
-            shape = self._model.input_shapes[layer_name]
+            shape = self._model.input_shapes[layer]
         else:
-            shape = self._model.output_shapes[layer_name]
+            shape = self._model.output_shapes[layer]
 
-        current_num_columns = self._model.layers_fullness[layer_name]
+        current_num_columns = self._data.columns_per_layer[layer]
 
         return False if num_columns + current_num_columns > shape else True
 
@@ -272,18 +227,6 @@ class ModelManager:
     @property
     def output_shapes(self) -> dict[str, int]:
         return self._model.output_shapes
-
-    @property
-    def input_model_columns(self) -> dict[str, list[str]]:
-        return self._model.input_model_columns
-
-    @property
-    def output_model_columns(self) -> dict[str, list[str]]:
-        return self._model.output_model_columns
-
-    @property
-    def layers_fullness(self) -> dict[str, int]:
-        return self._model.layers_fullness
 
     @property
     def optimizer(self) -> Any:

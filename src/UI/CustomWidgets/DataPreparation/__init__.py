@@ -1,3 +1,5 @@
 from .DataGridWidget import DataGridWidget
 from .DataPlotWidget import DataPlotWidget
-from .SelectModelColumnsWidget import SelectModelColumnsWidget
+from .SelectInputColumnsWidget import SelectInputColumnsWidget
+from .SelectOutputColumnsWidget import SelectOutputColumnsWidget
+from .SplitDataWidget import SplitDataWidget
