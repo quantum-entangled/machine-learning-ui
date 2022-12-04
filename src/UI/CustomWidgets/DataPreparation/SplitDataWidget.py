@@ -76,7 +76,7 @@ class SplitDataWidget(iw.VBox):
 
             self.data_manager.split_data(test_size=self.test_size_slider.value)
 
-            print(Success.DATA_SPLITTED)
+            print(Success.DATA_SPLIT)
 
     def _on_file_uploaded(self) -> None:
         """Callback for file upload."""

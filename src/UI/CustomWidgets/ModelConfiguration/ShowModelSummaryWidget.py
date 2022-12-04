@@ -26,7 +26,7 @@ class ShowModelSummaryWidget(iw.VBox):
         self.model_manager = model_manager
 
         # Widgets
-        self.show_summary_button = iw.Button(description="Save Model")
+        self.show_summary_button = iw.Button(description="Show Summary")
         self.summary = iw.Output()
 
         # Callbacks

@@ -47,6 +47,9 @@ class ManageLayersWidget(iw.VBox):
         self.layer_status = iw.Output()
 
         # Callbacks
+        self.layer_type_dropdown.observe(
+            self._on_layer_type_dropdown_value_change, names="value"
+        )
         self.add_layer_button.on_click(self._on_add_layer_button_clicked)
         iw.jslink(
             (self.layer_type_dropdown, "index"), (self.layers_stack, "selected_index")
@@ -61,10 +64,13 @@ class ManageLayersWidget(iw.VBox):
             ]
         )
 
+    def _on_layer_type_dropdown_value_change(self, _) -> None:
+        self.layer_status.clear_output()
+
     def _update_layer_widget(self) -> None:
         for layer_widget in self.layers_stack.children:
-            if callable(getattr(layer_widget, "_on_widget_state_change", None)):
-                layer_widget._on_widget_state_change()
+            if callable(getattr(layer_widget, "_update_widget", None)):
+                layer_widget._update_widget()
 
     def _on_add_layer_button_clicked(self, _) -> None:
         """Callback for add layer button."""

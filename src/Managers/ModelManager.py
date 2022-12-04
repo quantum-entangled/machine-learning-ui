@@ -34,6 +34,7 @@ class ModelManager:
         self.notify_observers(callback_type=Observe.MODEL)
 
     def refresh_model(self) -> None:
+        """Refresh model instance and its properties."""
         self._model.name = self._model.instance.name
         self._model.input_layers = {
             name: layer
@@ -58,6 +59,7 @@ class ModelManager:
         self._model.metrics = {name: list() for name in self._model.output_layers}
 
     def add_layer(self, layer_instance: Any, connect_to: Any, **kwargs) -> None:
+        """Add layers to model."""
         if not connect_to:
             layer = {kwargs["name"]: layer_instance(**kwargs)}
 
@@ -74,6 +76,7 @@ class ModelManager:
         self.notify_observers(callback_type=Observe.LAYER_ADDED)
 
     def set_model_outputs(self, outputs_names: Any) -> None:
+        """Set model outputs."""
         self._model.output_layers = {
             name: self._model.layers[name] for name in outputs_names
         }
@@ -87,6 +90,7 @@ class ModelManager:
         self.notify_observers(callback_type=Observe.OUTPUTS_SET)
 
     def show_model_summary(self) -> None:
+        """Show model summary."""
         display(self._model.instance.summary())
 
     def plot_model(self) -> None:
@@ -133,33 +137,25 @@ class ModelManager:
             loss=self._model.losses,
             metrics=self._model.metrics,
         )
+        self._model.compiled = True
+        self.notify_observers(callback_type=Observe.MODEL_COMPILED)
 
-    def fit_model(
-        self, batch_size: int, num_epochs: int, validation_split: float
-    ) -> None:
+    def fit_model(self, batch_size: int, num_epochs: int, val_split: float) -> None:
+        """Fit model."""
         history = self._model.instance.fit(
-            x={
-                layer_name: self._data.file[
-                    :, self._data.input_training_data[layer_name]
-                ]
-                for layer_name in self._data.input_training_data.keys()
-            },
-            y={
-                layer_name: self._data.file[
-                    :, self._data.output_training_data[layer_name]
-                ]
-                for layer_name in self._data.output_training_data.keys()
-            },
+            x=self._data.input_training_data,
+            y=self._data.output_training_data,
             batch_size=batch_size,
             epochs=num_epochs,
-            validation_split=validation_split,
+            validation_split=val_split,
             callbacks=self._model.callbacks,
-            verbose=1,
         )
 
         self._model.training_history = history.history
+        self.notify_observers(callback_type=Observe.MODEL_TRAINED)
 
     def plot_history(self, y: Any, color: Any, same_figure: bool) -> None:
+        """Plot training history."""
         y_data = self._model.training_history[y]
         x_data = [i + 1 for i, _ in enumerate(y_data)]
 
@@ -170,7 +166,7 @@ class ModelManager:
 
         fig.min_aspect_ratio = 1
         fig.max_aspect_ratio = 1
-        fig.fig_margin = {"top": 5, "bottom": 35, "left": 40, "right": 5}
+        fig.fig_margin = {"top": 5, "bottom": 35, "left": 45, "right": 5}
 
         bqplt.plot(x=x_data, y=y_data, colors=[color], labels=[y], figure=fig)
         bqplt.xlabel("Epoch")
@@ -181,6 +177,7 @@ class ModelManager:
     def check_layer_capacity(
         self, layer_type: str, layer: str, num_columns: int
     ) -> bool:
+        """Check if layer is overfilled."""
         if layer_type == "input":
             shape = self._model.input_shapes[layer]
         else:
@@ -191,6 +188,7 @@ class ModelManager:
         return False if num_columns + current_num_columns > shape else True
 
     def notify_observers(self, callback_type: str) -> None:
+        """Notifier for manager's observers."""
         for observer in self._observers:
             callback = getattr(observer, callback_type, None)
 
@@ -198,6 +196,7 @@ class ModelManager:
                 callback()
 
     def model_exists(self) -> bool:
+        """Check if model instance exists."""
         return True if self._model.instance else False
 
     @property
@@ -229,6 +228,10 @@ class ModelManager:
         return self._model.output_shapes
 
     @property
+    def compiled(self) -> bool:
+        return self._model.compiled
+
+    @property
     def optimizer(self) -> Any:
         return self._model.optimizer
 
@@ -243,6 +246,10 @@ class ModelManager:
     @property
     def callbacks(self) -> list[Any]:
         return self._model.callbacks
+
+    @property
+    def training_history(self) -> dict[str, Any]:
+        return self._model.training_history
 
     @property
     def observers(self) -> list[Any]:

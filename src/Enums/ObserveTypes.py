@@ -11,3 +11,6 @@ class Observe(str, Enum):
     INPUT_COLUMNS_ADDED = "_on_input_columns_added"
     OUTPUT_COLUMNS_ADDED = "_on_output_columns_added"
     LAYERS_FILLED = "_on_layers_filled"
+    DATA_SPLIT = "_on_data_split"
+    MODEL_COMPILED = "_on_model_compiled"
+    MODEL_TRAINED = "_on_model_trained"

@@ -43,6 +43,7 @@ class SelectLossesWidget(iw.VBox):
         self.loss_status = iw.Output()
 
         # Callbacks
+        self.layer_dropdown.observe(self._on_layer_dropdown_value_change, names="value")
         self.add_loss_button.on_click(self._on_add_loss_button_clicked)
 
         super().__init__(
@@ -53,6 +54,9 @@ class SelectLossesWidget(iw.VBox):
                 self.loss_status,
             ]
         )
+
+    def _on_layer_dropdown_value_change(self, _) -> None:
+        self.loss_status.clear_output()
 
     def _on_add_loss_button_clicked(self, _) -> None:
         self.loss_status.clear_output(wait=True)

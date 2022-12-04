@@ -94,6 +94,7 @@ class SelectOutputColumnsWidget(iw.VBox):
         )
 
     def _on_layer_dropdown_value_change(self, change: Any) -> None:
+        self.columns_status.clear_output()
         self.layer_fullness_status.value = f"Layer fullness: {self.data_manager.columns_per_layer.get(change['new'])}/{self.model_manager.output_shapes.get(change['new'])}"
 
     def _on_columns_select_value_change(self, change: Any) -> None:
@@ -141,7 +142,6 @@ class SelectOutputColumnsWidget(iw.VBox):
                 for item in self.columns_select.options
                 if item not in selected_columns
             ]
-            self.selected_columns_num.value = "Selected: 0 column(s)"
             self.layer_fullness_status.value = f"Layer fullness: {self.data_manager.columns_per_layer.get(layer)}/{self.model_manager.output_shapes.get(layer)}"
 
             print(Success.COLUMNS_ADDED)

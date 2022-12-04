@@ -14,7 +14,7 @@ class Success(Enum):
     OPTIMIZER_SELECTED = "Optimizer has been successfully selected!\u2705"
     OUTPUTS_SET = "Model outputs have been successfully set!\u2705"
     MODEL_COMPILED = "Model has been successfully compiled!\u2705"
-    DATA_SPLITTED = "Data have been successfully splitted!\u2705"
+    DATA_SPLIT = "Data have been successfully split!\u2705"
 
     def __str__(self):
         return f"{self.value}"

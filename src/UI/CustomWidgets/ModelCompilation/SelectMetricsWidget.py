@@ -43,6 +43,7 @@ class SelectMetricsWidget(iw.VBox):
         self.metric_status = iw.Output()
 
         # Callbacks
+        self.layer_dropdown.observe(self._on_layer_dropdown_value_change, names="value")
         self.add_metric_button.on_click(self._on_add_metric_button_clicked)
 
         super().__init__(
@@ -53,6 +54,9 @@ class SelectMetricsWidget(iw.VBox):
                 self.metric_status,
             ]
         )
+
+    def _on_layer_dropdown_value_change(self, _) -> None:
+        self.metric_status.clear_output()
 
     def _on_add_metric_button_clicked(self, _) -> None:
         self.metric_status.clear_output(wait=True)

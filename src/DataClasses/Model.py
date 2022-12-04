@@ -13,6 +13,7 @@ class Model:
     layers: dict[str, Any] = field(default_factory=dict)
     input_shapes: dict[str, int] = field(default_factory=dict)
     output_shapes: dict[str, int] = field(default_factory=dict)
+    compiled: bool = False
     optimizer: Any = None
     losses: dict[str, Any] = field(default_factory=dict)
     metrics: dict[str, list[Any]] = field(default_factory=dict)

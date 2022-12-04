@@ -39,6 +39,9 @@ class SelectOptimizerWidget(iw.VBox):
         self.optimizer_status = iw.Output()
 
         # Callbacks
+        self.optimizer_dropdown.observe(
+            self._on_optimizer_dropdown_value_change, names="value"
+        )
         self.select_optimizer_button.on_click(self._on_select_optimizer_button_clicked)
         iw.jslink(
             (self.optimizer_dropdown, "index"),
@@ -53,6 +56,9 @@ class SelectOptimizerWidget(iw.VBox):
                 self.optimizer_status,
             ]
         )
+
+    def _on_optimizer_dropdown_value_change(self, _) -> None:
+        self.optimizer_status.clear_output()
 
     def _on_select_optimizer_button_clicked(self, _) -> None:
         self.optimizer_status.clear_output(wait=True)

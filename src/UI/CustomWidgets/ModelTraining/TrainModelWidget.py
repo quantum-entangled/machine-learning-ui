@@ -3,29 +3,31 @@ from typing import Any, Protocol
 import ipywidgets as iw
 
 from Enums.ErrorMessages import Error
-from Enums.SuccessMessages import Success
 
 
 class DataManager(Protocol):
     """Protocol for data managers."""
 
-    def file_exists(self) -> bool:
+    @property
+    def input_training_data(self) -> dict[str, Any]:
         ...
 
-    def check_layers_fullness(self) -> str:
+    @property
+    def output_training_data(self) -> dict[str, Any]:
         ...
 
 
 class ModelManager(Protocol):
     """Protocol for model managers."""
 
-    @property
-    def model(self) -> Any:
+    def model_exists(self) -> bool:
         ...
 
-    def fit_model(
-        self, batch_size: int, num_epochs: int, validation_split: float
-    ) -> None:
+    def fit_model(self, batch_size: int, num_epochs: int, val_split: float) -> None:
+        ...
+
+    @property
+    def compiled(self) -> bool:
         ...
 
 
@@ -36,6 +38,7 @@ class TrainModelWidget(iw.VBox):
     def __init__(
         self, data_manager: DataManager, model_manager: ModelManager, **kwargs
     ):
+        """Initialize widget window."""
         # Managers
         self.data_manager = data_manager
         self.model_manager = model_manager
@@ -57,7 +60,7 @@ class TrainModelWidget(iw.VBox):
             description="Number of epochs:",
             style={"description_width": "initial"},
         )
-        self.validation_split = iw.BoundedFloatText(
+        self.val_split = iw.BoundedFloatText(
             value=0.15,
             min=0.01,
             max=1,
@@ -75,57 +78,50 @@ class TrainModelWidget(iw.VBox):
             children=[
                 self.batch_size,
                 self.num_epochs,
-                self.validation_split,
+                self.val_split,
                 self.train_model_button,
                 self.train_output,
             ]
         )
 
     def _on_train_model_button_clicked(self, _) -> None:
+        """Callback for train model button."""
         self.train_output.clear_output(wait=True)
 
         with self.train_output:
-            if not self.data_manager.file_exists():
-                print(Error.NO_FILE_UPLOADED)
-                return
-
-            if self.model_manager.model.instance is None:
-                print("Please, upload the model first!\u274C")
+            if not self.model_manager.model_exists():
+                print(Error.NO_MODEL)
                 return
 
             if not (
-                self.data_manager.data.input_training_columns
-                and self.data_manager.data.output_training_columns
+                self.data_manager.input_training_data
+                and self.data_manager.output_training_data
             ):
-                print("Please, select the training data first!\u274C")
+                print(Error.DATA_NOT_SPLIT)
                 return
 
-            layer_name = self.data_manager.check_layers_fullness()
-
-            if layer_name:
-                print(
-                    f"Layer '{layer_name}' is not fully filled with data columns!\u274C"
-                )
-                return
-
-            if not self.model_manager.model.optimizer:
-                print("Please, select the optimizer first!\u274C")
-                return
-
-            if not self.model_manager.model.losses:
-                print("Please, select the loss function(s) first!\u274C")
+            if not self.model_manager.compiled:
+                print(Error.MODEL_NOT_COMPILED)
                 return
 
             batch_size = self.batch_size.value
             num_epochs = self.num_epochs.value
-            validation_split = self.validation_split.value
+            val_split = self.val_split.value
 
             self.model_manager.fit_model(
                 batch_size=batch_size,
                 num_epochs=num_epochs,
-                validation_split=validation_split,
+                val_split=val_split,
             )
 
-    def _on_file_uploaded(self) -> None:
-        """Callback for file upload."""
+    def _on_model_instantiated(self) -> None:
+        """Callback for model instantiation."""
+        self.train_output.clear_output()
+
+    def _on_data_split(self) -> None:
+        """Callback for data split."""
+        self.train_output.clear_output()
+
+    def _on_model_compiled(self) -> None:
+        """Callback for model compilation."""
         self.train_output.clear_output()

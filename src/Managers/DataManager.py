@@ -1,4 +1,3 @@
-import itertools as it
 from typing import Any
 
 import pandas as pd
@@ -52,6 +51,7 @@ class DataManager:
         fig = bqplt.figure()
         fig.min_aspect_ratio = 1
         fig.max_aspect_ratio = 1
+        fig.fig_margin = {"top": 5, "bottom": 35, "left": 45, "right": 5}
 
         bqplt.plot(x=x_data, y=y_data, figure=fig)
         bqplt.xlabel(x)
@@ -103,6 +103,8 @@ class DataManager:
             for name, values in self._data.output_columns.items()
         }
 
+        self.notify_observers(callback_type=Observe.DATA_SPLIT)
+
     def notify_observers(self, callback_type: Any) -> None:
         for observer in self._observers:
             callback = getattr(observer, callback_type, None)
@@ -136,6 +138,22 @@ class DataManager:
     @property
     def columns_per_layer(self) -> dict[str, int]:
         return self._data.columns_per_layer
+
+    @property
+    def input_training_data(self) -> dict[str, Any]:
+        return self._data.input_training_data
+
+    @property
+    def output_training_data(self) -> dict[str, Any]:
+        return self._data.output_training_data
+
+    @property
+    def input_test_data(self) -> dict[str, Any]:
+        return self._data.input_test_data
+
+    @property
+    def output_test_data(self) -> dict[str, Any]:
+        return self._data.output_test_data
 
     @property
     def observers(self) -> list[Any]:

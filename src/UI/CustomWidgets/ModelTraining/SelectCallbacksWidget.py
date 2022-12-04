@@ -23,9 +23,10 @@ class ModelManager(Protocol):
 
 class SelectCallbackWidget(iw.VBox):
 
-    name = "Select Model Callbacks"
+    name = "Select Callbacks"
 
     def __init__(self, model_manager: ModelManager, **kwargs):
+        """Initialize widget window."""
         # Managers
         self.model_manager = model_manager
 
@@ -44,6 +45,9 @@ class SelectCallbackWidget(iw.VBox):
         self.callback_status = iw.Output()
 
         # Callbacks
+        self.callback_dropdown.observe(
+            self._on_callback_dropdown_value_change, names="value"
+        )
         self.add_callback_button.on_click(self._on_add_callback_button_clicked)
         iw.jslink(
             (self.callback_dropdown, "index"), (self.callbacks_stack, "selected_index")
@@ -58,7 +62,11 @@ class SelectCallbackWidget(iw.VBox):
             ]
         )
 
+    def _on_callback_dropdown_value_change(self, _) -> None:
+        self.callback_status.clear_output()
+
     def _on_add_callback_button_clicked(self, _) -> None:
+        """Callback for add callback button."""
         self.callback_status.clear_output(wait=True)
 
         with self.callback_status:
