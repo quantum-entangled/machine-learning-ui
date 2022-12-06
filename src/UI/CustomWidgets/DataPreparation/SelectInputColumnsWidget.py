@@ -109,7 +109,7 @@ class SelectInputColumnsWidget(iw.VBox):
                 return
 
             if not self.model_manager.model_exists():
-                print(Error.NO_MODEL_UPLOADED)
+                print(Error.NO_MODEL)
                 return
 
             layer = self.layer_dropdown.value

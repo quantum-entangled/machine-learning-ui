@@ -121,12 +121,12 @@ class TrainModelWidget(iw.VBox):
                 val_split=val_split,
             )
 
-    def _on_file_uploaded(self) -> None:
-        """Callback for file upload."""
-        self.train_output.clear_output()
-
     def _on_model_instantiated(self) -> None:
         """Callback for model instantiation."""
+        self.train_output.clear_output()
+
+    def _on_file_uploaded(self) -> None:
+        """Callback for file upload."""
         self.train_output.clear_output()
 
     def _on_data_split(self) -> None:

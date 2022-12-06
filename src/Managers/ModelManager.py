@@ -27,9 +27,9 @@ class ModelManager:
 
     def upload_model(self, model_path: Any) -> None:
         """Upload TensorFlow model."""
-        self._model.instance = tf.keras.models.load_model(
-            filepath=model_path, compile=False
-        )
+        tf.get_logger().setLevel("ERROR")
+
+        self._model.instance = tf.keras.models.load_model(filepath=model_path)
         self.refresh_model()
         self.notify_observers(callback_type=Observe.MODEL)
 
@@ -107,6 +107,8 @@ class ModelManager:
 
     def save_model(self) -> None:
         "Save model to '.h5' format."
+        tf.get_logger().setLevel("ERROR")
+
         self._model.instance.save(
             filepath=f"../db/Models/{self._model.name}.h5",
             save_format="h5",
@@ -156,12 +158,35 @@ class ModelManager:
 
     def evaluate_model(self, batch_size: int) -> None:
         """Evaluate model."""
-        self._model.instance.evaluate(
+        results = self._model.instance.evaluate(
             x=self._data.input_test_data,
             y=self._data.output_test_data,
             batch_size=batch_size,
             callbacks=self._model.callbacks,
+            return_dict=True,
+            verbose=0,
         )
+
+        for name, value in results.items():
+            print(f"{name}: {value}")
+
+    def make_predictions(self, batch_size: int) -> None:
+        """Make model predictions."""
+        predictions = self._model.instance.predict(
+            x={
+                name: self._data.file[values]
+                for name, values in self._data.input_columns.items()
+            },
+            batch_size=batch_size,
+            callbacks=self._model.callbacks,
+            verbose=0,
+        )
+
+        if isinstance(predictions, dict):
+            for name, value in predictions.items():
+                print(f"{name}: {list(value.flatten())}", end="\n\n")
+        else:
+            print(f"{self._model.output_layers.keys()}: {list(predictions.flatten())}")
 
     def plot_history(self, y: Any, color: Any, same_figure: bool) -> None:
         """Plot training history."""

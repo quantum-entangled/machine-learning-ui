@@ -12,7 +12,10 @@ class DataManager(Protocol):
     def file_exists(self) -> bool:
         ...
 
-    def check_layers_fullness(self) -> bool:
+    def check_inputs_fullness(self) -> bool:
+        ...
+
+    def check_outputs_fullness(self) -> bool:
         ...
 
     def split_data(self, test_size: int) -> None:
@@ -67,11 +70,15 @@ class SplitDataWidget(iw.VBox):
                 return
 
             if not self.model_manager.model_exists():
-                print(Error.NO_MODEL_UPLOADED)
+                print(Error.NO_MODEL)
                 return
 
-            if not self.data_manager.check_layers_fullness():
-                print(Error.LAYER_UNDERFILLED)
+            if not self.data_manager.check_inputs_fullness():
+                print(Error.INPUTS_UNDERFILLED)
+                return
+
+            if not self.data_manager.check_outputs_fullness():
+                print(Error.OUTPUTS_UNDERFILLED)
                 return
 
             self.data_manager.split_data(test_size=self.test_size_slider.value)
@@ -86,6 +93,10 @@ class SplitDataWidget(iw.VBox):
         """Callback for model instantiation."""
         self.split_output.clear_output()
 
-    def _on_layers_filled(self) -> None:
-        """Callback for filled layers."""
+    def _on_input_columns_added(self) -> None:
+        """Callback for adding input columns."""
+        self.split_output.clear_output()
+
+    def _on_output_columns_added(self) -> None:
+        """Callback for adding output columns."""
         self.split_output.clear_output()

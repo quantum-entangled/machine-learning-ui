@@ -25,8 +25,8 @@ class UploadModelWidget(iw.VBox):
         self.model_manager = model_manager
 
         # Widgets
-        self.file_chooser_label = iw.Label(value="Please, select your model:")
         self.file_chooser = FileChooser(
+            title="Please, select the model:",
             path="../db/Models",
             sandbox_path="../db/Models",
             filter_pattern="*.h5",
@@ -38,11 +38,7 @@ class UploadModelWidget(iw.VBox):
         self.upload_model_button.on_click(self._on_upload_model_button_clicked)
 
         super().__init__(
-            children=[
-                iw.HBox([self.file_chooser_label, self.file_chooser]),
-                self.upload_model_button,
-                self.upload_status,
-            ]
+            children=[self.file_chooser, self.upload_model_button, self.upload_status]
         )
 
     def _on_upload_model_button_clicked(self, _) -> None:

@@ -1,4 +1,4 @@
-from typing import Any, Protocol
+from typing import Protocol
 
 import ipywidgets as iw
 
@@ -11,12 +11,7 @@ class DataManager(Protocol):
     def file_exists(self) -> bool:
         ...
 
-    @property
-    def input_test_data(self) -> dict[str, Any]:
-        ...
-
-    @property
-    def output_test_data(self) -> dict[str, Any]:
+    def check_inputs_fullness(self) -> bool:
         ...
 
 
@@ -26,7 +21,7 @@ class ModelManager(Protocol):
     def model_exists(self) -> bool:
         ...
 
-    def evaluate_model(self, batch_size: int) -> None:
+    def make_predictions(self, batch_size: int) -> None:
         ...
 
     @property
@@ -34,9 +29,9 @@ class ModelManager(Protocol):
         ...
 
 
-class EvaluateModelWidget(iw.VBox):
+class MakePredictionsWidget(iw.VBox):
 
-    name = "Evaluate Model"
+    name = "Make Predictions"
 
     def __init__(
         self, data_manager: DataManager, model_manager: ModelManager, **kwargs
@@ -55,21 +50,21 @@ class EvaluateModelWidget(iw.VBox):
             description="Batch size:",
             style={"description_width": "initial"},
         )
-        self.evaluate_model_button = iw.Button(description="Evaluate Model")
-        self.evaluate_output = iw.Output()
+        self.predict_button = iw.Button(description="Make Predictions")
+        self.predict_output = iw.Output()
 
         # Callbacks
-        self.evaluate_model_button.on_click(self._on_evaluate_model_button_clicked)
+        self.predict_button.on_click(self._on_predict_button_clicked)
 
         super().__init__(
-            children=[self.batch_size, self.evaluate_model_button, self.evaluate_output]
+            children=[self.batch_size, self.predict_button, self.predict_output]
         )
 
-    def _on_evaluate_model_button_clicked(self, _) -> None:
+    def _on_predict_button_clicked(self, _) -> None:
         """Callback for evaluate model button."""
-        self.evaluate_output.clear_output(wait=True)
+        self.predict_output.clear_output(wait=True)
 
-        with self.evaluate_output:
+        with self.predict_output:
             if not self.model_manager.model_exists():
                 print(Error.NO_MODEL)
                 return
@@ -78,10 +73,8 @@ class EvaluateModelWidget(iw.VBox):
                 print(Error.NO_FILE_UPLOADED)
                 return
 
-            if not (
-                self.data_manager.input_test_data and self.data_manager.output_test_data
-            ):
-                print(Error.DATA_NOT_SPLIT)
+            if not self.data_manager.check_inputs_fullness():
+                print(Error.INPUTS_UNDERFILLED)
                 return
 
             if not self.model_manager.compiled:
@@ -90,20 +83,20 @@ class EvaluateModelWidget(iw.VBox):
 
             batch_size = self.batch_size.value
 
-            self.model_manager.evaluate_model(batch_size=batch_size)
+            self.model_manager.make_predictions(batch_size=batch_size)
 
     def _on_model_instantiated(self) -> None:
         """Callback for model instantiation."""
-        self.evaluate_output.clear_output()
+        self.predict_output.clear_output()
 
     def _on_file_uploaded(self) -> None:
         """Callback for file upload."""
-        self.evaluate_output.clear_output()
+        self.predict_output.clear_output()
 
-    def _on_data_split(self) -> None:
-        """Callback for data split."""
-        self.evaluate_output.clear_output()
+    def _on_input_columns_added(self) -> None:
+        """Callback for adding input columns."""
+        self.predict_output.clear_output()
 
     def _on_model_compiled(self) -> None:
         """Callback for model compilation."""
-        self.evaluate_output.clear_output()
+        self.predict_output.clear_output()

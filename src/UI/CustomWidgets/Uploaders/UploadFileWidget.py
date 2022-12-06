@@ -31,17 +31,17 @@ class UploadFileWidget(iw.VBox):
             sandbox_path="../db/Datasets",
             filter_pattern=["*.csv", "*.tsv"],
         )
-        self.upload_button = iw.Button(description="Upload File")
+        self.upload_file_button = iw.Button(description="Upload File")
         self.upload_status = iw.Output()
 
         # Callbacks
-        self.upload_button.on_click(self._on_upload_button_clicked)
+        self.upload_file_button.on_click(self._on_upload_file_button_clicked)
 
         super().__init__(
-            children=[self.file_chooser, self.upload_button, self.upload_status]
+            children=[self.file_chooser, self.upload_file_button, self.upload_status]
         )
 
-    def _on_upload_button_clicked(self, _) -> None:
+    def _on_upload_file_button_clicked(self, _) -> None:
         """Callback for upload file button."""
         self.upload_status.clear_output()
 
