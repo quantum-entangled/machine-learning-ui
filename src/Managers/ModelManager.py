@@ -143,8 +143,8 @@ class ModelManager:
     def fit_model(self, batch_size: int, num_epochs: int, val_split: float) -> None:
         """Fit model."""
         history = self._model.instance.fit(
-            x=self._data.input_training_data,
-            y=self._data.output_training_data,
+            x=self._data.input_train_data,
+            y=self._data.output_train_data,
             batch_size=batch_size,
             epochs=num_epochs,
             validation_split=val_split,
@@ -153,6 +153,15 @@ class ModelManager:
 
         self._model.training_history = history.history
         self.notify_observers(callback_type=Observe.MODEL_TRAINED)
+
+    def evaluate_model(self, batch_size: int) -> None:
+        """Evaluate model."""
+        self._model.instance.evaluate(
+            x=self._data.input_test_data,
+            y=self._data.output_test_data,
+            batch_size=batch_size,
+            callbacks=self._model.callbacks,
+        )
 
     def plot_history(self, y: Any, color: Any, same_figure: bool) -> None:
         """Plot training history."""

@@ -1,3 +1,3 @@
 from .PlotHistoryWidget import PlotHistoryWidget
-from .SelectCallbacksWidget import SelectCallbackWidget
+from .SelectCallbacksWidget import SelectCallbacksWidget
 from .TrainModelWidget import TrainModelWidget

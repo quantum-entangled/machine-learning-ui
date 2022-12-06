@@ -12,11 +12,11 @@ class DataManager(Protocol):
         ...
 
     @property
-    def input_train_data(self) -> dict[str, Any]:
+    def input_test_data(self) -> dict[str, Any]:
         ...
 
     @property
-    def output_train_data(self) -> dict[str, Any]:
+    def output_test_data(self) -> dict[str, Any]:
         ...
 
 
@@ -26,7 +26,7 @@ class ModelManager(Protocol):
     def model_exists(self) -> bool:
         ...
 
-    def fit_model(self, batch_size: int, num_epochs: int, val_split: float) -> None:
+    def evaluate_model(self, batch_size: int) -> None:
         ...
 
     @property
@@ -34,9 +34,9 @@ class ModelManager(Protocol):
         ...
 
 
-class TrainModelWidget(iw.VBox):
+class EvaluateModelWidget(iw.VBox):
 
-    name = "Train Model"
+    name = "Evaluate Model"
 
     def __init__(
         self, data_manager: DataManager, model_manager: ModelManager, **kwargs
@@ -55,43 +55,21 @@ class TrainModelWidget(iw.VBox):
             description="Batch size:",
             style={"description_width": "initial"},
         )
-        self.num_epochs = iw.BoundedIntText(
-            value=30,
-            min=1,
-            max=200,
-            step=1,
-            description="Number of epochs:",
-            style={"description_width": "initial"},
-        )
-        self.val_split = iw.BoundedFloatText(
-            value=0.15,
-            min=0.01,
-            max=1,
-            step=0.01,
-            description="Validation split:",
-            style={"description_width": "initial"},
-        )
-        self.train_model_button = iw.Button(description="Train Model")
-        self.train_output = iw.Output()
+        self.evaluate_model_button = iw.Button(description="Evaluate Model")
+        self.evaluate_output = iw.Output()
 
         # Callbacks
-        self.train_model_button.on_click(self._on_train_model_button_clicked)
+        self.evaluate_model_button.on_click(self._on_evaluate_model_button_clicked)
 
         super().__init__(
-            children=[
-                self.batch_size,
-                self.num_epochs,
-                self.val_split,
-                self.train_model_button,
-                self.train_output,
-            ]
+            children=[self.batch_size, self.evaluate_model_button, self.evaluate_output]
         )
 
-    def _on_train_model_button_clicked(self, _) -> None:
-        """Callback for train model button."""
-        self.train_output.clear_output(wait=True)
+    def _on_evaluate_model_button_clicked(self, _) -> None:
+        """Callback for evaluate model button."""
+        self.evaluate_output.clear_output(wait=True)
 
-        with self.train_output:
+        with self.evaluate_output:
             if not self.model_manager.model_exists():
                 print(Error.NO_MODEL)
                 return
@@ -101,8 +79,7 @@ class TrainModelWidget(iw.VBox):
                 return
 
             if not (
-                self.data_manager.input_train_data
-                and self.data_manager.output_train_data
+                self.data_manager.input_test_data and self.data_manager.output_test_data
             ):
                 print(Error.DATA_NOT_SPLIT)
                 return
@@ -112,27 +89,21 @@ class TrainModelWidget(iw.VBox):
                 return
 
             batch_size = self.batch_size.value
-            num_epochs = self.num_epochs.value
-            val_split = self.val_split.value
 
-            self.model_manager.fit_model(
-                batch_size=batch_size,
-                num_epochs=num_epochs,
-                val_split=val_split,
-            )
+            self.model_manager.evaluate_model(batch_size=batch_size)
 
     def _on_file_uploaded(self) -> None:
         """Callback for file upload."""
-        self.train_output.clear_output()
+        self.evaluate_output.clear_output()
 
     def _on_model_instantiated(self) -> None:
         """Callback for model instantiation."""
-        self.train_output.clear_output()
+        self.evaluate_output.clear_output()
 
     def _on_data_split(self) -> None:
         """Callback for data split."""
-        self.train_output.clear_output()
+        self.evaluate_output.clear_output()
 
     def _on_model_compiled(self) -> None:
         """Callback for model compilation."""
-        self.train_output.clear_output()
+        self.evaluate_output.clear_output()

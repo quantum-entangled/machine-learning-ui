@@ -21,7 +21,7 @@ class ModelManager(Protocol):
         ...
 
 
-class SelectCallbackWidget(iw.VBox):
+class SelectCallbacksWidget(iw.VBox):
 
     name = "Select Callbacks"
 

@@ -34,8 +34,8 @@ class DataManager:
         self._data.columns_per_layer = {
             name: 0 for name in self._model.input_layers | self._model.output_layers
         }
-        self._data.input_training_data = dict()
-        self._data.output_training_data = dict()
+        self._data.input_train_data = dict()
+        self._data.output_train_data = dict()
         self._data.input_test_data = dict()
         self._data.output_test_data = dict()
 
@@ -86,11 +86,11 @@ class DataManager:
     def split_data(self, test_size: int) -> None:
         train, test = train_test_split(self._data.file, test_size=test_size / 100)
 
-        self._data.input_training_data = {
+        self._data.input_train_data = {
             name: train[values].to_numpy()
             for name, values in self._data.input_columns.items()
         }
-        self._data.output_training_data = {
+        self._data.output_train_data = {
             name: train[values].to_numpy()
             for name, values in self._data.output_columns.items()
         }
@@ -140,12 +140,12 @@ class DataManager:
         return self._data.columns_per_layer
 
     @property
-    def input_training_data(self) -> dict[str, Any]:
-        return self._data.input_training_data
+    def input_train_data(self) -> dict[str, Any]:
+        return self._data.input_train_data
 
     @property
-    def output_training_data(self) -> dict[str, Any]:
-        return self._data.output_training_data
+    def output_train_data(self) -> dict[str, Any]:
+        return self._data.output_train_data
 
     @property
     def input_test_data(self) -> dict[str, Any]:
