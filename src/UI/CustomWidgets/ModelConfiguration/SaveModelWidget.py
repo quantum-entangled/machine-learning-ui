@@ -45,6 +45,7 @@ class SaveModelWidget(iw.VBox):
                 return
 
             self.model_manager.save_model()
+            self.save_status.clear_output()
 
             print(Success.MODEL_SAVED)
 

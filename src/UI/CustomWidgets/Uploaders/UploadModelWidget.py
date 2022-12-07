@@ -53,5 +53,6 @@ class UploadModelWidget(iw.VBox):
                 return
 
             self.model_manager.upload_model(model_path=model_path)
+            self.upload_status.clear_output()
 
             print(Success.MODEL_UPLOADED)
