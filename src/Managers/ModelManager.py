@@ -27,7 +27,7 @@ class ModelManager:
 
     def upload_model(self, model_path: Any) -> None:
         """Upload TensorFlow model."""
-        tf.get_logger().setLevel("ERROR")
+        tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
         self._model.instance = tf.keras.models.load_model(filepath=model_path)
         self.refresh_model()
@@ -107,7 +107,7 @@ class ModelManager:
 
     def save_model(self) -> None:
         "Save model to '.h5' format."
-        tf.get_logger().setLevel("ERROR")
+        tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
         self._model.instance.save(
             filepath=f"../db/Models/{self._model.name}.h5",
