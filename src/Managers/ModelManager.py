@@ -201,6 +201,7 @@ class ModelManager:
         fig.min_aspect_ratio = 1
         fig.max_aspect_ratio = 1
         fig.fig_margin = {"top": 5, "bottom": 35, "left": 45, "right": 5}
+        fig.legend_style = {"stroke-width": 1}
 
         bqplt.plot(x=x_data, y=y_data, colors=[color], labels=[y], figure=fig)
         bqplt.xlabel("Epoch")
