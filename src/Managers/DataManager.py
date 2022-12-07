@@ -26,6 +26,8 @@ class DataManager:
         with open(file_path, 'r') as csvfile:
             value_delimiter = Sniffer().sniff(csvfile.readline()).delimiter
             decimal_delimiter = re.search(r'[^0-9\\'+value_delimiter+']',csvfile.readline())[0]
+        if decimal_delimiter == '':
+            decimal_delimiter = '.'
         self._data.file = pd.read_csv(
             filepath_or_buffer=file_path, header=0, skipinitialspace=True, 
             sep = value_delimiter, decimal = decimal_delimiter
