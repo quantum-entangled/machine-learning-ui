@@ -59,6 +59,15 @@ class DataManager:
         """Show data grid."""
         display(DataGrid(dataframe=self._data.file))
 
+    def show_data_stat(self) -> None:
+        """Show data statistics."""
+        data_stat = pd.concat([self._data.file.describe().transpose(),
+               self._data.file.dtypes.rename("type"),
+               pd.Series(self._data.file.isnull().mean().round(3).mul(100), 
+               name = "% of nulls")],axis = 1) 
+        display(DataGrid(dataframe=data_stat))
+
+
     def show_data_plot(self, x: Any, y: Any) -> None:
         """Show data plot."""
         x_data = self._data.file[x]
