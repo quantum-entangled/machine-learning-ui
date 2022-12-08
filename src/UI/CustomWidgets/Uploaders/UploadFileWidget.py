@@ -4,6 +4,7 @@ import ipywidgets as iw
 from ipyfilechooser import FileChooser
 
 from Enums.ErrorMessages import Error
+from Enums.WarningMessages import Warnings 
 from Enums.SuccessMessages import Success
 
 
@@ -53,5 +54,15 @@ class UploadFileWidget(iw.VBox):
                 return
 
             self.data_manager.upload_file(file_path=file_path)
+
+            missing_value_columns = self.data_manager.check_missing_values()
+            if missing_value_columns:
+                print(Warnings.MISSING_VALUES, end=' ')
+                print(*missing_value_columns, sep = ',')
+
+            non_numeric_columns = self.data_manager.check_non_numeric_columns()
+            if non_numeric_columns:
+                print(Warnings.NON_NUMERIC, end=' ')
+                print(*non_numeric_columns, sep = ',')
 
             print(Success.FILE_UPLOADED)

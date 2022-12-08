@@ -25,15 +25,23 @@ class DataManager:
         """Read file to pandas format."""
         with open(file_path, 'r') as csvfile:
             value_delimiter = Sniffer().sniff(csvfile.readline()).delimiter
-            decimal_delimiter = re.search(r'[^0-9\\'+value_delimiter+']',csvfile.readline())[0]
-        if decimal_delimiter == '':
+            decimal_delimiter = re.search(r'[^0-9\\'+value_delimiter+']',csvfile.readline())[0] 
+        if decimal_delimiter == '': 
             decimal_delimiter = '.'
+        #  find first non digit and non delimiter as decimal separator, dot by default
         self._data.file = pd.read_csv(
             filepath_or_buffer=file_path, header=0, skipinitialspace=True, 
             sep = value_delimiter, decimal = decimal_delimiter
         )
         self.refresh_data()
         self.notify_observers(callback_type=Observe.FILE)
+
+    def check_missing_values(self) -> list[str]:
+        return self._data.file.columns[self._data.file.isna().any()].to_list()
+    
+    def check_non_numeric_columns(self) -> list[str]:
+        return self._data.file.select_dtypes(exclude='number').columns.to_list()
+            
 
     def refresh_data(self) -> None:
         self._data.columns = list(self._data.file.columns)
