@@ -1,4 +1,4 @@
-name: ml-gas-dynamics
+name: machine-learning-ui
 channels:
   - conda-forge
 dependencies:
