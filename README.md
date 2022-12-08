@@ -1,4 +1,8 @@
-# Installation Guide
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/quantum-entangled/machine-learning-ui/HEAD?urlpath=voila%2Frender%2Fsrc%2Fmain.ipynb)
+
+The app provides User Interface based on Jupyter's [ipywidgets](https://github.com/jupyter-widgets/ipywidgets) for managing basic Machine Learning workflows. You can launch it using Binder budge above or installing app locally.
+
+## Local Installation Guide
 
 Installation guide via built-in `venv` package.
 
