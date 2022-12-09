@@ -2,7 +2,7 @@
 
 The app provides User Interface based on Jupyter's [ipywidgets](https://github.com/jupyter-widgets/ipywidgets) for managing basic Machine Learning workflows. You can launch it using Binder budge above or installing app locally.
 
-The app was originally developed as part of St. Petersburg State University grant to help researchers solve problems of nonequilibrium gas dynamics using machine learning methods.
+The app was originally developed as part of St. Petersburg State University grant to help researchers solve problems of non-equilibrium gas dynamics using machine learning methods.
 
 ## Local Installation Guide
 
@@ -12,9 +12,9 @@ First of all, pull the repository to your local machine.
 - **(Git is not installed)** [Git Installation Guide](https://github.com/git-guides/install-git) / [Git Bash](https://git-scm.com/downloads).
 - **(Git is not installed and you don't want to do that)** Just download the ZIP-folder with source code via green `Code` button in the upper right corner of the page.
 
-Next, use either `conda` or `venv`.
+Next, use either `conda` or built-in `venv`.
 
-### Via `conda`:
+### conda:
 
 1) Install either `Miniconda` or `Anaconda` via this [Guide](https://conda.io/projects/conda/en/latest/user-guide/install/index.html).
 
@@ -30,7 +30,7 @@ Next, use either `conda` or `venv`.
 
 7) Repeat steps 2, 4-6 every time you start the app.
 
-### Via built-in `venv` package:
+### venv:
 
 Change `/` to `\` everywhere except URLs, if you're using Windows.
 
