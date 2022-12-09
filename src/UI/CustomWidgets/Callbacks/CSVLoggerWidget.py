@@ -8,4 +8,4 @@ class CSVLoggerWidget(iw.VBox):
 
     @property
     def params(self) -> dict[str, Any]:
-        return {"filename": "../db/Logs/csv/training.log"}
+        return {"filename": "../db/Logs/csv/log.csv"}
