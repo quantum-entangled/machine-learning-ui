@@ -8,4 +8,4 @@ class ModelCheckpointWidget(iw.VBox):
 
     @property
     def params(self) -> dict[str, Any]:
-        return {"filepath": "../db/Logs/checkpoints"}
+        return {"filepath": "../db/Logs/checkpoints/model.ckpt"}

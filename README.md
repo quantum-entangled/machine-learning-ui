@@ -2,30 +2,53 @@
 
 The app provides User Interface based on Jupyter's [ipywidgets](https://github.com/jupyter-widgets/ipywidgets) for managing basic Machine Learning workflows. You can launch it using Binder budge above or installing app locally.
 
+The app was originally developed as part of St. Petersburg State University grant to help researchers solve problems of nonequilibrium gas dynamics using machine learning methods.
+
 ## Local Installation Guide
 
-Installation guide via built-in `venv` package.
+First of all, pull the repository to your local machine.
+
+- **(Git is installed)** Run `git clone https://github.com/quantum-entangled/machine-learning-ui`.
+- **(Git is not installed)** [Git Installation Guide](https://github.com/git-guides/install-git) / [Git Bash](https://git-scm.com/downloads).
+- **(Git is not installed and you don't want to do that)** Just download the ZIP-folder with source code via green `Code` button in the upper right corner of the page.
+
+Next, use either `conda` or `venv`.
+
+### Via `conda`:
+
+1) Install either `Miniconda` or `Anaconda` via this [Guide](https://conda.io/projects/conda/en/latest/user-guide/install/index.html).
+
+2) Open `Anaconda Prompt` and `cd` to the repository directory on your machine. Useful guide if you're not familiar with `cd`: [Video](https://www.youtube.com/watch?v=KNjzcJhUwuA).
+
+3) Run `conda env create -f .binder/environment.yml`. Wait for the installation.
+
+4) Run `conda activate machine-learning-ui`.
+
+5) Run `jupyter notebook`. Navigate to `src/main.ipynb`. 
+
+6) Activate Voilà via the status bar button to automatically run and hide all input cells.
+
+7) Repeat steps 2, 4-6 every time you start the app.
+
+### Via built-in `venv` package:
+
+Change `/` to `\` everywhere except URLs, if you're using Windows.
 
 1) Install `Python 3.10` for your system: [Download](https://www.python.org/downloads/release/python-3108/).
     - Make sure your system meets all the requirements (for Windows users: Win8 and higher).
     - Make sure to toggle "Add to PATH" checkbox in the installation menu if you have some.
     - **(Optional)** Delete other Python versions installed on your system or make sure to launch Jupyter via Python 3.10.
 
-1) Pull the repository to your local machine.
-    - **(Git is installed)** `git clone https://github.com/quantum-entangled/gam-ml-test.git`.
-    - **(Git is not installed)** [Git Installation Guide](https://github.com/git-guides/install-git) / [Git Bash](https://git-scm.com/downloads).
-    - **(Git is not installed and you don't want to do that)** Just download the ZIP-folder with source code via green `Code` button in the upper right corner of the page.
+2) Open your terminal/cmd (not `conda` or similar, just system built-in) and `cd` to the repository directory on your machine. Useful guide if you're not familiar with `cd`: [Video](https://www.youtube.com/watch?v=KNjzcJhUwuA).
 
-1) Open your terminal/cmd (not `conda` or similar, just system built-in) and `cd` to the repository directory on your machine. Useful guide if your not familiar with `cd`: [Video](https://www.youtube.com/watch?v=KNjzcJhUwuA).
+3) Run `python -m venv venv`.
 
-1) Via the same terminal/cmd run: `python -m venv venv`.
-    - **(If `(venv)` badge has not appeared)** Type `venv/Scripts/activate.bat` or `venv/Scripts/activate`. Change `/` to `\` for Windows.
-    - **(If `(venv)` badge has appeared)** Your virtual environment has been activated.
+4) Run `venv/Scripts/activate.bat` or `source venv/Scripts/activate` to activate your environment, if `(venv)` badge has not appeared.
 
-1) Run `pip install -r requirements.txt`. Wait for the installation.
+5) Run `pip install -r .binder/requirements.txt`. Wait for the installation.
 
-1) Run `jupyter notebook src/main.ipynb`. Change `/` to `\` for Windows.
+6) Run `jupyter notebook`. Navigate to `src/main.ipynb`. 
 
-1) Activate `venv` and run last step every time you start the app.
+7) Activate Voilà via the status bar button to automatically run and hide all input cells.
 
-You're good to go if you haven't missed any steps or points. You can do the same using `conda` or similar virtualizers if you are familiar with them.
+8) Repeat steps 2, 4, 6 and 7 every time you start the app.
