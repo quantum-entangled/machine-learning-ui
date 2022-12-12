@@ -1,6 +1,6 @@
-from .DataStatWidget import DataStatWidget
 from .DataGridWidget import DataGridWidget
 from .DataPlotWidget import DataPlotWidget
+from .DataStatsWidget import DataStatsWidget
 from .SelectInputColumnsWidget import SelectInputColumnsWidget
 from .SelectOutputColumnsWidget import SelectOutputColumnsWidget
 from .SplitDataWidget import SplitDataWidget

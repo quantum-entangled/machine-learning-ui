@@ -1,3 +1,5 @@
+import re
+from csv import Sniffer
 from typing import Any
 
 import pandas as pd
@@ -5,8 +7,6 @@ from bqplot import pyplot as bqplt
 from ipydatagrid import DataGrid
 from IPython.display import display
 from sklearn.model_selection import train_test_split
-from csv import Sniffer
-import re
 
 from DataClasses import Data, Model
 from Enums.ObserveTypes import Observe
@@ -23,25 +23,31 @@ class DataManager:
 
     def upload_file(self, file_path: Any) -> None:
         """Read file to pandas format."""
-        with open(file_path, 'r') as csvfile:
+        with open(file_path, "r") as csvfile:
             value_delimiter = Sniffer().sniff(csvfile.readline()).delimiter
-            decimal_delimiter = re.search(r'[^0-9\\'+value_delimiter+']',csvfile.readline())[0] 
-        if decimal_delimiter == '': 
-            decimal_delimiter = '.'
-        #  find first non digit and non delimiter as decimal separator, dot by default
+            decimal_delimiter = re.search(
+                r"[^0-9\\" + value_delimiter + "]", csvfile.readline()
+            )[0]
+
+        if decimal_delimiter == "":
+            decimal_delimiter = "."
+
+        # Find first non-digit and non-delimiter as decimal separator, dot by default
         self._data.file = pd.read_csv(
-            filepath_or_buffer=file_path, header=0, skipinitialspace=True, 
-            sep = value_delimiter, decimal = decimal_delimiter
+            filepath_or_buffer=file_path,
+            header=0,
+            skipinitialspace=True,
+            sep=value_delimiter,
+            decimal=decimal_delimiter,
         )
         self.refresh_data()
         self.notify_observers(callback_type=Observe.FILE)
 
     def check_missing_values(self) -> list[str]:
         return self._data.file.columns[self._data.file.isna().any()].to_list()
-    
+
     def check_non_numeric_columns(self) -> list[str]:
-        return self._data.file.select_dtypes(exclude='number').columns.to_list()
-            
+        return self._data.file.select_dtypes(exclude="number").columns.to_list()
 
     def refresh_data(self) -> None:
         self._data.columns = list(self._data.file.columns)
@@ -61,12 +67,17 @@ class DataManager:
 
     def show_data_stat(self) -> None:
         """Show data statistics."""
-        data_stat = pd.concat([self._data.file.describe().transpose(),
-               self._data.file.dtypes.rename("type"),
-               pd.Series(self._data.file.isnull().mean().round(3).mul(100), 
-               name = "% of nulls")],axis = 1) 
+        data_stat = pd.concat(
+            [
+                self._data.file.describe().transpose(),
+                self._data.file.dtypes.rename("type"),
+                pd.Series(
+                    self._data.file.isnull().mean().round(3).mul(100), name="% of nulls"
+                ),
+            ],
+            axis=1,
+        )
         display(DataGrid(dataframe=data_stat))
-
 
     def show_data_plot(self, x: Any, y: Any) -> None:
         """Show data plot."""

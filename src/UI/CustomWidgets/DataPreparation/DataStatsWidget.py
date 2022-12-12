@@ -15,7 +15,7 @@ class DataManager(Protocol):
         ...
 
 
-class DataStatWidget(iw.VBox):
+class DataStatsWidget(iw.VBox):
     """Widget to display a data statistics."""
 
     name = "Show Data Statistics"
@@ -26,8 +26,8 @@ class DataStatWidget(iw.VBox):
         self.data_manager = data_manager
 
         # Widgets
-        self.show_stat_button= iw.Button(description="Show Data Statistics")
-        self.stat_output= iw.Output()
+        self.show_stat_button = iw.Button(description="Show Data Statistics")
+        self.stat_output = iw.Output()
 
         # Callbacks
         self.show_stat_button.on_click(self._on_show_grid_button_clicked)

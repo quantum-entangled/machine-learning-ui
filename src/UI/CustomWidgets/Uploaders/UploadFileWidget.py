@@ -3,8 +3,8 @@ from typing import Any, Protocol
 import ipywidgets as iw
 from ipyfilechooser import FileChooser
 
+from Enums.CautionMessages import Caution
 from Enums.ErrorMessages import Error
-from Enums.WarningMessages import Warnings 
 from Enums.SuccessMessages import Success
 
 
@@ -12,6 +12,12 @@ class DataManager(Protocol):
     """Protocol for data managers."""
 
     def upload_file(self, file_path: Any) -> None:
+        ...
+
+    def check_missing_values(self) -> list[str]:
+        ...
+
+    def check_non_numeric_columns(self) -> list[str]:
         ...
 
 
@@ -56,13 +62,15 @@ class UploadFileWidget(iw.VBox):
             self.data_manager.upload_file(file_path=file_path)
 
             missing_value_columns = self.data_manager.check_missing_values()
+
             if missing_value_columns:
-                print(Warnings.MISSING_VALUES, end=' ')
-                print(*missing_value_columns, sep = ',')
+                print(Caution.MISSING_VALUES, end=" ")
+                print(*missing_value_columns, sep=",")
 
             non_numeric_columns = self.data_manager.check_non_numeric_columns()
+
             if non_numeric_columns:
-                print(Warnings.NON_NUMERIC, end=' ')
-                print(*non_numeric_columns, sep = ',')
+                print(Caution.NON_NUMERIC, end=" ")
+                print(*non_numeric_columns, sep=",")
 
             print(Success.FILE_UPLOADED)
