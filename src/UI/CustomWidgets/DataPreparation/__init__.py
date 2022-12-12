@@ -1,3 +1,4 @@
+from .DataStatWidget import DataStatWidget
 from .DataGridWidget import DataGridWidget
 from .DataPlotWidget import DataPlotWidget
 from .SelectInputColumnsWidget import SelectInputColumnsWidget
