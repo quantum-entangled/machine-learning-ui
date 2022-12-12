@@ -65,7 +65,7 @@ class DataManager:
         """Show data grid."""
         display(DataGrid(dataframe=self._data.file))
 
-    def show_data_stat(self) -> None:
+    def show_data_stats(self) -> None:
         """Show data statistics."""
         data_stat = pd.concat(
             [
@@ -77,6 +77,7 @@ class DataManager:
             ],
             axis=1,
         )
+
         display(DataGrid(dataframe=data_stat))
 
     def show_data_plot(self, x: Any, y: Any) -> None:

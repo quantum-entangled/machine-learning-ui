@@ -11,7 +11,7 @@ class DataManager(Protocol):
     def file_exists(self) -> bool:
         ...
 
-    def show_data_stat(self) -> None:
+    def show_data_stats(self) -> None:
         ...
 
 
@@ -43,7 +43,7 @@ class DataStatsWidget(iw.VBox):
                 print(Error.NO_FILE_UPLOADED)
                 return
 
-            self.data_manager.show_data_stat()
+            self.data_manager.show_data_stats()
 
     def _on_file_uploaded(self) -> None:
         """Callback for file upload."""
