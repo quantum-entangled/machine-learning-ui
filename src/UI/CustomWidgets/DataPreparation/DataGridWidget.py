@@ -29,6 +29,8 @@ class DataGridWidget(iw.VBox):
         # Managers
         self.data_manager = data_manager
         # widgets for set range
+
+        # row range
         self._row_range = iw.IntRangeSlider(
             value=[0, 10],
             min=0,
@@ -41,6 +43,8 @@ class DataGridWidget(iw.VBox):
             readout=True,
             readout_fomat='d',
         )
+
+        # columns range
         self._col_range = iw.IntRangeSlider(
             value=[0, 10],
             min=0,
