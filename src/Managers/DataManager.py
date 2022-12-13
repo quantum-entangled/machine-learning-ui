@@ -27,14 +27,14 @@ class DataManager:
         )
         self._data.columns = list(self._data.file.columns)
     def set_range_grid(self, begin_r: Protocol, end_r: Protocol,
-                       begin_c: Protocol, end_c: Protocol, output_handler: Any) -> None:
+                       begin_c: Protocol, end_c: Protocol) -> None:
         self._range[0] = begin_r
         self._range[1] = end_r
         self._range[2] = begin_c
         self._range[3] = end_c
-        with output_handler:
-            out_txt="Rows from {0} to {1} and Columns from {2} to {3}"
-            print(out_txt.format(self._range[0],
+
+        out_txt="Rows from {0} to {1} and Columns from {2} to {3}"
+        print(out_txt.format(self._range[0],
                                  self._range[1],
                                  self._range[2],
                                  self._range[3]))
