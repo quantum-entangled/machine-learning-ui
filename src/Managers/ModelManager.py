@@ -4,8 +4,8 @@ import tensorflow as tf
 from bqplot import pyplot as bqplt
 from IPython.display import display
 
-from DataClasses import Data, Model
-from Enums.ObserveTypes import Observe
+from src.DataClasses import Data, Model
+from src.Enums.ObserveTypes import Observe
 
 
 class ModelManager:
@@ -96,7 +96,7 @@ class ModelManager:
         display(
             tf.keras.utils.plot_model(
                 self._model.instance,
-                to_file=f"../db/Images/{self._model.name}.png",
+                to_file=f"db/Images/{self._model.name}.png",
                 show_shapes=True,
                 rankdir="LR",
                 dpi=200,
@@ -106,7 +106,7 @@ class ModelManager:
     def save_model(self) -> None:
         "Save model to '.h5' format."
         self._model.instance.save(
-            filepath=f"../db/Models/{self._model.name}.h5",
+            filepath=f"db/Models/{self._model.name}.h5",
             save_format="h5",
         )
 
@@ -231,12 +231,12 @@ class ModelManager:
         return True if self._model.instance else False
 
     @property
-    def model(self) -> Model:
-        return self._model
-
-    @property
     def name(self) -> str:
         return self._model.name
+
+    @property
+    def model_instance(self) -> Any:
+        return self._model.instance
 
     @property
     def input_layers(self) -> dict[str, Any]:

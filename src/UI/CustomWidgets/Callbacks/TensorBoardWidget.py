@@ -26,7 +26,7 @@ class TensorBoardWidget(iw.VBox):
     @property
     def params(self) -> dict[str, Any]:
         return {
-            "log_dir": "../db/Logs/graph",
+            "log_dir": "db/Logs/graph",
             "histogram_freq": self.histogram_frequency.value,
             "write_graph": self.write_graph.value,
             "write_images": self.write_images.value,

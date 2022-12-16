@@ -1,7 +1,7 @@
 from typing import Any
 
 import ipywidgets as iw
-from Enums.Activations import activations
+from src.Enums.Activations import activations
 
 
 class DenseLayerWidget(iw.VBox):

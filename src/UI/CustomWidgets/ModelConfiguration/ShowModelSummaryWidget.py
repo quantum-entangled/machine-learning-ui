@@ -2,7 +2,7 @@ from typing import Protocol
 
 import ipywidgets as iw
 
-from Enums.ErrorMessages import Error
+from src.Enums.ErrorMessages import Error
 
 
 class ModelManager(Protocol):

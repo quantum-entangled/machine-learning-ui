@@ -3,8 +3,8 @@ from typing import Any, Protocol
 import ipywidgets as iw
 from ipyfilechooser import FileChooser
 
-from Enums.ErrorMessages import Error
-from Enums.SuccessMessages import Success
+from src.Enums.ErrorMessages import Error
+from src.Enums.SuccessMessages import Success
 
 
 class ModelManager(Protocol):
@@ -27,8 +27,8 @@ class UploadModelWidget(iw.VBox):
         # Widgets
         self.file_chooser = FileChooser(
             title="Please, select the model:",
-            path="../db/Models",
-            sandbox_path="../db/Models",
+            path="db/Models",
+            sandbox_path="db/Models",
             filter_pattern="*.h5",
         )
         self.upload_model_button = iw.Button(description="Upload Model")

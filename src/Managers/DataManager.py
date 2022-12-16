@@ -8,8 +8,8 @@ from ipydatagrid import DataGrid
 from IPython.display import display
 from sklearn.model_selection import train_test_split
 
-from DataClasses import Data, Model
-from Enums.ObserveTypes import Observe
+from src.DataClasses import Data, Model
+from src.Enums.ObserveTypes import Observe
 
 
 class DataManager:
@@ -154,10 +154,6 @@ class DataManager:
     def file_exists(self) -> bool:
         """Check if file exists."""
         return False if self._data.file.empty else True
-
-    @property
-    def data(self) -> Data:
-        return self._data
 
     @property
     def file(self) -> pd.DataFrame:

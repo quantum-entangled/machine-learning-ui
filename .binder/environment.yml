@@ -13,7 +13,7 @@ dependencies:
   - pydot=1.4.*
   - scikit-learn=1.1.*
   - voila=0.4.*
-  - pip
+  - pip=22.2.*
   - pip:
       - tensorflow==2.10.*
       - tensorflow-addons==0.18.*

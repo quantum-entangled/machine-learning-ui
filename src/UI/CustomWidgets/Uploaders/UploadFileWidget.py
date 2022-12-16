@@ -3,9 +3,9 @@ from typing import Any, Protocol
 import ipywidgets as iw
 from ipyfilechooser import FileChooser
 
-from Enums.CautionMessages import Caution
-from Enums.ErrorMessages import Error
-from Enums.SuccessMessages import Success
+from src.Enums.CautionMessages import Caution
+from src.Enums.ErrorMessages import Error
+from src.Enums.SuccessMessages import Success
 
 
 class DataManager(Protocol):
@@ -34,8 +34,8 @@ class UploadFileWidget(iw.VBox):
         # Widgets
         self.file_chooser = FileChooser(
             title="Please, select the data file:",
-            path="../db/Datasets",
-            sandbox_path="../db/Datasets",
+            path="db/Datasets",
+            sandbox_path="db/Datasets",
             filter_pattern=["*.csv", "*.tsv"],
         )
         self.upload_file_button = iw.Button(description="Upload File")

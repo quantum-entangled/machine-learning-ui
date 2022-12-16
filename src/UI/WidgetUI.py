@@ -1,7 +1,6 @@
 from typing import Any, Protocol
 
-from Managers.DataManager import DataManager
-from Managers.ModelManager import ModelManager
+from src.Managers import DataManager, ModelManager
 
 
 class ChildWidget(Protocol):

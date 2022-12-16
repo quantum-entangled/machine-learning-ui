@@ -2,9 +2,9 @@ from typing import Any, Protocol
 
 import ipywidgets as iw
 
-from Enums.ErrorMessages import Error
-from Enums.Losses import losses
-from Enums.SuccessMessages import Success
+from src.Enums.ErrorMessages import Error
+from src.Enums.Losses import losses
+from src.Enums.SuccessMessages import Success
 
 
 class ModelManager(Protocol):

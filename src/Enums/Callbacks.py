@@ -2,8 +2,8 @@ from typing import Any
 
 import tensorflow as tf
 
-from DataClasses import WidgetWrapper
-from UI.CustomWidgets.Callbacks import (
+from src.DataClasses import WidgetWrapper
+from src.UI.CustomWidgets.Callbacks import (
     CSVLoggerWidget,
     EarlyStoppingWidget,
     ModelCheckpointWidget,

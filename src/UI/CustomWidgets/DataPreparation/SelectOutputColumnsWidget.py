@@ -3,8 +3,8 @@ from typing import Any, Protocol
 
 import ipywidgets as iw
 
-from Enums.ErrorMessages import Error
-from Enums.SuccessMessages import Success
+from src.Enums.ErrorMessages import Error
+from src.Enums.SuccessMessages import Success
 
 
 class DataManager(Protocol):
