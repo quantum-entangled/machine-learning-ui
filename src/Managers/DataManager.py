@@ -1,4 +1,4 @@
-from typing import Any,Protocol
+from typing import Any, Protocol
 
 import numpy as np
 import pandas as pd
@@ -16,9 +16,6 @@ class DataManager:
         """Initialize the internal data object."""
         self._data = data
         self._model = model
-        """row_begin, row_end, columns begin, columns end"""
-        self._range = [0, 0, 0, 0]
-
 
     def upload_file(self, file_path: Any) -> None:
         """Read file to the pandas format and store it."""
@@ -26,22 +23,13 @@ class DataManager:
             filepath_or_buffer=file_path, header=0, skipinitialspace=True
         )
         self._data.columns = list(self._data.file.columns)
-    def set_range_grid(self, begin_r: Protocol, end_r: Protocol,
-                       begin_c: Protocol, end_c: Protocol) -> None:
-        self._range[0] = begin_r
-        self._range[1] = end_r
-        self._range[2] = begin_c
-        self._range[3] = end_c
 
-        out_txt="Rows from {0} to {1} and Columns from {2} to {3}"
-        print(out_txt.format(self._range[0],
-                                 self._range[1],
-                                 self._range[2],
-                                 self._range[3]))
-    def show_data_grid(self) -> None:
+    def show_data_grid(self, begin_r: int, end_r: int,
+                       begin_c: int, end_c: int) -> None:
         """Show the file data grid."""
 
-        display(DataGrid(dataframe=self._data.file.iloc[self._range[0]:self._range[1],self._range[2]:self._range[3]]))
+        display(DataGrid(dataframe=self._data.file.iloc[begin_r:end_r,
+                                   begin_c:end_c]))
 
     def show_data_plot(self, x: Any, y: Any) -> None:
         """Show data plot."""

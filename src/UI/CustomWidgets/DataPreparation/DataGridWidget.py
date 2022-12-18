@@ -11,11 +11,10 @@ class DataManager(Protocol):
     def file_exists(self) -> bool:
         ...
 
-    def set_range_grid(self, begin_r: Protocol, end_r: Protocol,
-                       begin_c: Protocol, end_c: Protocol) -> None:
-        ...
 
-    def show_data_grid(self) -> None:
+
+    def show_data_grid(self, begin_r: int, end_r: int,
+                       begin_c: int, end_c: int) -> None:
         ...
 
 
@@ -58,9 +57,9 @@ class DataGridWidget(iw.VBox):
             readout_fomat='d',
         )
 
-        self.set_grid_button = iw.Button(description="Set Data Grid")
-        self.set_grid_output = iw.Output()
-        self.set_grid_button.on_click(self._on_set_grid_button_clicked)
+
+
+
 
         # Widgets
         self.show_grid_button = iw.Button(description="Show Data Grid")
@@ -69,7 +68,7 @@ class DataGridWidget(iw.VBox):
         # Callbacks
         self.show_grid_button.on_click(self._on_show_grid_button_clicked)
 
-        super().__init__(children=[self._row_range, self._col_range, self.set_grid_button, self.set_grid_output,
+        super().__init__(children=[self._row_range, self._col_range,
                                    self.show_grid_button, self.grid_output])
 
     def _on_show_grid_button_clicked(self, _) -> None:
@@ -81,13 +80,12 @@ class DataGridWidget(iw.VBox):
                 print(Error.NO_FILE_UPLOADED)
                 return
 
-            self.data_manager.show_data_grid()
+            self.data_manager.show_data_grid(self._row_range.value[0],
+                                             self._row_range.value[1],
+                                             self._col_range.value[0],
+                                             self._col_range.value[1])
 
     def _on_widget_state_change(self) -> None:
         """Callback for parent widget ensemble."""
         self.grid_output.clear_output()
 
-    def _on_set_grid_button_clicked(self, _) -> None:
-        self.data_manager.set_range_grid(self._row_range.value[0], self._row_range.value[1],
-                                         self._col_range.value[0], self._col_range.value[1]
-                                         )
