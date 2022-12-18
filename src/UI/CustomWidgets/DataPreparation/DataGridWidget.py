@@ -57,10 +57,6 @@ class DataGridWidget(iw.VBox):
             readout_fomat='d',
         )
 
-
-
-
-
         # Widgets
         self.show_grid_button = iw.Button(description="Show Data Grid")
         self.grid_output = iw.Output()
