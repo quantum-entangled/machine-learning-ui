@@ -30,8 +30,12 @@ class DataPlotWidget(iw.VBox):
         self.data_manager = data_manager
 
         # Widgets
-        self.x_dropdown = iw.Dropdown(description="Select X-axis:")
-        self.y_dropdown = iw.Dropdown(description="Select Y-axis:")
+        self.x_dropdown = iw.Dropdown(
+            description="Select X-axis:", style={"description_width": "initial"}
+        )
+        self.y_dropdown = iw.Dropdown(
+            description="Select Y-axis:", style={"description_width": "initial"}
+        )
         self.show_plot_button = iw.Button(description="Show Data Plot")
         self.plot_output = iw.Output()
 

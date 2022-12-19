@@ -61,9 +61,15 @@ class DataManager:
         self._data.input_test_data = dict()
         self._data.output_test_data = dict()
 
-    def show_data_grid(self) -> None:
+    def show_data_grid(
+        self, begin_row: int, end_row: int, begin_col: int, end_col: int
+    ) -> None:
         """Show data grid."""
-        display(DataGrid(dataframe=self._data.file))
+        display(
+            DataGrid(
+                dataframe=self._data.file.iloc[begin_row:end_row, begin_col:end_col]
+            )
+        )
 
     def show_data_stats(self) -> None:
         """Show data statistics."""
