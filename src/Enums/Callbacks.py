@@ -1,5 +1,3 @@
-from typing import Any
-
 import tensorflow as tf
 
 from src.DataClasses import WidgetWrapper
@@ -10,7 +8,7 @@ from src.UI.CustomWidgets.Callbacks import (
     TensorBoardWidget,
 )
 
-callbacks: dict[str, Any] = {
+callbacks: dict[str, WidgetWrapper] = {
     "CSV Logger": WidgetWrapper(
         instance=tf.keras.callbacks.CSVLogger, widget=CSVLoggerWidget
     ),

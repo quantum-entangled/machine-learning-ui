@@ -1,4 +1,4 @@
-from typing import Any, Protocol
+from typing import Protocol
 
 import ipywidgets as iw
 from ipyfilechooser import FileChooser
@@ -11,7 +11,7 @@ from src.Enums.SuccessMessages import Success
 class DataManager(Protocol):
     """Protocol for data managers."""
 
-    def upload_file(self, file_path: Any) -> None:
+    def upload_file(self, file_path: str) -> None:
         ...
 
     def check_missing_values(self) -> list[str]:
@@ -55,7 +55,7 @@ class UploadFileWidget(iw.VBox):
         with self.upload_status:
             file_path = self.file_chooser.selected
 
-            if not file_path:
+            if file_path is None:
                 print(Error.NO_FILE_PATH)
                 return
 

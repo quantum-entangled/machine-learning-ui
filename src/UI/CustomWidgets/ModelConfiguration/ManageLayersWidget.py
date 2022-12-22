@@ -13,7 +13,9 @@ class ModelManager(Protocol):
     def model_exists(self) -> bool:
         ...
 
-    def add_layer(self, layer_instance: Any, connect_to: Any, **kwargs) -> None:
+    def add_layer(
+        self, layer_instance: Any, connect_to: str | list[str] | None, **kwargs
+    ) -> None:
         ...
 
     @property

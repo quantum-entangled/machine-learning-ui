@@ -16,11 +16,13 @@ class DataManager(Protocol):
     def file_exists(self) -> bool:
         ...
 
-    def add_columns(self, layer_type: str, layer: str, columns: Any) -> None:
+    def add_columns(
+        self, layer_type: str, layer: str, columns: str | list[str]
+    ) -> None:
         ...
 
     @property
-    def columns(self) -> list:
+    def columns(self) -> list[str]:
         ...
 
     @property

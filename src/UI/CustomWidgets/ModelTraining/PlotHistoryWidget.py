@@ -11,11 +11,11 @@ class ModelManager(Protocol):
     def model_exists(self) -> bool:
         ...
 
-    def plot_history(self, y: Any, color: Any, same_figure: bool) -> None:
+    def plot_history(self, y: str, color: Any, same_figure: bool) -> None:
         ...
 
     @property
-    def training_history(self) -> dict[str, Any]:
+    def training_history(self) -> dict[str, list[Any]]:
         ...
 
 

@@ -1,6 +1,7 @@
-from typing import Any, Protocol
+from typing import Protocol
 
 import ipywidgets as iw
+import numpy as np
 
 from src.Enums.ErrorMessages import Error
 
@@ -12,11 +13,11 @@ class DataManager(Protocol):
         ...
 
     @property
-    def input_train_data(self) -> dict[str, Any]:
+    def input_train_data(self) -> dict[str, np.ndarray]:
         ...
 
     @property
-    def output_train_data(self) -> dict[str, Any]:
+    def output_train_data(self) -> dict[str, np.ndarray]:
         ...
 
 

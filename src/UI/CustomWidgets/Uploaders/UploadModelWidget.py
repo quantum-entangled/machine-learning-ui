@@ -1,4 +1,4 @@
-from typing import Any, Protocol
+from typing import Protocol
 
 import ipywidgets as iw
 from ipyfilechooser import FileChooser
@@ -10,7 +10,7 @@ from src.Enums.SuccessMessages import Success
 class ModelManager(Protocol):
     """Protocol for model managers."""
 
-    def upload_model(self, model_path: Any) -> None:
+    def upload_model(self, model_path: str) -> None:
         ...
 
 
@@ -48,7 +48,7 @@ class UploadModelWidget(iw.VBox):
         with self.upload_status:
             model_path = self.file_chooser.selected
 
-            if not model_path:
+            if model_path is None:
                 print(Error.NO_MODEL_PATH)
                 return
 

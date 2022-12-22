@@ -1,5 +1,3 @@
-from typing import Any
-
 import tensorflow as tf
 
 from src.DataClasses import WidgetWrapper
@@ -9,7 +7,7 @@ from src.UI.CustomWidgets.Layers import (
     InputLayerWidget,
 )
 
-layers: dict[str, Any] = {
+layers: dict[str, WidgetWrapper] = {
     "Input": WidgetWrapper(instance=tf.keras.Input, widget=InputLayerWidget),
     "Dense": WidgetWrapper(instance=tf.keras.layers.Dense, widget=DenseLayerWidget),
     "Concatenate": WidgetWrapper(

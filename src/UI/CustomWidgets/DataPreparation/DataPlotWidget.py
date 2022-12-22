@@ -11,11 +11,11 @@ class DataManager(Protocol):
     def file_exists(self) -> bool:
         ...
 
-    def show_data_plot(self, x: Any, y: Any) -> None:
+    def show_data_plot(self, x: str, y: str) -> None:
         ...
 
     @property
-    def columns(self) -> list:
+    def columns(self) -> list[str]:
         ...
 
 

@@ -35,7 +35,7 @@ class ConcatenateLayerWidget(iw.VBox):
         return {"name": self.layer_name.value}
 
     @property
-    def connect(self) -> list | int:
+    def connect(self) -> list[str] | int:
         return (
             [layer_name for layer_name in self.concatenate.value]
             if len(self.concatenate.value) >= 2

@@ -18,4 +18,4 @@ class Model:
     losses: dict[str, Any] = field(default_factory=dict)
     metrics: dict[str, list[Any]] = field(default_factory=dict)
     callbacks: list[Any] = field(default_factory=list)
-    training_history: dict[str, Any] = field(default_factory=dict)
+    training_history: dict[str, list[Any]] = field(default_factory=dict)

@@ -2,6 +2,7 @@ import re
 from csv import Sniffer
 from typing import Any
 
+import numpy as np
 import pandas as pd
 from bqplot import pyplot as bqplt
 from ipydatagrid import DataGrid
@@ -21,7 +22,7 @@ class DataManager:
         self._model = model
         self._observers = list()
 
-    def upload_file(self, file_path: Any) -> None:
+    def upload_file(self, file_path: str) -> None:
         """Read file to pandas format."""
         with open(file_path, "r") as csvfile:
             value_delimiter = Sniffer().sniff(csvfile.readline()).delimiter
@@ -86,7 +87,7 @@ class DataManager:
 
         display(DataGrid(dataframe=data_stat))
 
-    def show_data_plot(self, x: Any, y: Any) -> None:
+    def show_data_plot(self, x: str, y: str) -> None:
         """Show data plot."""
         x_data = self._data.file[x]
         y_data = self._data.file[y]
@@ -101,7 +102,9 @@ class DataManager:
         bqplt.ylabel(y)
         bqplt.show()
 
-    def add_columns(self, layer_type: str, layer: str, columns: Any) -> None:
+    def add_columns(
+        self, layer_type: str, layer: str, columns: str | list[str]
+    ) -> None:
         """Specify columns for model layers."""
         if layer_type == "input":
             self._data.input_columns[layer].extend(columns)
@@ -149,7 +152,7 @@ class DataManager:
 
         self.notify_observers(callback_type=Observe.DATA_SPLIT)
 
-    def notify_observers(self, callback_type: Any) -> None:
+    def notify_observers(self, callback_type: str) -> None:
         """Notifier for manager's observers."""
         for observer in self._observers:
             callback = getattr(observer, callback_type, None)
@@ -182,19 +185,19 @@ class DataManager:
         return self._data.columns_per_layer
 
     @property
-    def input_train_data(self) -> dict[str, Any]:
+    def input_train_data(self) -> dict[str, np.ndarray]:
         return self._data.input_train_data
 
     @property
-    def output_train_data(self) -> dict[str, Any]:
+    def output_train_data(self) -> dict[str, np.ndarray]:
         return self._data.output_train_data
 
     @property
-    def input_test_data(self) -> dict[str, Any]:
+    def input_test_data(self) -> dict[str, np.ndarray]:
         return self._data.input_test_data
 
     @property
-    def output_test_data(self) -> dict[str, Any]:
+    def output_test_data(self) -> dict[str, np.ndarray]:
         return self._data.output_test_data
 
     @property

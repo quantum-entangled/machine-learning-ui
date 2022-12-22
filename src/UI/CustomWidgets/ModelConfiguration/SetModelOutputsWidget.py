@@ -12,7 +12,7 @@ class ModelManager(Protocol):
     def model_exists(self) -> bool:
         ...
 
-    def set_model_outputs(self, outputs_names: Any) -> None:
+    def set_model_outputs(self, outputs_names: str | list[str]) -> None:
         ...
 
     @property

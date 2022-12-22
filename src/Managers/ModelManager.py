@@ -25,7 +25,7 @@ class ModelManager:
         self.refresh_model()
         self.notify_observers(callback_type=Observe.MODEL)
 
-    def upload_model(self, model_path: Any) -> None:
+    def upload_model(self, model_path: str) -> None:
         """Upload TensorFlow model."""
         self._model.instance = tf.keras.models.load_model(filepath=model_path)
         self.refresh_model()
@@ -56,9 +56,11 @@ class ModelManager:
         self._model.losses = {name: list() for name in self._model.output_layers}
         self._model.metrics = {name: list() for name in self._model.output_layers}
 
-    def add_layer(self, layer_instance: Any, connect_to: Any, **kwargs) -> None:
+    def add_layer(
+        self, layer_instance: Any, connect_to: str | list[str] | None, **kwargs
+    ) -> None:
         """Add layers to model."""
-        if not connect_to:
+        if connect_to is None:
             layer = {kwargs["name"]: layer_instance(**kwargs)}
 
             self._model.input_layers.update(layer)
@@ -73,7 +75,7 @@ class ModelManager:
         self._model.layers.update(layer)
         self.notify_observers(callback_type=Observe.LAYER_ADDED)
 
-    def set_model_outputs(self, outputs_names: Any) -> None:
+    def set_model_outputs(self, outputs_names: str | list[str]) -> None:
         """Set model outputs."""
         self._model.output_layers = {
             name: self._model.layers[name] for name in outputs_names
@@ -184,7 +186,7 @@ class ModelManager:
         else:
             print(f"{self._model.output_layers.keys()}: {list(predictions.flatten())}")
 
-    def plot_history(self, y: Any, color: Any, same_figure: bool) -> None:
+    def plot_history(self, y: str, color: Any, same_figure: bool) -> None:
         """Plot training history."""
         y_data = self._model.training_history[y]
         x_data = [i + 1 for i, _ in enumerate(y_data)]
@@ -279,7 +281,7 @@ class ModelManager:
         return self._model.callbacks
 
     @property
-    def training_history(self) -> dict[str, Any]:
+    def training_history(self) -> dict[str, list[Any]]:
         return self._model.training_history
 
     @property
