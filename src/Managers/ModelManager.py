@@ -9,16 +9,37 @@ from src.Enums.ObserveTypes import Observe
 
 
 class ModelManager:
-    """Manager for operating the model configuration."""
+    """Manager for operating the model configuration.
+
+    Parameters
+    ----------
+    data : Data
+        Data container object.
+    model : Model
+        Model container object.
+
+    """
 
     def __init__(self, data: Data, model: Model) -> None:
-        """Initialize model object."""
         self._data = data
         self._model = model
         self._observers = list()
 
     def create_model(self, model_name: str) -> None:
-        """Create model from scratch."""
+        """Create a model from scratch.
+
+        TensorFlow `Model` class is used to construct a new model.
+
+        Parameters
+        ----------
+        model_name : str
+            Name of model to construct.
+
+        Returns
+        -------
+        None
+
+        """
         self._model.instance = tf.keras.Model(
             inputs=list(), outputs=list(), name=model_name
         )
@@ -26,13 +47,33 @@ class ModelManager:
         self.notify_observers(callback_type=Observe.MODEL)
 
     def upload_model(self, model_path: str) -> None:
-        """Upload TensorFlow model."""
+        """Upload TensorFlow model to the app.
+
+        TensorFlow `load_model` function is used to upload a model within
+        the given path.
+
+        Parameters
+        ----------
+        model_path : str
+            Path to a model location.
+
+        Returns
+        -------
+        None
+
+        """
         self._model.instance = tf.keras.models.load_model(filepath=model_path)
         self.refresh_model()
         self.notify_observers(callback_type=Observe.MODEL)
 
     def refresh_model(self) -> None:
-        """Refresh model instance and its properties."""
+        """Refresh attributes of model container.
+
+        Returns
+        -------
+        None
+
+        """
         self._model.name = self._model.instance.name
         self._model.input_layers = {
             name: layer
@@ -59,7 +100,21 @@ class ModelManager:
     def add_layer(
         self, layer_instance: Any, connect_to: str | list[str] | None, **kwargs
     ) -> None:
-        """Add layers to model."""
+        """Add layer to a model.
+
+        Parameters
+        ----------
+        layer_instance : Any
+            TensorFlow layer object.
+        connect_to : str | list[str] | None
+            A single layer name or a sequence of layers' names. For Input
+            layer -- None.
+
+        Returns
+        -------
+        None
+
+        """
         if connect_to is None:
             layer = {kwargs["name"]: layer_instance(**kwargs)}
 
@@ -76,7 +131,20 @@ class ModelManager:
         self.notify_observers(callback_type=Observe.LAYER_ADDED)
 
     def set_model_outputs(self, outputs_names: str | list[str]) -> None:
-        """Set model outputs."""
+        """Set model outputs.
+
+        Reconstruct a model with new outputs specified by names.
+
+        Parameters
+        ----------
+        outputs_names : str | list[str]
+            Names of new outputs.
+
+        Returns
+        -------
+        None
+
+        """
         self._model.output_layers = {
             name: self._model.layers[name] for name in outputs_names
         }
@@ -90,11 +158,23 @@ class ModelManager:
         self.notify_observers(callback_type=Observe.OUTPUTS_SET)
 
     def show_model_summary(self) -> None:
-        """Show model summary."""
+        """Display a model summary.
+
+        Returns
+        -------
+        None
+
+        """
         display(self._model.instance.summary())
 
     def plot_model(self) -> None:
-        """Plot TensorFlow model graph."""
+        """Display a model graph.
+
+        Returns
+        -------
+        None
+
+        """
         display(
             tf.keras.utils.plot_model(
                 self._model.instance,
@@ -106,32 +186,97 @@ class ModelManager:
         )
 
     def save_model(self) -> None:
-        "Save model to '.h5' format."
+        """Save a model to '.h5' format.
+
+        TensorFlow `save` function is used to save a model within the given
+        path.
+
+        Returns
+        -------
+        None
+
+        """
         self._model.instance.save(
             filepath=f"db/Models/{self._model.name}.h5",
             save_format="h5",
         )
 
     def select_optimizer(self, optimizer: Any, **kwargs) -> None:
-        """Instantiate model optimizer."""
+        """Set a model optimizer.
+
+        Parameters
+        ----------
+        optimizer : Any
+            TensorFlow optimizer object.
+
+        Returns
+        -------
+        None
+
+        """
         self._model.optimizer = optimizer(**kwargs)
         self.notify_observers(callback_type=Observe.OPTIMIZER_SELECTED)
 
     def add_loss(self, layer: str, loss: Any) -> None:
-        """Instantiate model losses."""
+        """Add a model loss function.
+
+        Parameters
+        ----------
+        layer : str
+            Layer name for the loss function to bind.
+        loss : Any
+            TensorFlow loss function object.
+
+        Returns
+        -------
+        None
+
+        """
         self._model.losses[layer] = loss()
         self.notify_observers(callback_type=Observe.LOSSES_SELECTED)
 
     def add_metric(self, layer: str, metric: Any) -> None:
-        """Instantiate model metrics."""
+        """Add a model metric.
+
+        Parameters
+        ----------
+        layer : str
+            Layer name for the metric to bind.
+        metric : Any
+            TensorFlow metric object.
+
+        Returns
+        -------
+        None
+
+        """
         self._model.metrics[layer].append(metric())
 
     def add_callback(self, callback: Any, **kwargs) -> None:
-        """Instantiate model callbacks."""
+        """Add a model callbacks.
+
+        Parameters
+        ----------
+        callback : Any
+            TensorFlow callback object.
+
+        Returns
+        -------
+        None
+
+        """
         self._model.callbacks.append(callback(**kwargs))
 
     def compile_model(self) -> None:
-        """Compile model."""
+        """Compile a model.
+
+        TensorFlow `compile` function is used to compile a model.
+
+        Returns
+        -------
+        None
+
+        """
         self._model.instance.compile(
             optimizer=self._model.optimizer,
             loss=self._model.losses,
@@ -141,7 +286,24 @@ class ModelManager:
         self.notify_observers(callback_type=Observe.MODEL_COMPILED)
 
     def fit_model(self, batch_size: int, num_epochs: int, val_split: float) -> None:
-        """Fit model."""
+        """Fit a model to a training data.
+
+        TensorFlow `fit` function is used to train a model.
+
+        Parameters
+        ----------
+        batch_size : int
+            Batch size hyperparameter.
+        num_epochs : int
+            Number of epochs hyperparameter.
+        val_split : float
+            Validation split hyperparameter.
+
+        Returns
+        -------
+        None
+
+        """
         history = self._model.instance.fit(
             x=self._data.input_train_data,
             y=self._data.output_train_data,
@@ -155,7 +317,20 @@ class ModelManager:
         self.notify_observers(callback_type=Observe.MODEL_TRAINED)
 
     def evaluate_model(self, batch_size: int) -> None:
-        """Evaluate model."""
+        """Evaluate a model.
+
+        TensorFlow `evaluate` function is used to evaluate a model.
+
+        Parameters
+        ----------
+        batch_size : int
+            Batch size hyperparameter.
+
+        Returns
+        -------
+        None
+
+        """
         results = self._model.instance.evaluate(
             x=self._data.input_test_data,
             y=self._data.output_test_data,
@@ -169,7 +344,20 @@ class ModelManager:
             print(f"{name}: {value}")
 
     def make_predictions(self, batch_size: int) -> None:
-        """Make model predictions."""
+        """Make a model predictions.
+
+        TensorFlow `predict` function is used to predict new values.
+
+        Parameters
+        ----------
+        batch_size : int
+            Batch size hyperparameter.
+
+        Returns
+        -------
+        None
+
+        """
         predictions = self._model.instance.predict(
             x={
                 name: self._data.file[values]
@@ -187,7 +375,22 @@ class ModelManager:
             print(f"{self._model.output_layers.keys()}: {list(predictions.flatten())}")
 
     def plot_history(self, y: str, color: Any, same_figure: bool) -> None:
-        """Plot training history."""
+        """Plot a training history against number of epochs.
+
+        Parameters
+        ----------
+        y : str
+            Name of training history object for an Y-axis.
+        color : Any
+            Line color.
+        same_figure : bool
+            Whether to plot incoming values on the same figure.
+
+        Returns
+        -------
+        None
+
+        """
         y_data = self._model.training_history[y]
         x_data = [i + 1 for i, _ in enumerate(y_data)]
 
@@ -210,7 +413,23 @@ class ModelManager:
     def check_layer_capacity(
         self, layer_type: str, layer: str, num_columns: int
     ) -> bool:
-        """Check if layer is overfilled."""
+        """Check if layer will be overfilled.
+
+        Parameters
+        ----------
+        layer_type : str
+            Type of layer to check.
+        layer : str
+            Name of layer to check.
+        num_columns : int
+            Number of columns to add to a layer.
+
+        Returns
+        -------
+        bool
+            True if layer will not be overfilled, False otherwise.
+
+        """
         if layer_type == "input":
             shape = self._model.input_shapes[layer]
         else:
@@ -221,7 +440,18 @@ class ModelManager:
         return False if num_columns + current_num_columns > shape else True
 
     def notify_observers(self, callback_type: str) -> None:
-        """Notifier for manager's observers."""
+        """Notify manager's observers with a specified callback.
+
+        Parameters
+        ----------
+        callback_type : str
+            A callback to invoke inside an observer.
+
+        Returns
+        -------
+        None
+
+        """
         for observer in self._observers:
             callback = getattr(observer, callback_type, None)
 
@@ -229,63 +459,84 @@ class ModelManager:
                 callback()
 
     def model_exists(self) -> bool:
-        """Check if model instance exists."""
+        """Check if model is constructed.
+
+        Returns
+        -------
+        bool
+            True if model is constructed, False otherwise.
+
+        """
         return True if self._model.instance else False
 
     @property
     def name(self) -> str:
+        """str: Model name."""
         return self._model.name
 
     @property
     def model_instance(self) -> Any:
+        """Any: Tesnsorflow model object."""
         return self._model.instance
 
     @property
     def input_layers(self) -> dict[str, Any]:
+        """dict[str, Any]: Dictionary of model input layers."""
         return self._model.input_layers
 
     @property
     def output_layers(self) -> dict[str, Any]:
+        """dict[str, Any]: Dictionary of model output layers."""
         return self._model.output_layers
 
     @property
     def layers(self) -> dict[str, Any]:
+        """dict[str, Any]: Dictionary of all model layers."""
         return self._model.layers
 
     @property
     def input_shapes(self) -> dict[str, int]:
+        """dict[str, int]: Dictionary of model input shapes."""
         return self._model.input_shapes
 
     @property
     def output_shapes(self) -> dict[str, int]:
+        """dict[str, int]: Dictionary of model output shapes."""
         return self._model.output_shapes
 
     @property
     def compiled(self) -> bool:
+        """bool: Whether a model is compiled."""
         return self._model.compiled
 
     @property
     def optimizer(self) -> Any:
+        """Any: TensorFlow optimizer object."""
         return self._model.optimizer
 
     @property
     def losses(self) -> dict[str, Any]:
+        """dict[str, Any]: Dictionary of model loss functions."""
         return self._model.losses
 
     @property
     def metrics(self) -> dict[str, list[Any]]:
+        """dict[str, list[Any]]: Dictionary of model metrics."""
         return self._model.metrics
 
     @property
     def callbacks(self) -> list[Any]:
+        """list[Any]: List of model callbacks."""
         return self._model.callbacks
 
     @property
     def training_history(self) -> dict[str, list[Any]]:
+        """dict[str, list[Any]]: Dictionary of model training history."""
         return self._model.training_history
 
     @property
     def observers(self) -> list[Any]:
+        """list[Any]: List of manager's observers."""
         return self._observers
 
     @observers.setter
