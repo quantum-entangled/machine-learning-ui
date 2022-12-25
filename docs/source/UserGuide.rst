@@ -12,7 +12,7 @@ If you are using **Binder**, there is no need to install anything, because the a
 Links
 -----
 
-To successfully use the app, you need a properly formatted Dataset (requirements: #TODO), which you can upload to **Jupyter** server via the given link. Other files, like Models, Graphs, Logs from Callbacks, which you will create during the session, could also be found via the corresponding links. You can download files as well.
+To successfully use the app, you need a properly formatted Dataset (:ref:`requirements <AcceptedInput>`), which you can upload to **Jupyter** server via the given link. Other files, like Models, Graphs, Logs from Callbacks, which you will create during the session, could also be found via the corresponding links. You can download files as well.
 
 .. image:: gifs/links.gif
    :width: 80%

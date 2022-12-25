@@ -31,6 +31,12 @@ The app was originally developed as part of research project, funded by **St. Pe
    UserGuide.rst
 
 .. toctree::
+   :caption: Accepted File Formats 
+   :maxdepth: 3
+
+   AcceptedInput.rst
+
+.. toctree::
    :caption: Developer Guide
    :maxdepth: 2
 
