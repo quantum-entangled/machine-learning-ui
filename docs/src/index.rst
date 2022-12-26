@@ -9,7 +9,7 @@ Welcome to Machine Learning UI's documentation!
 .. image:: https://mybinder.org/badge_logo.svg
    :target: https://mybinder.org/v2/gh/quantum-entangled/machine-learning-ui/HEAD?urlpath=voila%2Frender%2Fsrc%2Fmain.ipynb
 
-The app provides User Interface based on Jupyter's `ipywidgets <https://github.com/jupyter-widgets/ipywidgets>`_ for managing basic Machine Learning workflows. You can launch it using Binder budge above or installing app locally.
+The app provides User Interface based on Jupyter's `ipywidgets <https://github.com/jupyter-widgets/ipywidgets>`_ for managing basic Machine Learning workflows. You can launch it using Binder badge above or installing app locally.
 
 The app was originally developed as part of research project, funded by **St. Petersburg State University**, to help researchers solve problems of non-equilibrium gas dynamics using machine learning methods.
 
