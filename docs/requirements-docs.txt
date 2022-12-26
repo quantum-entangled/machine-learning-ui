@@ -10,5 +10,6 @@ scikit-learn==1.1.*
 tensorflow==2.10.*
 tensorflow-addons==0.18.*
 voila==0.4.*
+sphinx==5.3.*
 furo==2022.12.*
 myst-parser==0.18.*
