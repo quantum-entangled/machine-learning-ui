@@ -1,6 +1,6 @@
 # Build Docs
 
-To build **HTML** version of docs with **Sphinx** run either of this commands within a root directory:
+To build **HTML** version of docs with **Sphinx** run either of these commands within a root directory:
 ```sh
 sphinx-build -E -b html docs/src/ docs/build/html
 ```
