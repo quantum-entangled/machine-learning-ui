@@ -1,12 +1,11 @@
 .. _AcceptedInput:
 
-***************
 Accepted Input
-***************
+==============
 
 Only text files with numeric values without any kind of missing values are accepted. There are currently four supported file formats:
 
-.. list-table:: supported file formats
+.. list-table:: Supported File Formats
    :widths: 25 25 25 50
    :header-rows: 1
 

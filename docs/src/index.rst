@@ -3,7 +3,6 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-===============================================
 Welcome to Machine Learning UI's documentation!
 ===============================================
 
@@ -29,12 +28,7 @@ The app was originally developed as part of research project, funded by **St. Pe
    :maxdepth: 2
 
    UserGuide.rst
-
-.. toctree::
-   :caption: Accepted File Formats 
-   :maxdepth: 3
-
-   AcceptedInput.rst
+   AcceptedInput.rst   
 
 .. toctree::
    :caption: Developer Guide

@@ -98,10 +98,10 @@ class DataManager:
         fig.fig_margin = {"top": 5, "bottom": 35, "left": 45, "right": 5}
 
         if x == y:
-            bqplt.hist(x_data, figure=fig) 
+            bqplt.hist(sample=x_data, figure=fig)
             bqplt.title(x)
         else:
-            bqplt.plot(x=x_data, y=y_data, figure=fig, marker = 'circle', markersize = 3)
+            bqplt.plot(x=x_data, y=y_data, figure=fig, marker="circle", markersize=3)
             bqplt.xlabel(x)
             bqplt.ylabel(y)
         bqplt.show()

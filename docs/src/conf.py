@@ -11,7 +11,7 @@ import sys
 
 sys.path.insert(0, pathlib.Path(__file__).parents[2].resolve().as_posix())
 
-project = "Machine Learning UI"
+project = "ML UI"
 copyright = "2022, SPbU"
 author = "SPbU"
 release = "0.1"
@@ -38,4 +38,3 @@ exclude_patterns = []
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "furo"
-html_static_path = ["_static"]
