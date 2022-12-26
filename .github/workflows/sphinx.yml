@@ -1,4 +1,4 @@
-name: docs-build-deploy
+name: sphinx-build
 
 on: push
 
