@@ -14,7 +14,7 @@ from src.Enums.ObserveTypes import Observe
 
 
 class DataManager:
-    """Manager for data preperation.
+    """Manager for data preparation.
 
     Parameters
     ----------
