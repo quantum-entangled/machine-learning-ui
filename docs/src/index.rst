@@ -7,7 +7,7 @@ Welcome to Machine Learning UI's documentation!
 ===============================================
 
 .. image:: https://mybinder.org/badge_logo.svg
-   :target: https://mybinder.org/v2/gh/quantum-entangled/machine-learning-ui/v0.1.0?urlpath=voila%2Frender%2Fmain.ipynb
+   :target: https://mybinder.org/v2/gh/quantum-entangled/machine-learning-ui/v0.1.1?urlpath=voila%2Frender%2Fmain.ipynb
 
 The app provides User Interface based on Jupyter's `ipywidgets <https://github.com/jupyter-widgets/ipywidgets>`_ for managing basic Machine Learning workflows. You can launch it using Binder badge above or installing app locally.
 
