@@ -6,13 +6,13 @@ import managers.data_manager as dm
 import managers.model_manager as mm
 
 
-def create_upload_file_ui(data: Data) -> None:
+def upload_file_ui(data: Data, model: Model) -> None:
     st.header("Upload File")
     uploaded_file = st.file_uploader("Choose a data file:", "csv", key="file_uploader")
 
     if uploaded_file:
         try:
-            dm.upload_file(uploaded_file, data)
+            dm.upload_file(uploaded_file, data, model)
             st.success("File is uploaded and ready to be processed!", icon="✅")
         except dm.UploadError as error:
             st.exception(error)
@@ -24,7 +24,7 @@ def create_upload_file_ui(data: Data) -> None:
         )
 
 
-def create_upload_model_ui(model: Model) -> None:
+def upload_model_ui(model: Model) -> None:
     st.header("Upload Model")
     uploaded_model = st.file_uploader(
         "Choose a model file:", "h5", key="model_uploader"
