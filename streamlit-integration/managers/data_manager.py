@@ -1,9 +1,10 @@
-from typing import Any
+import io
 
 import pandas as pd
-from managers.errors import UploadError
 from data_classes.data import Data
 from data_classes.model import Model
+
+from managers.errors import UploadError
 
 
 def file_exists(data: Data) -> bool:
@@ -22,21 +23,21 @@ def file_exists(data: Data) -> bool:
     return False if data.file.empty else True
 
 
-def upload_file(path_or_buff: Any, data: Data) -> None:
+def upload_file(buff: io.BytesIO | None, data: Data) -> None:
     """Read file to pandas format.
 
     Parameters
     ----------
-    path_or_buff : Any
-        Path to a data file or buffer object.
+    buff : BytesIO | None
+        Buffer object to upload.
     data : Data
         Data container object.
     """
-    if not path_or_buff:
+    if not buff:
         return
 
     try:
-        data.file = pd.read_csv(path_or_buff, header=0, skipinitialspace=True)
+        data.file = pd.read_csv(buff, header=0, skipinitialspace=True)
     except ValueError as error:
         raise UploadError(f"Unable to upload the file!") from error
 

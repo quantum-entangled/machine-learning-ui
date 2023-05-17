@@ -1,5 +1,3 @@
-import tempfile
-
 import streamlit as st
 from data_classes.data import Data
 from data_classes.model import Model
@@ -34,10 +32,7 @@ def create_upload_model_ui(model: Model) -> None:
 
     if uploaded_model:
         try:
-            with tempfile.NamedTemporaryFile() as tmp:
-                tmp.write(uploaded_model.getbuffer())
-                mm.upload_model(tmp.name, model)
-
+            mm.upload_model(uploaded_model, model)
             st.success("Model is uploaded and ready to be processed!", icon="✅")
         except mm.UploadError as error:
             st.exception(error)

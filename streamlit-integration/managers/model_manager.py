@@ -1,7 +1,5 @@
-import os
+import io
 import tempfile
-import zipfile
-from typing import Any
 
 import tensorflow as tf
 from data_classes.model import Model
@@ -25,21 +23,23 @@ def model_exists(model: Model) -> bool:
     return True if model.instance else False
 
 
-def upload_model(path: Any, model: Model) -> None:
+def upload_model(buff: io.BytesIO | None, model: Model) -> None:
     """Upload TensorFlow model.
 
     Parameters
     ----------
-    path : Any
-        Path to a model file.
+    buff : BytesIO | None
+        Buffer object to upload.
     model : Model
         Model container object.
     """
-    if not path:
+    if not buff:
         return
 
     try:
-        model.instance = tf.keras.models.load_model(path)
+        with tempfile.NamedTemporaryFile() as tmp:
+            tmp.write(buff.getbuffer())
+            model.instance = tf.keras.models.load_model(tmp.name)
     except ValueError as error:
         raise UploadError(f"Unable to upload the model!") from error
 
