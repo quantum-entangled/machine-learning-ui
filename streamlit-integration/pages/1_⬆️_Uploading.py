@@ -1,11 +1,11 @@
+import data_classes.data as data_cls
+import data_classes.model as model_cls
 import streamlit as st
-from data_classes.data import Data
-from data_classes.model import Model
-from widgets.upload import upload as up
+import widgets.upload as up
 
 if "data" not in st.session_state or "model" not in st.session_state:
-    st.session_state.data = Data()
-    st.session_state.model = Model()
+    st.session_state.data = data_cls.Data()
+    st.session_state.model = model_cls.Model()
 
 data = st.session_state.data
 model = st.session_state.model

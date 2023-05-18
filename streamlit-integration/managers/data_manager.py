@@ -1,20 +1,20 @@
 import io
 
+import data_classes.data as data_cls
+import data_classes.model as model_cls
 import pandas as pd
 import plotly as ply
 import plotly.express as px
-from data_classes.data import Data
-from data_classes.model import Model
 
 from managers.errors import UploadError
 
 
-def file_exists(data: Data) -> bool:
+def file_exists(data: data_cls.Data) -> bool:
     """Check if data file exists.
 
     Parameters
     ----------
-    data : Data
+    data : data_cls.Data
         Data container object.
 
     Returns
@@ -25,16 +25,18 @@ def file_exists(data: Data) -> bool:
     return False if data.file.empty else True
 
 
-def upload_file(buff: io.BytesIO | None, data: Data, model: Model) -> None:
+def upload_file(
+    buff: io.BytesIO | None, data: data_cls.Data, model: model_cls.Model
+) -> None:
     """Read file to pandas format.
 
     Parameters
     ----------
     buff : BytesIO | None
         Buffer object to upload.
-    data : Data
+    data : data_cls.Data
         Data container object.
-    model : Model
+    model : model_cls.Model
         Model container object.
     """
     if not buff:
@@ -47,14 +49,14 @@ def upload_file(buff: io.BytesIO | None, data: Data, model: Model) -> None:
         raise UploadError(f"Unable to upload the file!") from error
 
 
-def refresh_data(data: Data, model: Model) -> None:
+def refresh_data(data: data_cls.Data, model: model_cls.Model) -> None:
     """Refresh attributes of data container.
 
     Parameters
     ----------
-    data : Data
+    data : data_cls.Data
         Data container object.
-    model : Model
+    model : model_cls.Model
         Model container object.
     """
     data.columns = list(data.file.columns)
@@ -69,12 +71,12 @@ def refresh_data(data: Data, model: Model) -> None:
     data.output_test_data = dict()
 
 
-def show_data_stats(data: Data) -> pd.DataFrame | None:
+def show_data_stats(data: data_cls.Data) -> pd.DataFrame | None:
     """Show summary of data statistics.
 
     Parameters
     ----------
-    data : Data
+    data : data_cls.Data
         Data container object.
 
     Returns
@@ -97,7 +99,7 @@ def show_data_stats(data: Data) -> pd.DataFrame | None:
     return data_stats
 
 
-def show_data_plot(x: str, y: str, data: Data) -> ply.graph_objs.Figure:
+def show_data_plot(x: str, y: str, data: data_cls.Data) -> ply.graph_objs.Figure:
     """Show data plot.
 
     Parameters
@@ -106,7 +108,7 @@ def show_data_plot(x: str, y: str, data: Data) -> ply.graph_objs.Figure:
         X-axis column name.
     y : str
         Y-axis column name.
-    data : Data
+    data : data_cls.Data
         Data container object.
 
     Returns

@@ -1,12 +1,21 @@
+import data_classes.data as data_cls
+import data_classes.model as model_cls
 import streamlit as st
-from data_classes.data import Data
-from data_classes.model import Model
 
 import managers.data_manager as dm
 import managers.model_manager as mm
 
 
-def upload_file_ui(data: Data, model: Model) -> None:
+def upload_file_ui(data: data_cls.Data, model: model_cls.Model) -> None:
+    """Generate UI for uploading a file.
+
+    Parameters
+    ----------
+    data : data_cls.Data
+        Data container object.
+    model : model_cls.Model
+        Model container object.
+    """
     st.header("Upload File")
     uploaded_file = st.file_uploader("Choose a data file:", "csv", key="file_uploader")
 
@@ -24,7 +33,14 @@ def upload_file_ui(data: Data, model: Model) -> None:
         )
 
 
-def upload_model_ui(model: Model) -> None:
+def upload_model_ui(model: model_cls.Model) -> None:
+    """Generate UI for uploading a model.
+
+    Parameters
+    ----------
+    model : model_cls.Model
+        Model container object.
+    """
     st.header("Upload Model")
     uploaded_model = st.file_uploader(
         "Choose a model file:", "h5", key="model_uploader"
