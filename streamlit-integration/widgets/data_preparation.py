@@ -13,6 +13,13 @@ def show_dataframe_ui(data: data_cls.Data) -> None:
         Data container object.
     """
     st.header("Dataframe")
+    st.markdown(
+        "Here, you can view the uploaded file's dataframe and edit it. "
+        "You can sort and resize columns, search through data (click on table, "
+        "then `⌘ Cmd + F` or `Ctrl + F`), as well as edit each cell, copy/paste "
+        "different parts to/from clipboard."
+    )
+
     data.file = st.experimental_data_editor(data.file, use_container_width=True)
 
 
@@ -24,8 +31,13 @@ def show_data_stats_ui(data: data_cls.Data) -> None:
     data : data_cls.Data
         Data container object.
     """
-    df = dm.show_data_stats(data)
     st.header("Data Statistics")
+    st.markdown(
+        "Here, you can view the descriptive statistics of the dataset, as well as "
+        "the type and number of missing values for each column."
+    )
+
+    df = dm.show_data_stats(data)
     st.dataframe(df, use_container_width=True)
 
 
@@ -38,6 +50,12 @@ def show_data_plot_ui(data: data_cls.Data) -> None:
         Data container object.
     """
     st.header("Data Plot")
+    st.markdown(
+        "Here, you can plot different columns of the dataset against each other. "
+        "A simple line plot is used for two distinct columns, and a histogram "
+        "is used for the same ones."
+    )
+
     col_1, col_2 = st.columns(2)
 
     with col_1:

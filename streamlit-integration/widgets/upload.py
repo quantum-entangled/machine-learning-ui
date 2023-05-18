@@ -17,6 +17,8 @@ def upload_file_ui(data: data_cls.Data, model: model_cls.Model) -> None:
         Model container object.
     """
     st.header("Upload File")
+    st.markdown("Upload a file from your system by clicking the `Browse files` button.")
+
     uploaded_file = st.file_uploader("Choose a data file:", "csv", key="file_uploader")
 
     if uploaded_file:
@@ -42,6 +44,10 @@ def upload_model_ui(model: model_cls.Model) -> None:
         Model container object.
     """
     st.header("Upload Model")
+    st.markdown(
+        "Upload a model from your system by clicking the `Browse files` button."
+    )
+
     uploaded_model = st.file_uploader(
         "Choose a model file:", "h5", key="model_uploader"
     )
