@@ -3,6 +3,7 @@ import data_classes.model as model_cls
 import streamlit as st
 
 import managers.data_manager as dm
+import managers.errors as err
 import managers.model_manager as mm
 
 
@@ -11,9 +12,9 @@ def upload_file_ui(data: data_cls.Data, model: model_cls.Model) -> None:
 
     Parameters
     ----------
-    data : data_cls.Data
+    data : Data
         Data container object.
-    model : model_cls.Model
+    model : Model
         Model container object.
     """
     st.header("Upload File")
@@ -25,14 +26,8 @@ def upload_file_ui(data: data_cls.Data, model: model_cls.Model) -> None:
         try:
             dm.upload_file(uploaded_file, data, model)
             st.success("File is uploaded and ready to be processed!", icon="✅")
-        except dm.UploadError as error:
-            st.exception(error)
-
-    if dm.file_exists(data):
-        st.info(
-            "View the existing file on Data Preparation page or upload a new one.",
-            icon="💡",
-        )
+        except err.UploadError as error:
+            st.error(error, icon="❌")
 
 
 def upload_model_ui(model: model_cls.Model) -> None:
@@ -40,7 +35,7 @@ def upload_model_ui(model: model_cls.Model) -> None:
 
     Parameters
     ----------
-    model : model_cls.Model
+    model : Model
         Model container object.
     """
     st.header("Upload Model")
@@ -56,11 +51,5 @@ def upload_model_ui(model: model_cls.Model) -> None:
         try:
             mm.upload_model(uploaded_model, model)
             st.success("Model is uploaded and ready to be processed!", icon="✅")
-        except mm.UploadError as error:
-            st.exception(error)
-
-    if mm.model_exists(model):
-        st.info(
-            "View the existing model on Model Preparation page or upload a new one.",
-            icon="💡",
-        )
+        except err.UploadError as error:
+            st.error(error, icon="❌")

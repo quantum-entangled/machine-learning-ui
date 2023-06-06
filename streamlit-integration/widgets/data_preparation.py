@@ -9,7 +9,7 @@ def show_dataframe_ui(data: data_cls.Data) -> None:
 
     Parameters
     ----------
-    data : data_cls.Data
+    data : Data
         Data container object.
     """
     st.header("Dataframe")
@@ -28,7 +28,7 @@ def show_data_stats_ui(data: data_cls.Data) -> None:
 
     Parameters
     ----------
-    data : data_cls.Data
+    data : Data
         Data container object.
     """
     st.header("Data Statistics")
@@ -46,7 +46,7 @@ def show_data_plot_ui(data: data_cls.Data) -> None:
 
     Parameters
     ----------
-    data : data_cls.Data
+    data : Data
         Data container object.
     """
     st.header("Data Plot")

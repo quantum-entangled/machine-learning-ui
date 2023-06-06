@@ -6,7 +6,7 @@ import pandas as pd
 import plotly as ply
 import plotly.express as px
 
-from managers.errors import UploadError
+import managers.errors as err
 
 
 def file_exists(data: data_cls.Data) -> bool:
@@ -14,7 +14,7 @@ def file_exists(data: data_cls.Data) -> bool:
 
     Parameters
     ----------
-    data : data_cls.Data
+    data : Data
         Data container object.
 
     Returns
@@ -32,12 +32,17 @@ def upload_file(
 
     Parameters
     ----------
-    buff : BytesIO | None
+    buff : File-like object | None
         Buffer object to upload.
-    data : data_cls.Data
+    data : Data
         Data container object.
-    model : model_cls.Model
+    model : Model
         Model container object.
+
+    Raises
+    ------
+    UploadError
+        For errors with uploading procedure.
     """
     if not buff:
         return
@@ -46,7 +51,7 @@ def upload_file(
         data.file = pd.read_csv(buff, header=0, skipinitialspace=True)
         refresh_data(data, model)
     except ValueError as error:
-        raise UploadError(f"Unable to upload the file!") from error
+        raise err.UploadError(f"Unable to upload a file!") from error
 
 
 def refresh_data(data: data_cls.Data, model: model_cls.Model) -> None:
@@ -54,9 +59,9 @@ def refresh_data(data: data_cls.Data, model: model_cls.Model) -> None:
 
     Parameters
     ----------
-    data : data_cls.Data
+    data : Data
         Data container object.
-    model : model_cls.Model
+    model : Model
         Model container object.
     """
     data.columns = list(data.file.columns)
@@ -76,13 +81,13 @@ def show_data_stats(data: data_cls.Data) -> pd.DataFrame | None:
 
     Parameters
     ----------
-    data : data_cls.Data
+    data : Data
         Data container object.
 
     Returns
     -------
-    pd.DataFrame | None
-        Dataframe with data statistics. None, if data file is absent.
+    DataFrame | None
+        Dataframe with data statistics. None if data file is absent.
     """
     if not file_exists(data):
         return
@@ -108,12 +113,12 @@ def show_data_plot(x: str, y: str, data: data_cls.Data) -> ply.graph_objs.Figure
         X-axis column name.
     y : str
         Y-axis column name.
-    data : data_cls.Data
+    data : Data
         Data container object.
 
     Returns
     -------
-    ply.graph_objs.Figure
+    Figure
         Plotly figure object.
     """
     if x == y:
