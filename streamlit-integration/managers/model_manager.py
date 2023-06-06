@@ -43,7 +43,7 @@ def create_model(model_name: str, model: model_cls.Model) -> None:
         When trying to create a model with already existing name.
     """
     if not model_name:
-        raise err.NoModelNameError("Please, enter a model name!")
+        raise err.NoModelNameError("Please, enter the model name!")
 
     if model.name == model_name:
         raise err.SameModelNameError(
@@ -76,8 +76,9 @@ def upload_model(buff: io.BytesIO | None, model: model_cls.Model) -> None:
         with tempfile.NamedTemporaryFile() as tmp:
             tmp.write(buff.getbuffer())
             model.instance = tf.keras.models.load_model(tmp.name)
+            refresh_model(model)
     except ValueError as error:
-        raise err.UploadError("Unable to upload a model!") from error
+        raise err.UploadError("Unable to upload the model!") from error
 
 
 def refresh_model(model: model_cls.Model) -> None:
@@ -97,7 +98,7 @@ def refresh_model(model: model_cls.Model) -> None:
         name: layer
         for name, layer in zip(model.instance.output_names, model.instance.outputs)
     }
-    model.layers = model.input_layers | model.output_layers
+    model.layers = {layer.name: layer.output for layer in model.instance.layers}
     model.input_shapes = {layer.name: layer.shape[1] for layer in model.instance.inputs}
     model.output_shapes = {layer_name: 1 for layer_name in model.instance.output_names}
     model.losses = {name: list() for name in model.output_layers}
@@ -126,12 +127,14 @@ def add_layer(
 
     Raises
     ------
+    NoModelError
+        When model isn't instantiated.
     NoLayerNameError
         When trying to create a layer with no name.
     SameLayerNameError
         When trying to create a layer with already existing name.
     NoConnectionError
-        When no connection is provided for a layer.
+        When no connection is provided for the layer.
     """
     if not model_exists(model):
         raise err.NoModelError("Please, create or upload a model!")
@@ -139,7 +142,7 @@ def add_layer(
     name = layer_params["name"]
 
     if not name:
-        raise err.NoLayerNameError("Please, enter a layer name!")
+        raise err.NoLayerNameError("Please, enter the layer name!")
 
     if name in model.layers:
         raise err.SameLayerNameError(
@@ -147,7 +150,7 @@ def add_layer(
         )
 
     if isinstance(layer_connection, int):
-        raise err.NoConnectionError("Please, select a connection!")
+        raise err.NoConnectionError("Please, select the connection!")
 
     if layer_connection is None:
         layer = {name: layer_instance(**layer_params)}
@@ -161,3 +164,33 @@ def add_layer(
         layer = {name: layer_instance(**layer_params)(connect_to)}
 
     model.layers.update(layer)
+
+
+def set_outputs(outputs: list[str], model: model_cls.Model) -> None:
+    """Set outputs for a model.
+
+    Parameters
+    ----------
+    outputs : list
+        List of all output layers' names.
+    model : Model
+        Model container object.
+
+    Raises
+    ------
+    NoModelError
+        When model isn't instantiated.
+    NoOutputsSelectedError
+        When no layers are selected for the model outputs.
+    """
+    if not model_exists(model):
+        raise err.NoModelError("Please, create or upload a model!")
+
+    if not outputs:
+        raise err.NoOutputsSelectedError("Please, select the model outputs!")
+
+    model.output_layers = {name: model.layers[name] for name in outputs}
+    model.instance = tf.keras.Model(
+        inputs=model.input_layers, outputs=model.output_layers, name=model.name
+    )
+    refresh_model(model)

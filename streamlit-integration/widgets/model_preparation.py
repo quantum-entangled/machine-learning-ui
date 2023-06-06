@@ -57,3 +57,26 @@ def add_layers_ui(model: model_cls.Model) -> None:
             err.NoConnectionError,
         ) as error:
             st.error(error, icon="❌")
+
+
+def set_outputs_ui(model: model_cls.Model) -> None:
+    """Generate UI for setting model's ouputs.
+
+    Parameters
+    ----------
+    model : Model
+        Model container object.
+    """
+    st.header("Set Outputs")
+
+    outputs = st.multiselect(
+        "Select outputs:", list(set(model.layers) - set(model.input_layers))
+    )
+    set_outputs_btn = st.button("Set Outputs")
+
+    if set_outputs_btn:
+        try:
+            mm.set_outputs(outputs, model)
+            st.success("Outputs are set!", icon="✅")
+        except (err.NoModelError, err.NoOutputsSelectedError) as error:
+            st.error(error, icon="❌")

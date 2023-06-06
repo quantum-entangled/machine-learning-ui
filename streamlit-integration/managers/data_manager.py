@@ -51,7 +51,7 @@ def upload_file(
         data.file = pd.read_csv(buff, header=0, skipinitialspace=True)
         refresh_data(data, model)
     except ValueError as error:
-        raise err.UploadError(f"Unable to upload a file!") from error
+        raise err.UploadError(f"Unable to upload the file!") from error
 
 
 def refresh_data(data: data_cls.Data, model: model_cls.Model) -> None:

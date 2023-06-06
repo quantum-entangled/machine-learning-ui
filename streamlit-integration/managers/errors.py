@@ -11,7 +11,7 @@ class SameModelNameError(Exception):
 
 
 class NoModelError(Exception):
-    """Exception raised when a model doesn't exist."""
+    """Exception raised when model isn't instantiated."""
 
 
 class NoLayerNameError(Exception):
@@ -23,4 +23,8 @@ class SameLayerNameError(Exception):
 
 
 class NoConnectionError(Exception):
-    """Exception raised when no connection is provided for a layer."""
+    """Exception raised when no connection is provided for the layer."""
+
+
+class NoOutputsSelectedError(Exception):
+    """Exception raised when no layers are selected for the model outputs."""

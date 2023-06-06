@@ -15,3 +15,4 @@ model = st.session_state.model
 with st.container():
     mp.create_model_ui(model)
     mp.add_layers_ui(model)
+    mp.set_outputs_ui(model)
