@@ -60,7 +60,7 @@ def add_layers_ui(model: model_cls.Model) -> None:
 
 
 def set_outputs_ui(model: model_cls.Model) -> None:
-    """Generate UI for setting model's ouputs.
+    """Generate UI for setting the model ouputs.
 
     Parameters
     ----------
