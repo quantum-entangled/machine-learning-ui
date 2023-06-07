@@ -87,7 +87,8 @@ def set_outputs_ui(model: model_cls.Model) -> None:
 def examine_model(model: model_cls.Model) -> None:
     """Generate UI for examining a model.
 
-    It allows you to show the model summary, as well as save the model and its graph.
+    It includes the ability to show the model summary, as well as download the model
+    and its graph.
 
     Parameters
     ----------
