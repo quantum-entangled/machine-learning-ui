@@ -1,8 +1,10 @@
 import io
+import os
 import tempfile
 from typing import Type
 
 import data_classes.model as model_cls
+import streamlit as st
 import tensorflow as tf
 import widgets.layers as wl
 
@@ -194,3 +196,106 @@ def set_outputs(outputs: list[str], model: model_cls.Model) -> None:
         inputs=model.input_layers, outputs=model.output_layers, name=model.name
     )
     refresh_model(model)
+
+
+def show_summary(model: model_cls.Model) -> None:
+    """Show model summary.
+
+    Parameters
+    ----------
+    model : Model
+        Model container object.
+
+    Raises
+    ------
+    NoModelError
+        When model isn't instantiated.
+    NoOutputLayersError
+        When there are no output layers in the model.
+    """
+    if not model_exists(model):
+        raise err.NoModelError("Please, create or upload a model!")
+
+    if not model.output_layers:
+        raise err.NoOutputLayersError("Please, set the model outputs!")
+
+    model.instance.summary(print_fn=lambda x: st.text(x))
+
+
+def download_graph(model: model_cls.Model) -> bytes:
+    """Save model graph.
+
+    Parameters
+    ----------
+    model : Model
+        Model container object.
+
+    Returns
+    -------
+    bytes
+        Graph object in bytes.
+
+    Raises
+    ------
+    NoModelError
+        When model isn't instantiated.
+    NoOutputLayersError
+        When there are no output layers in the model.
+    """
+    if not model_exists(model):
+        raise err.NoModelError("Please, create or upload a model!")
+
+    if not model.output_layers:
+        raise err.NoOutputLayersError("Please, set the model outputs!")
+
+    with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
+        tf.keras.utils.plot_model(
+            model.instance,
+            to_file=tmp.name,
+            show_shapes=True,
+            rankdir="LR",
+            dpi=200,
+        )
+        graph = tmp.read()
+        tmp.close()
+        os.unlink(tmp.name)
+
+    return graph
+
+
+def download_model(model: model_cls.Model) -> bytes:
+    """Save model object.
+
+    Parameters
+    ----------
+    model : Model
+        Model container object.
+
+    Returns
+    -------
+    bytes
+        Model object in bytes.
+
+    Raises
+    ------
+    NoModelError
+        When model isn't instantiated.
+    NoOutputLayersError
+        When there are no output layers in the model.
+    """
+    if not model_exists(model):
+        raise err.NoModelError("Please, create or upload a model!")
+
+    if not model.output_layers:
+        raise err.NoOutputLayersError("Please, set the model outputs!")
+
+    with tempfile.NamedTemporaryFile(delete=False) as tmp:
+        model.instance.save(
+            filepath=tmp.name,
+            save_format="h5",
+        )
+        model_object = tmp.read()
+        tmp.close()
+        os.unlink(tmp.name)
+
+    return model_object

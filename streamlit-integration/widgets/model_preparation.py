@@ -1,3 +1,5 @@
+import io
+
 import data_classes.model as model_cls
 import streamlit as st
 
@@ -80,3 +82,43 @@ def set_outputs_ui(model: model_cls.Model) -> None:
             st.success("Outputs are set!", icon="✅")
         except (err.NoModelError, err.NoOutputsSelectedError) as error:
             st.error(error, icon="❌")
+
+
+def examine_model(model: model_cls.Model) -> None:
+    """Generate UI for examining a model.
+
+    It allows you to show the model summary, as well as save the model and its graph.
+
+    Parameters
+    ----------
+    model : Model
+        Model container object.
+    """
+    st.header("Examine Model")
+
+    placeholder = st.empty()
+
+    try:
+        with placeholder.container():
+            st.markdown("Expand the box below to view the model summary.")
+
+            with st.expander("Model Summary"):
+                mm.show_summary(model)
+
+            st.markdown("Click the button below to download the model graph.")
+            graph = mm.download_graph(model)
+
+            with io.BytesIO(graph) as graph_pdf_bytes:
+                st.download_button("Download Graph", graph_pdf_bytes, "model_graph.pdf")
+
+            st.markdown("Click the button below to download the model.")
+            model_object = mm.download_model(model)
+
+            with io.BytesIO(model_object) as model_object_bytes:
+                st.download_button("Download Model", model_object_bytes, "model.h5")
+    except (err.NoModelError, err.NoOutputLayersError):
+        placeholder.info(
+            "You will be able to examine the model once you create/upload it and "
+            "select the outputs.",
+            icon="💡",
+        )

@@ -28,3 +28,7 @@ class NoConnectionError(Exception):
 
 class NoOutputsSelectedError(Exception):
     """Exception raised when no layers are selected for the model outputs."""
+
+
+class NoOutputLayersError(Exception):
+    """Exception raised when there are no output layers in the model."""
