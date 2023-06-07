@@ -233,7 +233,7 @@ def download_graph(model: model_cls.Model) -> bytes:
     Returns
     -------
     bytes
-        Graph object in bytes.
+        Graph representation in PDF format as bytes object.
 
     Raises
     ------
@@ -274,7 +274,7 @@ def download_model(model: model_cls.Model) -> bytes:
     Returns
     -------
     bytes
-        Model object in bytes.
+        Model representation in HDF5 format as bytes object.
 
     Raises
     ------
