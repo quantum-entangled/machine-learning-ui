@@ -1,34 +1,42 @@
 class UploadError(Exception):
-    """Exception raised for errors during uploading of files/models."""
+    """For errors during the uploading of files/models."""
 
 
 class NoModelNameError(Exception):
-    """Exception raised when trying to create a model with no name."""
+    """When trying to create a model with no name."""
 
 
 class SameModelNameError(Exception):
-    """Exception raised when trying to create a model with already existing name."""
+    """When trying to create a model with already existing name."""
 
 
 class NoModelError(Exception):
-    """Exception raised when model isn't instantiated."""
+    """When model is not instantiated."""
 
 
 class NoLayerNameError(Exception):
-    """Exception raised when trying to create a layer with no name."""
+    """When trying to create a layer with no name."""
 
 
 class SameLayerNameError(Exception):
-    """Exception raised when trying to create a layer with already existing name."""
+    """When trying to create a layer with already existing name."""
 
 
 class NoConnectionError(Exception):
-    """Exception raised when no connection is provided for the layer."""
+    """When no connection is provided for the layer."""
 
 
 class NoOutputsSelectedError(Exception):
-    """Exception raised when no layers are selected for the model outputs."""
+    """When no layers are selected for the model outputs."""
 
 
 class NoOutputLayersError(Exception):
-    """Exception raised when there are no output layers in the model."""
+    """When there are no output layers in the model."""
+
+
+class LayerOverfilledError(Exception):
+    """When the addition of new columns exceeds the layer's capacity."""
+
+
+class NoColumnsSelectedError(Exception):
+    """When no columns are selected."""

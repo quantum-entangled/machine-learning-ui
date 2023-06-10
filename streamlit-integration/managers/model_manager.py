@@ -61,7 +61,7 @@ def upload_model(buff: io.BytesIO | None, model: model_cls.Model) -> None:
 
     Parameters
     ----------
-    buff : File-like object | None
+    buff : File-like object or None
         Buffer object to upload.
     model : Model
         Model container object.
@@ -84,25 +84,28 @@ def upload_model(buff: io.BytesIO | None, model: model_cls.Model) -> None:
 
 
 def refresh_model(model: model_cls.Model) -> None:
-    """Refresh attributes of a model container.
+    """Refresh attributes of the model container.
 
     Parameters
     ----------
     model : Model
         Model container object.
     """
+    input_names = model.instance.input_names
+    output_names = model.instance.output_names
+    inputs = model.instance.inputs
+    outputs = model.instance.outputs
+
     model.name = model.instance.name
-    model.input_layers = {
-        name: layer
-        for name, layer in zip(model.instance.input_names, model.instance.inputs)
-    }
-    model.output_layers = {
-        name: layer
-        for name, layer in zip(model.instance.output_names, model.instance.outputs)
-    }
+    model.input_layers = {name: layer for name, layer in zip(input_names, inputs)}
+    model.output_layers = {name: layer for name, layer in zip(output_names, outputs)}
     model.layers = {layer.name: layer.output for layer in model.instance.layers}
-    model.input_shapes = {layer.name: layer.shape[1] for layer in model.instance.inputs}
-    model.output_shapes = {layer_name: 1 for layer_name in model.instance.output_names}
+    model.input_shapes = {
+        name: layer.shape[1] for name, layer in zip(input_names, inputs)
+    }
+    model.output_shapes = {
+        name: layer.shape[1] for name, layer in zip(output_names, outputs)
+    }
     model.losses = {name: list() for name in model.output_layers}
     model.metrics = {name: list() for name in model.output_layers}
 
@@ -121,7 +124,7 @@ def add_layer(
         TensorFlow layer class.
     layer_params : dict
         Dictionary containing construction parameters of a layer.
-    layer_connection : str, list, int, or None
+    layer_connection : str, list of str, int, or None
         A single layer name or a sequence of layers' names. None if no connection is
         provided. 0 if connection was required, but not given.
     model : Model
@@ -130,7 +133,7 @@ def add_layer(
     Raises
     ------
     NoModelError
-        When model isn't instantiated.
+        When model is not instantiated.
     NoLayerNameError
         When trying to create a layer with no name.
     SameLayerNameError
@@ -173,7 +176,7 @@ def set_outputs(outputs: list[str], model: model_cls.Model) -> None:
 
     Parameters
     ----------
-    outputs : list
+    outputs : list of str
         List of all output layers' names.
     model : Model
         Model container object.
@@ -181,7 +184,7 @@ def set_outputs(outputs: list[str], model: model_cls.Model) -> None:
     Raises
     ------
     NoModelError
-        When model isn't instantiated.
+        When model is not instantiated.
     NoOutputsSelectedError
         When no layers are selected for the model outputs.
     """
@@ -209,7 +212,7 @@ def show_summary(model: model_cls.Model) -> None:
     Raises
     ------
     NoModelError
-        When model isn't instantiated.
+        When model is not instantiated.
     NoOutputLayersError
         When there are no output layers in the model.
     """
@@ -238,7 +241,7 @@ def download_graph(model: model_cls.Model) -> bytes:
     Raises
     ------
     NoModelError
-        When model isn't instantiated.
+        When model is not instantiated.
     NoOutputLayersError
         When there are no output layers in the model.
     """
@@ -279,7 +282,7 @@ def download_model(model: model_cls.Model) -> bytes:
     Raises
     ------
     NoModelError
-        When model isn't instantiated.
+        When model is not instantiated.
     NoOutputLayersError
         When there are no output layers in the model.
     """
