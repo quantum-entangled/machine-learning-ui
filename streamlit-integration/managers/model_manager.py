@@ -58,7 +58,7 @@ def create_model(model_name: str, model: model_cls.Model) -> None:
 
 
 def upload_model(buff: io.BytesIO | None, model: model_cls.Model) -> None:
-    """Upload TensorFlow model.
+    """Upload a TensorFlow model.
 
     Parameters
     ----------
@@ -85,7 +85,7 @@ def upload_model(buff: io.BytesIO | None, model: model_cls.Model) -> None:
 
 
 def refresh_model(model: model_cls.Model) -> None:
-    """Refresh attributes of the model container.
+    """Refresh the attributes of the model container.
 
     Parameters
     ----------
@@ -117,7 +117,7 @@ def add_layer(
     layer_connection: wl.LayerConnection,
     model: model_cls.Model,
 ) -> None:
-    """Add layer to the model.
+    """Add the layer to the model.
 
     Parameters
     ----------
@@ -173,7 +173,7 @@ def add_layer(
 
 
 def set_outputs(outputs: list[str], model: model_cls.Model) -> None:
-    """Set outputs for a model.
+    """Set the outputs for the model.
 
     Parameters
     ----------
@@ -203,7 +203,7 @@ def set_outputs(outputs: list[str], model: model_cls.Model) -> None:
 
 
 def show_summary(model: model_cls.Model) -> None:
-    """Show model summary.
+    """Show the model summary.
 
     Parameters
     ----------
@@ -227,7 +227,7 @@ def show_summary(model: model_cls.Model) -> None:
 
 
 def download_graph(model: model_cls.Model) -> bytes:
-    """Save model graph.
+    """Save the model graph.
 
     Parameters
     ----------
@@ -268,7 +268,7 @@ def download_graph(model: model_cls.Model) -> bytes:
 
 
 def download_model(model: model_cls.Model) -> bytes:
-    """Save model object.
+    """Save the model object.
 
     Parameters
     ----------
@@ -310,7 +310,7 @@ def set_optimizer(
     optimizer_params: wo.OptimizerParams,
     model: model_cls.Model,
 ) -> None:
-    """Set optimizer for the model.
+    """Set the optimizer for the model.
 
     Parameters
     ----------
@@ -335,3 +335,35 @@ def set_optimizer(
         raise err.NoOutputLayersError("Please, set the model outputs!")
 
     model.optimizer = optimizer_cls(**optimizer_params)
+
+
+def set_loss(
+    layer: str,
+    loss_cls: Type[tf.keras.losses.Loss],
+    model: model_cls.Model,
+) -> None:
+    """Set the loss function for the model's output layer.
+
+    Parameters
+    ----------
+    layer : str
+        Name of the layer to which the loss function will be attached.
+    loss_cls : Loss
+        TensorFlow loss function class.
+    model : Model
+        Model container object.
+
+    Raises
+    ------
+    NoModelError
+        When model is not instantiated.
+    NoOutputLayersError
+        When there are no output layers in the model.
+    """
+    if not model_exists(model):
+        raise err.NoModelError("Please, create or upload a model!")
+
+    if not model.output_layers:
+        raise err.NoOutputLayersError("Please, set the model outputs!")
+
+    model.losses[layer] = loss_cls()

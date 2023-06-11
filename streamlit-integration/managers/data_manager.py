@@ -32,7 +32,7 @@ def file_exists(data: data_cls.Data) -> bool:
 def upload_file(
     buff: io.BytesIO | None, data: data_cls.Data, model: model_cls.Model
 ) -> None:
-    """Read file to pandas format.
+    """Read a file to the pandas format.
 
     Parameters
     ----------
@@ -59,7 +59,7 @@ def upload_file(
 
 
 def refresh_data(data: data_cls.Data) -> None:
-    """Refresh attributes of data container.
+    """Refresh the attributes of the data container.
 
     Parameters
     ----------
@@ -72,7 +72,7 @@ def refresh_data(data: data_cls.Data) -> None:
 
 
 def show_data_stats(data: data_cls.Data) -> pd.DataFrame | None:
-    """Show summary of data statistics.
+    """Show the summary of the data statistics.
 
     Parameters
     ----------
@@ -100,7 +100,7 @@ def show_data_stats(data: data_cls.Data) -> pd.DataFrame | None:
 
 
 def show_data_plot(x: str, y: str, data: data_cls.Data) -> ply.graph_objs.Figure:
-    """Show data plot.
+    """Show the data plot.
 
     Parameters
     ----------
@@ -129,14 +129,14 @@ def show_data_plot(x: str, y: str, data: data_cls.Data) -> ply.graph_objs.Figure
 def get_layer_columns(
     layer_type: Literal["Input", "Output"], layer: str, data: data_cls.Data
 ) -> list[str]:
-    """Get columns attached to the layer.
+    """Get the columns attached to the layer.
 
     Parameters
     ----------
     layer_type : "Input" or "Output"
         Type of the layer.
     layer : str
-        Name of the layer.
+        Name of the layer to which the columns are attached.
     data : Data
         Data container object.
 
@@ -164,14 +164,14 @@ def set_columns(
     data: data_cls.Data,
     model: model_cls.Model,
 ) -> None:
-    """Set columns for the layer.
+    """Set the columns for the layer.
 
     Parameters
     ----------
     layer_type : "Input" or "Output"
         Type of the layer.
     layer : str
-        Name of the layer.
+        Name of the layer to which the columns will be attached.
     columns : list of str
         List of columns' names to set.
     data : Data

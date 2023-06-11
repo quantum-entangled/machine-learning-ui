@@ -16,10 +16,10 @@ model = st.session_state.model
 
 if not mm.model_exists(model):
     st.info(
-        "You will be able to compile the model once you create/upload it and select "
-        "the outputs.",
+        "You will be able to compile the model once you create/upload it.",
         icon="💡",
     )
 else:
     with st.container():
         mc.set_optimizer_ui(model)
+        mc.set_loss_functions_ui(model)
