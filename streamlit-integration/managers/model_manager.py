@@ -7,6 +7,7 @@ import data_classes.model as model_cls
 import streamlit as st
 import tensorflow as tf
 import widgets.layers as wl
+import widgets.optimizers as wo
 
 import managers.errors as err
 
@@ -111,19 +112,19 @@ def refresh_model(model: model_cls.Model) -> None:
 
 
 def add_layer(
-    layer_instance: Type[tf.keras.layers.Layer],
+    layer_cls: Type[tf.keras.layers.Layer],
     layer_params: wl.LayerParams,
     layer_connection: wl.LayerConnection,
     model: model_cls.Model,
 ) -> None:
-    """Add layer to a model.
+    """Add layer to the model.
 
     Parameters
     ----------
-    layer_instance : Layer
+    layer_cls : Layer
         TensorFlow layer class.
     layer_params : dict
-        Dictionary containing construction parameters of a layer.
+        Dictionary containing construction parameters of the layer.
     layer_connection : str, list of str, int, or None
         A single layer name or a sequence of layers' names. None if no connection is
         provided. 0 if connection was required, but not given.
@@ -158,7 +159,7 @@ def add_layer(
         raise err.NoConnectionError("Please, select the connection!")
 
     if layer_connection is None:
-        layer = {name: layer_instance(**layer_params)}
+        layer = {name: layer_cls(**layer_params)}
         model.input_layers.update(layer)
     else:
         if isinstance(layer_connection, str):
@@ -166,7 +167,7 @@ def add_layer(
         else:
             connect_to = [model.layers[name] for name in layer_connection]
 
-        layer = {name: layer_instance(**layer_params)(connect_to)}
+        layer = {name: layer_cls(**layer_params)(connect_to)}
 
     model.layers.update(layer)
 
@@ -302,3 +303,35 @@ def download_model(model: model_cls.Model) -> bytes:
         os.unlink(tmp.name)
 
     return model_object
+
+
+def set_optimizer(
+    optimizer_cls: tf.keras.optimizers.Optimizer,
+    optimizer_params: wo.OptimizerParams,
+    model: model_cls.Model,
+) -> None:
+    """Set optimizer for the model.
+
+    Parameters
+    ----------
+    optimizer_cls : Optimizer
+        TensorFlow optimizer class.
+    optimizer_params : dict
+        Dictionary containing construction parameters of the optimizer.
+    model : Model
+        Model container object.
+
+    Raises
+    ------
+    NoModelError
+        When model is not instantiated.
+    NoOutputLayersError
+        When there are no output layers in the model.
+    """
+    if not model_exists(model):
+        raise err.NoModelError("Please, create or upload a model!")
+
+    if not model.output_layers:
+        raise err.NoOutputLayersError("Please, set the model outputs!")
+
+    model.optimizer = optimizer_cls(**optimizer_params)

@@ -3,7 +3,7 @@ from typing import Type
 import tensorflow as tf
 import widgets.layers as wl
 
-instances: dict[str, Type[tf.keras.layers.Layer]] = {
+classes: dict[str, Type[tf.keras.layers.Layer]] = {
     "Input": tf.keras.Input,
     "Dense": tf.keras.layers.Dense,
     "Concatenate": tf.keras.layers.Concatenate,

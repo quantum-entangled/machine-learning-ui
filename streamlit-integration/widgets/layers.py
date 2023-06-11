@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+import abc
 from typing import Callable, TypeAlias, TypedDict
 
 import data_classes.model as model_cls
@@ -17,26 +17,26 @@ class LayerParams(TypedDict):
 
 
 class InputParams(LayerParams):
-    """Type annotation for an Input layer."""
+    """Type annotation for the Input layer."""
 
     shape: tuple[int]
 
 
 class DenseParams(LayerParams):
-    """Type annotation for a Dense layer."""
+    """Type annotation for the Dense layer."""
 
     units: int
     activation: Callable[..., tf.Tensor]
 
 
 class ConcatenateParams(LayerParams):
-    """Type annotation for a Concatenate layer."""
+    """Type annotation for the Concatenate layer."""
 
 
-class LayerWidget(ABC):
+class LayerWidget(abc.ABC):
     """Base class for a layer's widget."""
 
-    @abstractmethod
+    @abc.abstractmethod
     def __init__(self, model: model_cls.Model) -> None:
         """
         Parameters
@@ -47,7 +47,7 @@ class LayerWidget(ABC):
         self.model = model
 
     @property
-    @abstractmethod
+    @abc.abstractmethod
     def params(self) -> LayerParams:
         """Layer's parameters.
 
@@ -56,19 +56,17 @@ class LayerWidget(ABC):
         dict
             Dictionary containing values of adjustable parameters.
         """
-        ...
 
     @property
-    @abstractmethod
+    @abc.abstractmethod
     def connection(self) -> LayerConnection:
         """Connection layer.
 
         Returns
         -------
-        str, list, int, or None
+        str, list of str, int, or None
             Reference to a connection layer in a model.
         """
-        ...
 
 
 class Input(LayerWidget):
@@ -193,7 +191,7 @@ class Concatenate(LayerWidget):
 
         Returns
         -------
-        list or int
+        list of str or int
             List of layers' names if selected, 0 otherwise.
         """
         return (

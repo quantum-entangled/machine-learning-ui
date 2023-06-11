@@ -41,16 +41,16 @@ def add_layers_ui(model: model_cls.Model) -> None:
     """
     st.header("Add Layers")
 
-    layer_type = str(st.selectbox("Select layer type:", list(layers.instances)))
-    layer_instance = layers.instances[layer_type]
-    layer_widget = layers.widgets[layer_type](model=model)
+    layer = str(st.selectbox("Select layer class:", list(layers.classes)))
+    layer_cls = layers.classes[layer]
+    layer_widget = layers.widgets[layer](model=model)
     layer_params = layer_widget.params
     layer_connection = layer_widget.connection
     add_layer_btn = st.button("Add Layer")
 
     if add_layer_btn:
         try:
-            mm.add_layer(layer_instance, layer_params, layer_connection, model)
+            mm.add_layer(layer_cls, layer_params, layer_connection, model)
             st.success("Layer is added!", icon="✅")
         except (
             err.NoModelError,

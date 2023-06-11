@@ -1,12 +1,11 @@
 import data_classes.data as data_cls
 import data_classes.model as model_cls
 import streamlit as st
-import widgets.training_preparation as tp
+import widgets.model_compilation as mc
 
-import managers.data_manager as dm
 import managers.model_manager as mm
 
-st.set_page_config(page_title="Training Preparation", page_icon="⚙️")
+st.set_page_config(page_title="Model Compilation", page_icon="📟")
 
 if "data" not in st.session_state or "model" not in st.session_state:
     st.session_state.data = data_cls.Data()
@@ -15,13 +14,12 @@ if "data" not in st.session_state or "model" not in st.session_state:
 data = st.session_state.data
 model = st.session_state.model
 
-if not dm.file_exists(data) or not mm.model_exists(model):
+if not mm.model_exists(model):
     st.info(
-        "You will be able to prepare for the training process once you upload the data "
-        "file and create/upload the model.",
+        "You will be able to compile the model once you create/upload it and select "
+        "the outputs.",
         icon="💡",
     )
 else:
     with st.container():
-        tp.set_columns_ui(data, model)
-        tp.split_data_ui(data, model)
+        mc.set_optimizer_ui(model)
