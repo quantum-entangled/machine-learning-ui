@@ -53,3 +53,34 @@ def set_columns_ui(data: data_cls.Data, model: model_cls.Model) -> None:
                     st.success("Columns are set!", icon="✅")
                 except (err.NoColumnsSelectedError, err.LayerOverfilledError) as error:
                     st.error(error, icon="❌")
+
+
+def split_data_ui(data: data_cls.Data, model: model_cls.Model) -> None:
+    """Generate UI for splitting the data into training and test sets.
+
+    Parameters
+    ----------
+    data : Data
+        Data container object.
+    model : Model
+        Model container object.
+    """
+    st.header("Split Data")
+
+    test_size = float(
+        st.slider(
+            "Select the percent of test data:",
+            min_value=0.0,
+            max_value=1.0,
+            value=0.0,
+            step=0.05,
+        )
+    )
+    split_data_btn = st.button("Split Data")
+
+    if split_data_btn:
+        try:
+            dm.split_data(test_size, data, model)
+            st.success("Dataset is split!", icon="✅")
+        except (err.InputsUnderfilledError, err.OutputsUnderfilledError) as error:
+            st.error(error, icon="❌")

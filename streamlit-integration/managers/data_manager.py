@@ -8,6 +8,7 @@ import data_classes.model as model_cls
 import pandas as pd
 import plotly as ply
 import plotly.express as px
+import sklearn.model_selection as sk
 
 import managers.errors as err
 
@@ -212,3 +213,86 @@ def set_columns(
         for item, count in data.columns_counter.items()
         if count > selected_counter[item]
     ]
+
+
+def layers_are_filled(
+    layer_type: Literal["Input", "Output"], data: data_cls.Data, model: model_cls.Model
+) -> bool:
+    """Check if the specific type layers are filled with the data columns.
+
+    Parameters
+    ----------
+    layer_type : "Input" or "Output"
+        Type of the layers.
+    data : Data
+        Data container object.
+    model : Model
+        Model container object.
+
+    Returns
+    -------
+    bool
+        True if the layers are filled with the data columns, False otherwise.
+    """
+    if layer_type == "Input":
+        layers = model.input_layers
+        columns_type = data.input_columns
+        shape = model.input_shapes
+    else:
+        layers = model.output_layers
+        columns_type = data.output_columns
+        shape = model.output_shapes
+
+    for layer in layers:
+        if not columns_type.get(layer):
+            return False
+
+        if len(columns_type[layer]) < shape[layer]:
+            return False
+
+    return True
+
+
+def split_data(test_size: float, data: data_cls.Data, model: model_cls.Model) -> None:
+    """Split the data into training and test sets.
+
+    Parameters
+    ----------
+    test_size : float
+        Test data percent.
+    data : Data
+        Data container object.
+    model : Model
+        Model container object.
+
+    Raises
+    ------
+    InputsUnderfilledError
+        When some of the input layers are not filled with the data columns.
+    OutputsUnderfilledError
+        When some of the output layers are not filled with the data columns.
+    """
+    if not layers_are_filled("Input", data, model):
+        raise err.InputsUnderfilledError(
+            "Please, set the data columns for all the input layers!"
+        )
+
+    if not layers_are_filled("Output", data, model):
+        raise err.OutputsUnderfilledError(
+            "Please, set the data columns for all the output layers!"
+        )
+
+    train, test = sk.train_test_split(data.file, test_size=test_size)
+
+    data.input_train_data = {
+        name: train[values].to_numpy() for name, values in data.input_columns.items()
+    }
+    data.output_train_data = {
+        name: train[values].to_numpy() for name, values in data.output_columns.items()
+    }
+    data.input_test_data = {
+        name: test[values].to_numpy() for name, values in data.input_columns.items()
+    }
+    data.output_test_data = {
+        name: test[values].to_numpy() for name, values in data.output_columns.items()
+    }

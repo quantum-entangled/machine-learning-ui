@@ -25,3 +25,4 @@ if not dm.file_exists(data) or not mm.model_exists(model):
 else:
     with st.container():
         tp.set_columns_ui(data, model)
+        tp.split_data_ui(data, model)

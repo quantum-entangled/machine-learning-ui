@@ -40,3 +40,11 @@ class LayerOverfilledError(Exception):
 
 class NoColumnsSelectedError(Exception):
     """When no columns are selected."""
+
+
+class InputsUnderfilledError(Exception):
+    """When some of the input layers are not filled with the data columns."""
+
+
+class OutputsUnderfilledError(Exception):
+    """When some of the output layers are not filled with the data columns."""
