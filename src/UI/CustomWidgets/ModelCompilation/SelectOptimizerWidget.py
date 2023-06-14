@@ -74,7 +74,7 @@ class SelectOptimizerWidget(iw.VBox):
             ]
 
             self.model_manager.select_optimizer(
-                optimizer=optimizer.instance, **optimizer_widget.params
+                optimizer_=optimizer.instance, **optimizer_widget.params
             )
 
             print(Success.OPTIMIZER_SELECTED)

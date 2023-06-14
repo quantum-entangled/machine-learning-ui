@@ -157,15 +157,15 @@ class ModelManager:
             save_format="h5",
         )
 
-    def select_optimizer(self, optimizer: Any, **kwargs) -> None:
+    def select_optimizer(self, optimizer_: Any, **kwargs) -> None:
         """Set a model optimizer.
 
         Parameters
         ----------
-        optimizer : Any
+        optimizer_ : Any
             TensorFlow optimizer object.
         """
-        self._model.optimizer = optimizer(**kwargs)
+        self._model.optimizer = optimizer_(**kwargs)
         self.notify_observers(callback_type=Observe.OPTIMIZER_SELECTED)
 
     def add_loss(self, layer: str, loss: Any) -> None:
