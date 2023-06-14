@@ -60,3 +60,7 @@ class NoOptimizerError(Exception):
 
 class NoLossError(Exception):
     """When loss functions are not set for each layer."""
+
+
+class SameCallbackError(Exception):
+    """When trying to set the already attached callback to the model."""

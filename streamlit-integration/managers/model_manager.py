@@ -8,6 +8,7 @@ import streamlit as st
 import tensorflow as tf
 import widgets.layers as wl
 import widgets.optimizers as wo
+import widgets.callbacks as wc
 
 import managers.errors as err
 
@@ -436,3 +437,31 @@ def compile_model(model: model_cls.Model) -> None:
         optimizer=model.optimizer, loss=model.losses, metrics=model.metrics
     )
     model.compiled = True
+
+
+def set_callback(
+    callback_cls: Type[tf.keras.callbacks.Callback],
+    callback_params: wc.CallbackParams,
+    model: model_cls.Model,
+) -> None:
+    """Set callbacks for the model.
+
+    Parameters
+    ----------
+    model : Model
+        Model container object.
+
+    Raises
+    ------
+    NoModelError
+        When model is not instantiated.
+    SameCallbackError
+        When trying to set the already attached callback to the model.
+    """
+    if not model_exists(model):
+        raise err.NoModelError("Please, create or upload a model!")
+
+    if callback_cls in [type(callback) for callback in model.callbacks]:
+        raise err.SameCallbackError("Please, select the distinct callback!")
+
+    model.callbacks.append(callback_cls(**callback_params))

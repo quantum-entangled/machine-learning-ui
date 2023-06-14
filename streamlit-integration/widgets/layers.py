@@ -29,10 +29,6 @@ class DenseParams(LayerParams):
     activation: Callable[..., tf.Tensor]
 
 
-class ConcatenateParams(LayerParams):
-    """Type annotation for the Concatenate layer."""
-
-
 class LayerWidget(abc.ABC):
     """Base class for a layer's widget."""
 
@@ -175,7 +171,7 @@ class Concatenate(LayerWidget):
         )
 
     @property
-    def params(self) -> ConcatenateParams:
+    def params(self) -> LayerParams:
         """Layer's parameters.
 
         Returns

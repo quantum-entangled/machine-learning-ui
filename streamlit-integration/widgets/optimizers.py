@@ -48,7 +48,6 @@ class OptimizerWidget(abc.ABC):
         dict
             Dictionary containing values of adjustable parameters.
         """
-        ...
 
 
 class Adam(OptimizerWidget):
