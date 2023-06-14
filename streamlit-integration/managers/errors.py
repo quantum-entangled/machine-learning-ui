@@ -48,3 +48,7 @@ class InputsUnderfilledError(Exception):
 
 class OutputsUnderfilledError(Exception):
     """When some of the output layers are not filled with the data columns."""
+
+
+class SameMetricError(Exception):
+    """When trying to set the already attached metric to the layer."""

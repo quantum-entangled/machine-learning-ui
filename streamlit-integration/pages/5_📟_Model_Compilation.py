@@ -23,3 +23,4 @@ else:
     with st.container():
         mc.set_optimizer_ui(model)
         mc.set_loss_functions_ui(model)
+        mc.set_metrics_ui(model)

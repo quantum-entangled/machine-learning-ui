@@ -367,3 +367,40 @@ def set_loss(
         raise err.NoOutputLayersError("Please, set the model outputs!")
 
     model.losses[layer] = loss_cls()
+
+
+def set_metric(
+    layer: str,
+    metric_cls: Type[tf.keras.metrics.Metric],
+    model: model_cls.Model,
+) -> None:
+    """Set the metric for the model's output layer.
+
+    Parameters
+    ----------
+    layer : str
+        Name of the layer to which the metric will be attached.
+    metric_cls : Metric
+        TensorFlow metric class.
+    model : Model
+        Model container object.
+
+    Raises
+    ------
+    NoModelError
+        When model is not instantiated.
+    NoOutputLayersError
+        When there are no output layers in the model.
+    SameMetricError
+        When trying to set the already attached metric to the layer.
+    """
+    if not model_exists(model):
+        raise err.NoModelError("Please, create or upload a model!")
+
+    if not model.output_layers:
+        raise err.NoOutputLayersError("Please, set the model outputs!")
+    
+    if metric_cls in [type(metric) for metric in model.metrics[layer]]:
+        raise err.SameMetricError("Please, select the distinct metric!")
+
+    model.metrics[layer].append(metric_cls())
