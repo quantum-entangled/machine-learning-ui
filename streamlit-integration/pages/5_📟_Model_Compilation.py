@@ -24,3 +24,4 @@ else:
         mc.set_optimizer_ui(model)
         mc.set_loss_functions_ui(model)
         mc.set_metrics_ui(model)
+        mc.compile_model_ui(model)

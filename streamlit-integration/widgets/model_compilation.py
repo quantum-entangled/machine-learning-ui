@@ -80,3 +80,23 @@ def set_metrics_ui(model: model_cls.Model) -> None:
             err.SameMetricError,
         ) as error:
             st.error(error, icon="❌")
+
+
+def compile_model_ui(model: model_cls.Model) -> None:
+    """Generate UI for compiling the model.
+
+    Parameters
+    ----------
+    model : Model
+        Model container object.
+    """
+    st.header("Compile Model")
+
+    compile_model_btn = st.button("Compile Model")
+
+    if compile_model_btn:
+        try:
+            mm.compile_model(model)
+            st.success("Model is compiled!", icon="✅")
+        except (err.NoModelError, err.NoOptimizerError, err.NoLossError) as error:
+            st.error(error, icon="❌")

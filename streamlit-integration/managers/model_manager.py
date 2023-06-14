@@ -399,8 +399,40 @@ def set_metric(
 
     if not model.output_layers:
         raise err.NoOutputLayersError("Please, set the model outputs!")
-    
+
     if metric_cls in [type(metric) for metric in model.metrics[layer]]:
         raise err.SameMetricError("Please, select the distinct metric!")
 
     model.metrics[layer].append(metric_cls())
+
+
+def compile_model(model: model_cls.Model) -> None:
+    """Compile the TensorFlow model.
+
+    Parameters
+    ----------
+    model : Model
+        Model container object.
+
+    Raises
+    ------
+    NoModelError
+        When model is not instantiated.
+    NoOptimizerError
+        When no optimizer is set for the model.
+    NoLossError
+        When loss functions are not set for each layer.
+    """
+    if not model_exists(model):
+        raise err.NoModelError("Please, create or upload a model!")
+
+    if not model.optimizer:
+        raise err.NoOptimizerError("Please, set the model optimizer!")
+
+    if not all(model.losses.values()):
+        raise err.NoLossError("Please, set the loss function for each output layer!")
+
+    model.instance.compile(
+        optimizer=model.optimizer, loss=model.losses, metrics=model.metrics
+    )
+    model.compiled = True

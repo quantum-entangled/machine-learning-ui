@@ -52,3 +52,11 @@ class OutputsUnderfilledError(Exception):
 
 class SameMetricError(Exception):
     """When trying to set the already attached metric to the layer."""
+
+
+class NoOptimizerError(Exception):
+    """When no optimizer is set for the model."""
+
+
+class NoLossError(Exception):
+    """When loss functions are not set for each layer."""
