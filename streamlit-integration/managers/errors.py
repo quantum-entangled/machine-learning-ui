@@ -64,3 +64,11 @@ class NoLossError(Exception):
 
 class SameCallbackError(Exception):
     """When trying to set the already attached callback to the model."""
+
+
+class DataNotSplitError(Exception):
+    """When the dataset is not split into training and testing sets."""
+
+
+class ModelNotCompiledError(Exception):
+    """When the model is not compiled."""

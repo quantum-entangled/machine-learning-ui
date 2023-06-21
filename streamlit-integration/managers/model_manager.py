@@ -3,12 +3,14 @@ import os
 import tempfile
 from typing import Type
 
+import data_classes.data as data_cls
 import data_classes.model as model_cls
 import streamlit as st
+import streamlit.delta_generator as dg
 import tensorflow as tf
+import widgets.callbacks as wc
 import widgets.layers as wl
 import widgets.optimizers as wo
-import widgets.callbacks as wc
 
 import managers.errors as err
 
@@ -465,3 +467,71 @@ def set_callback(
         raise err.SameCallbackError("Please, select the distinct callback!")
 
     model.callbacks.append(callback_cls(**callback_params))
+
+
+def fit_model(
+    batch_size: int,
+    num_epochs: int,
+    val_split: float,
+    batch_container: dg.DeltaGenerator,
+    epoch_container: dg.DeltaGenerator,
+    data: data_cls.Data,
+    model: model_cls.Model,
+) -> None:
+    """Fit the TensorFlow model.
+
+    Parameters
+    ----------
+    batch_size : int
+        Batch size hyperparameter for the fitting process.
+    num_epochs : int
+        Number of epochs hyperparameter for the fitting process.
+    val_split : float
+        Validation split hyperparameter for the fitting process.
+    batch_container : Container
+        Streamlit container for displaying the batch logs.
+    epoch_container : Container
+        Streamlit container for displaying the epoch logs.
+    data : Data
+        Data container object.
+    model : Model
+        Model container object.
+
+    Raises
+    ------
+    NoModelError
+        When model is not instantiated.
+    DataNotSplitError
+        When the dataset is not split into training and testing sets.
+    ModelNotCompiledError
+        When the model is not compiled.
+    """
+    if not model_exists(model):
+        raise err.NoModelError("Please, create or upload a model!")
+
+    if not (data.input_train_data and data.output_train_data):
+        raise err.DataNotSplitError("Please, split the data first!")
+
+    if not model.compiled:
+        raise err.ModelNotCompiledError("Please, compile the model first!")
+
+    batch_callback = tf.keras.callbacks.LambdaCallback(
+        on_batch_end=lambda batch, logs: batch_container.write(
+            f"Batch {batch + 1}: {logs}"
+        )
+    )
+    epoch_callback = tf.keras.callbacks.LambdaCallback(
+        on_epoch_end=lambda epoch, logs: epoch_container.write(
+            f"Epoch {epoch + 1}: {logs}"
+        )
+    )
+
+    history = model.instance.fit(
+        x=data.input_train_data,
+        y=data.output_train_data,
+        batch_size=batch_size,
+        epochs=num_epochs,
+        validation_split=val_split,
+        callbacks=model.callbacks + [batch_callback, epoch_callback],
+    )
+    model.training_history = history.history

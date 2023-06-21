@@ -5,7 +5,7 @@ import widgets.training as tr
 
 import managers.model_manager as mm
 
-st.set_page_config(page_title="Training")
+st.set_page_config(page_title="Training", page_icon="🏋️‍♂️")
 
 if "data" not in st.session_state or "model" not in st.session_state:
     st.session_state.data = data_cls.Data()
@@ -22,3 +22,4 @@ if not mm.model_exists(model) or not model.compiled:
 else:
     with st.container():
         tr.set_callbacks_ui(model)
+        tr.fit_model_ui(data, model)
