@@ -1,5 +1,3 @@
-import time
-
 import data_classes.data as data_cls
 import data_classes.model as model_cls
 import streamlit as st

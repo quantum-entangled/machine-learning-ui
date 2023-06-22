@@ -505,7 +505,7 @@ def fit_model(
         When model is not instantiated.
     DataNotSplitError
         When the dataset is not split into training and testing sets.
-    ModelNotCompiledError
+    ModelIsNotCompiledError
         When the model is not compiled.
     """
     if not model_exists(model):
@@ -577,3 +577,49 @@ def show_history_plot(
     fig.update_traces(line_color=color)
 
     return fig
+
+
+def evaluate_model(
+    batch_size: int,
+    data: data_cls.Data,
+    model: model_cls.Model,
+) -> dict[str, float]:
+    """Evaluate the TensorFlow model.
+
+    Parameters
+    ----------
+    batch_size : int
+        Batch size hyperparameter for the evaluation process.
+    data : Data
+        Data container object.
+    model : Model
+        Model container object.
+
+    Raises
+    ------
+    NoModelError
+        When model is not instantiated.
+    DataNotSplitError
+        When the dataset is not split into training and testing sets.
+    ModelIsNotCompiledError
+        When the model is not compiled.
+    """
+    if not model_exists(model):
+        raise err.NoModelError("Please, create or upload a model!")
+
+    if not (data.input_train_data and data.output_train_data):
+        raise err.DataNotSplitError("Please, split the data first!")
+
+    if not model.compiled:
+        raise err.ModelIsNotCompiledError("Please, compile the model first!")
+
+    results = model.instance.evaluate(
+        x=data.input_test_data,
+        y=data.output_test_data,
+        batch_size=batch_size,
+        callbacks=model.callbacks,
+        return_dict=True,
+        verbose=0,
+    )
+
+    return results
