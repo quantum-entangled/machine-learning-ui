@@ -1,4 +1,5 @@
 import time
+
 import data_classes.data as data_cls
 import data_classes.model as model_cls
 import streamlit as st
@@ -76,6 +77,36 @@ def fit_model_ui(data: data_cls.Data, model: model_cls.Model) -> None:
         except (
             err.NoModelError,
             err.DataNotSplitError,
-            err.ModelNotCompiledError,
+            err.ModelIsNotCompiledError,
         ) as error:
+            st.error(error, icon="❌")
+
+
+def show_history_plot_ui(model: model_cls.Model) -> None:
+    """Generate UI for plotting the training history.
+
+    Parameters
+    ----------
+    model : Model
+        Model container object.
+    """
+    st.header("History Plot")
+
+    col_1, col_2 = st.columns(2)
+
+    with col_1:
+        history_type = str(
+            st.selectbox("Select logs to plot:", list(model.training_history))
+        )
+
+    with col_2:
+        color = st.color_picker("Line color:", "#0000FF")
+
+    plot_history_btn = st.button("Plot History")
+
+    if plot_history_btn:
+        try:
+            fig = mm.show_history_plot(history_type, color, model)
+            st.plotly_chart(fig, use_container_width=True)
+        except (err.NoModelError, err.ModelIsNotTrainedError) as error:
             st.error(error, icon="❌")

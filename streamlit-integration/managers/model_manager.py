@@ -5,6 +5,8 @@ from typing import Type
 
 import data_classes.data as data_cls
 import data_classes.model as model_cls
+import plotly as ply
+import plotly.express as px
 import streamlit as st
 import streamlit.delta_generator as dg
 import tensorflow as tf
@@ -513,7 +515,7 @@ def fit_model(
         raise err.DataNotSplitError("Please, split the data first!")
 
     if not model.compiled:
-        raise err.ModelNotCompiledError("Please, compile the model first!")
+        raise err.ModelIsNotCompiledError("Please, compile the model first!")
 
     batch_callback = tf.keras.callbacks.LambdaCallback(
         on_batch_end=lambda batch, logs: batch_container.write(
@@ -535,3 +537,43 @@ def fit_model(
         callbacks=model.callbacks + [batch_callback, epoch_callback],
     )
     model.training_history = history.history
+
+
+def show_history_plot(
+    y: str, color: str, model: model_cls.Model
+) -> ply.graph_objs.Figure:
+    """Show the history plot.
+
+    Parameters
+    ----------
+    y : str
+        Y-axis column name.
+    color : str
+        Color of the line.
+    model : Model
+        Model container object.
+
+    Returns
+    -------
+    Figure
+        Plotly figure object.
+
+    Raises
+    ------
+    NoModelError
+        When model is not instantiated.
+    ModelIsNotTrainedError
+        When the model is not trained.
+    """
+    if not model_exists(model):
+        raise err.NoModelError("Please, create or upload a model!")
+
+    if not model.training_history:
+        raise err.ModelIsNotTrainedError("Please, train the model first!")
+
+    y_data = model.training_history[y]
+    x_data = range(1, len(y_data) + 1)
+    fig = px.line(x=x_data, y=y_data, labels={"x": "Epoch", "y": y}, markers=True)
+    fig.update_traces(line_color=color)
+
+    return fig

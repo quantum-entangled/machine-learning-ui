@@ -23,3 +23,4 @@ else:
     with st.container():
         tr.set_callbacks_ui(model)
         tr.fit_model_ui(data, model)
+        tr.show_history_plot_ui(model)
