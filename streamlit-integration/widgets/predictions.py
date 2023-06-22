@@ -6,8 +6,8 @@ import managers.errors as err
 import managers.model_manager as mm
 
 
-def evaluate_model_ui(data: data_cls.Data, model: model_cls.Model) -> None:
-    """Generate UI for evaluating the model.
+def make_predictions_ui(data: data_cls.Data, model: model_cls.Model) -> None:
+    """Generate UI for making the model predictions.
 
     Parameters
     ----------
@@ -16,21 +16,21 @@ def evaluate_model_ui(data: data_cls.Data, model: model_cls.Model) -> None:
     model : Model
         Model container object.
     """
-    st.header("Evaluate Model")
+    st.header("Make Predictions")
 
     batch_size = int(
         st.number_input("Batch size:", min_value=1, max_value=1024, value=32, step=1)
     )
-    evaluate_model_btn = st.button("Evaluate Model")
+    make_predictions_btn = st.button("Make Predictions")
 
-    if evaluate_model_btn:
+    if make_predictions_btn:
         try:
-            results = mm.evaluate_model(batch_size, data, model)
-            st.write("Results:", results)
-            st.success("Evaluation is completed!", icon="✅")
+            predictions = mm.make_predictions(batch_size, data, model)
+            st.write("Predictions:", predictions)
+            st.success("Predictions are completed!", icon="✅")
         except (
             err.NoModelError,
-            err.DataNotSplitError,
+            err.InputsUnderfilledError,
             err.ModelNotCompiledError,
         ) as error:
             st.error(error, icon="❌")

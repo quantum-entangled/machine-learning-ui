@@ -14,6 +14,7 @@ import widgets.callbacks as wc
 import widgets.layers as wl
 import widgets.optimizers as wo
 
+import managers.data_manager as dm
 import managers.errors as err
 
 
@@ -505,7 +506,7 @@ def fit_model(
         When model is not instantiated.
     DataNotSplitError
         When the dataset is not split into training and testing sets.
-    ModelIsNotCompiledError
+    ModelNotCompiledError
         When the model is not compiled.
     """
     if not model_exists(model):
@@ -515,16 +516,16 @@ def fit_model(
         raise err.DataNotSplitError("Please, split the data first!")
 
     if not model.compiled:
-        raise err.ModelIsNotCompiledError("Please, compile the model first!")
+        raise err.ModelNotCompiledError("Please, compile the model first!")
 
     batch_callback = tf.keras.callbacks.LambdaCallback(
         on_batch_end=lambda batch, logs: batch_container.write(
-            f"Batch {batch + 1}: {logs}"
+            {"batch": batch + 1} | logs
         )
     )
     epoch_callback = tf.keras.callbacks.LambdaCallback(
         on_epoch_end=lambda epoch, logs: epoch_container.write(
-            f"Epoch {epoch + 1}: {logs}"
+            {"epoch": epoch + 1} | logs
         )
     )
 
@@ -562,14 +563,14 @@ def show_history_plot(
     ------
     NoModelError
         When model is not instantiated.
-    ModelIsNotTrainedError
+    ModelNotTrainedError
         When the model is not trained.
     """
     if not model_exists(model):
         raise err.NoModelError("Please, create or upload a model!")
 
     if not model.training_history:
-        raise err.ModelIsNotTrainedError("Please, train the model first!")
+        raise err.ModelNotTrainedError("Please, train the model first!")
 
     y_data = model.training_history[y]
     x_data = range(1, len(y_data) + 1)
@@ -601,7 +602,7 @@ def evaluate_model(
         When model is not instantiated.
     DataNotSplitError
         When the dataset is not split into training and testing sets.
-    ModelIsNotCompiledError
+    ModelNotCompiledError
         When the model is not compiled.
     """
     if not model_exists(model):
@@ -611,7 +612,7 @@ def evaluate_model(
         raise err.DataNotSplitError("Please, split the data first!")
 
     if not model.compiled:
-        raise err.ModelIsNotCompiledError("Please, compile the model first!")
+        raise err.ModelNotCompiledError("Please, compile the model first!")
 
     results = model.instance.evaluate(
         x=data.input_test_data,
@@ -623,3 +624,50 @@ def evaluate_model(
     )
 
     return results
+
+
+def make_predictions(
+    batch_size: int,
+    data: data_cls.Data,
+    model: model_cls.Model,
+) -> dict[str, list[float]]:
+    """Make predictions of the TensorFlow model.
+
+    Parameters
+    ----------
+    batch_size : int
+        Batch size hyperparameter for the evaluation process.
+    data : Data
+        Data container object.
+    model : Model
+        Model container object.
+
+    Raises
+    ------
+    NoModelError
+        When model is not instantiated.
+    InputsUnderfilledError
+        When some of the input layers are not filled with the data columns.
+    ModelNotCompiledError
+        When the model is not compiled.
+    """
+    if not model_exists(model):
+        raise err.NoModelError("Please, create or upload a model!")
+
+    if not dm.layers_are_filled("Input", data, model):
+        raise err.InputsUnderfilledError(
+            "Please, set the data columns for all the input layers!"
+        )
+
+    if not model.compiled:
+        raise err.ModelNotCompiledError("Please, compile the model first!")
+
+    predictions = model.instance.predict(
+        x={name: data.file[values] for name, values in data.input_columns.items()},
+        batch_size=batch_size,
+        callbacks=model.callbacks,
+        verbose=0,
+    )
+    predictions = {layer: list(value.flatten()) for layer, value in predictions.items()}
+
+    return predictions

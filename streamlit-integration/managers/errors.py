@@ -70,9 +70,9 @@ class DataNotSplitError(Exception):
     """When the dataset is not split into training and testing sets."""
 
 
-class ModelIsNotCompiledError(Exception):
+class ModelNotCompiledError(Exception):
     """When the model is not compiled."""
 
 
-class ModelIsNotTrainedError(Exception):
+class ModelNotTrainedError(Exception):
     """When the model is not trained."""

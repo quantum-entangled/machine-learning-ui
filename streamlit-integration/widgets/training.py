@@ -75,7 +75,7 @@ def fit_model_ui(data: data_cls.Data, model: model_cls.Model) -> None:
         except (
             err.NoModelError,
             err.DataNotSplitError,
-            err.ModelIsNotCompiledError,
+            err.ModelNotCompiledError,
         ) as error:
             st.error(error, icon="❌")
 
@@ -106,5 +106,5 @@ def show_history_plot_ui(model: model_cls.Model) -> None:
         try:
             fig = mm.show_history_plot(history_type, color, model)
             st.plotly_chart(fig, use_container_width=True)
-        except (err.NoModelError, err.ModelIsNotTrainedError) as error:
+        except (err.NoModelError, err.ModelNotTrainedError) as error:
             st.error(error, icon="❌")
