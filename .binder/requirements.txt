@@ -10,3 +10,5 @@ scikit-learn==1.1.*
 tensorflow==2.10.*
 tensorflow-addons==0.18.*
 voila==0.4.*
+streamlit==1.22.*
+plotly==5.14.*
