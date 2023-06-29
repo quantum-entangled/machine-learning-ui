@@ -2,6 +2,7 @@ import abc
 from typing import TypedDict
 
 import streamlit as st
+import tensorflow as tf
 
 
 class OptimizerParams(TypedDict):
@@ -29,6 +30,46 @@ class SGDParams(OptimizerParams):
 
     learning_rate: float
     momentum: float
+
+
+class AdaModParams(OptimizerParams):
+    """Type annotation for the AdaMod optimizer."""
+
+    learning_rate: float
+    beta_1: float
+    beta_2: float
+    beta_3: float
+
+
+class ApolloParams(OptimizerParams):
+    """Type annotation for the Apollo optimizer."""
+
+    learning_rate: float
+    beta: float
+    weight_decay: float
+    weight_decay_type: str
+
+
+class LAMBParams(OptimizerParams):
+    """Type annotation for the LAMB optimizer."""
+
+    learning_rate: float
+    beta_1: float
+    beta_2: float
+
+
+class LookaheadParams(OptimizerParams):
+    """Type annotation for the Lookahead optimizer."""
+
+    optimizer: tf.keras.optimizers.Optimizer
+
+
+class RAdamParams(OptimizerParams):
+    """Type annotation for the RAdam optimizer."""
+
+    learning_rate: float
+    beta_1: float
+    beta_2: float
 
 
 class OptimizerWidget(abc.ABC):
@@ -175,4 +216,213 @@ class SGD(OptimizerWidget):
         return {
             "learning_rate": self.learning_rate,
             "momentum": self.momentum,
+        }
+
+
+class AdaMod(OptimizerWidget):
+    """AdaMod optimizer widget."""
+
+    def __init__(self):
+        self.learning_rate = float(
+            st.number_input(
+                "Learning rate:",
+                min_value=0.0,
+                max_value=0.1,
+                value=0.001,
+                step=0.005,
+                format="%e",
+            )
+        )
+        self.beta_1 = float(
+            st.number_input(
+                "Decay 1:",
+                min_value=0.0,
+                max_value=1.0,
+                value=0.9,
+                step=0.001,
+                format="%.3f",
+            )
+        )
+        self.beta_2 = float(
+            st.number_input(
+                "Decay 2:",
+                min_value=0.0,
+                max_value=1.0,
+                value=0.999,
+                step=0.001,
+                format="%.3f",
+            )
+        )
+        self.beta_3 = float(
+            st.number_input(
+                "Decay 3:",
+                min_value=0.0,
+                max_value=1.0,
+                value=0.995,
+                step=0.001,
+                format="%.3f",
+            )
+        )
+
+    @property
+    def params(self) -> AdaModParams:
+        return {
+            "learning_rate": self.learning_rate,
+            "beta_1": self.beta_1,
+            "beta_2": self.beta_2,
+            "beta_3": self.beta_3,
+        }
+
+
+class Apollo(OptimizerWidget):
+
+    def __init__(self):
+        self.learning_rate = float(
+            st.number_input(
+                "Learning rate:",
+                min_value=0.0,
+                max_value=0.1,
+                value=0.01,
+                step=0.005,
+                format="%e",
+            )
+        )
+        self.beta = float(
+            st.number_input(
+                "Beta:",
+                min_value=0.0,
+                max_value=1,
+                value=0.9,
+                step=0.005,
+                format="%e",
+            )
+        )
+        self.weight_decay = float(
+            st.number_input(
+                "Weight Decay:",
+                min_value=0.0,
+                max_value=0.001,
+                value=0,
+                step=0.00005,
+                format="%e",
+            )
+        )
+        self.weight_decay_type = str(
+            st.selectbox(
+                "Weight Decay Type:",
+                ("L2", "Decoupled", "Stable")
+            )
+        )
+
+    @property
+    def params(self) -> ApolloParams:
+        return {
+            "learning_rate": self.learning_rate,
+            "beta": self.beta,
+            "weight_decay": self.weight_decay,
+            "weight_decay_type": self.weight_decay_type,
+        }
+
+
+class LAMB(OptimizerWidget):
+
+    def __init__(self):
+        self.learning_rate = float(
+            st.number_input(
+                "Learning rate:",
+                min_value=0.0,
+                max_value=0.1,
+                value=0.001,
+                step=0.005,
+                format="%e",
+            )
+        )
+        self.beta_1 = float(
+            st.number_input(
+                "Decay 1:",
+                min_value=0.0,
+                max_value=1.0,
+                value=0.9,
+                step=0.005,
+                format="%.3f",
+            )
+        )
+        self.beta_2 = float(
+            st.number_input(
+                "Decay 2:",
+                min_value=0.0,
+                max_value=1.0,
+                value=0.999,
+                step=0.005,
+                format="%.3f",
+            )
+        )
+
+    @property
+    def params(self) -> LAMBParams:
+        return {
+            "learning_rate": self.learning_rate,
+            "beta_1": self.beta_1,
+            "beta_2": self.beta_2,
+        }
+
+
+class Lookahead(OptimizerWidget):
+
+    def __init__(self):
+        self.optimizer = tf.keras.optimizers.Optimizer(
+            st.selectbox(
+                "Optimizer:",
+                (tf.keras.optimizers.SGD(), tf.keras.optimizers.Adam(), tf.keras.optimizers.RMSprop(),
+                 tf.keras.optimizers.Adamax(), tf.keras.optimizers.Adagrad())
+            )
+        )
+
+    @property
+    def params(self) -> LookaheadParams:
+        return {
+            "optimizer": self.optimizer
+        }
+
+
+class RAdam(OptimizerWidget):
+
+    def __init__(self) -> None:
+        self.learning_rate = float(
+            st.number_input(
+                "Learning rate:",
+                min_value=0.0,
+                max_value=0.1,
+                value=0.001,
+                step=0.005,
+                format="%e",
+            )
+        )
+        self.beta_1 = float(
+            st.number_input(
+                "Decay 1:",
+                min_value=0.0,
+                max_value=1.0,
+                value=0.9,
+                step=0.005,
+                format="%.3f",
+            )
+        )
+        self.beta_2 = float(
+            st.number_input(
+                "Decay 2:",
+                min_value=0.0,
+                max_value=1.0,
+                value=0.999,
+                step=0.005,
+                format="%.3f",
+            )
+        )
+
+    @property
+    def params(self) -> AdamParams:
+        return {
+            "learning_rate": self.learning_rate,
+            "beta_1": self.beta_1,
+            "beta_2": self.beta_2,
         }
