@@ -1,5 +1,4 @@
 import pytest
-
 from src.DataClasses import Data, Model
 
 
