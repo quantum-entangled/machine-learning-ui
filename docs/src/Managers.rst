@@ -4,5 +4,6 @@ Managers
 .. toctree::
    :maxdepth: 2
 
-   DataManager
-   ModelManager
+   managers/data_manager.rst
+   managers/model_manager.rst
+   managers/errors.rst

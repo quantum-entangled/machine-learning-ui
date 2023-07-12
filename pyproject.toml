@@ -8,7 +8,7 @@ readme = "README.md"
 repository = "https://github.com/quantum-entangled/machine-learning-ui"
 documentation = "https://quantum-entangled.github.io/machine-learning-ui/index.html"
 keywords = ["python", "machine learning"]
-packages = [{include = "machine_learning_ui", from = "src"}]
+packages = [{include = "mlui", from = "src"}]
 include = [
     {path = "tests", format = "sdist"},
     {path = "docs", format = "sdist"}
@@ -43,6 +43,7 @@ optional = true
 [tool.poetry.group.docs.dependencies]
 Sphinx = "^7.0.1"
 furo = "^2023.5.20"
+myst-parser = "^2.0.0"
 
 [tool.pytest.ini_options]
 filterwarnings = ["ignore::DeprecationWarning"]
