@@ -1,12 +1,14 @@
 import pytest
-from src.DataClasses import Data, Model
+
+from mlui.data_classes import data as data_cls
+from mlui.data_classes import model as model_cls
 
 
 @pytest.fixture
-def data() -> Data:
-    return Data()
+def data() -> data_cls.Data:
+    return data_cls.Data()
 
 
 @pytest.fixture
-def model() -> Model:
-    return Model()
+def model() -> model_cls.Model:
+    return model_cls.Model()
