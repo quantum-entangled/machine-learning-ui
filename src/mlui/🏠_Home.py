@@ -1,6 +1,7 @@
-import data_classes.data as data_cls
-import data_classes.model as model_cls
 import streamlit as st
+
+from .data_classes import data as data_cls
+from .data_classes import model as model_cls
 
 if "data" not in st.session_state or "model" not in st.session_state:
     st.session_state.data = data_cls.Data()
