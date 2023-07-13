@@ -2,7 +2,7 @@ from typing import Type
 
 import tensorflow as tf
 
-from ..widgets import callbacks as wc
+import mlui.widgets.callbacks as wc
 
 classes: dict[str, Type[tf.keras.callbacks.Callback]] = {
     "EarlyStopping": tf.keras.callbacks.EarlyStopping,

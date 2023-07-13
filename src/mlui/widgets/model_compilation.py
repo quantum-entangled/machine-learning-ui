@@ -1,7 +1,7 @@
 import streamlit as st
 
-from ..data_classes import model as model_cls
-from ..enums import losses, metrics, optimizers
+import mlui.data_classes.model as model_cls
+from mlui.enums import losses, metrics, optimizers
 from ..managers import errors as err
 from ..managers import model_manager as mm
 

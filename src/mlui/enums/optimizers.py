@@ -2,7 +2,7 @@ from typing import Type
 
 import tensorflow as tf
 
-from ..widgets import optimizers as wo
+import mlui.widgets.optimizers as wo
 
 classes: dict[str, tf.keras.optimizers.Optimizer] = {
     "Adam": tf.keras.optimizers.Adam,

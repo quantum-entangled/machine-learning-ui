@@ -1,8 +1,8 @@
 import streamlit as st
 
-from ..data_classes import data as data_cls
-from ..data_classes import model as model_cls
-from ..widgets import model_preparation as mp
+import mlui.data_classes.data as data_cls
+import mlui.data_classes.model as model_cls
+import mlui.widgets.model_preparation as mp
 
 st.set_page_config(page_title="Model Preparation", page_icon="🛠️")
 

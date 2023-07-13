@@ -4,8 +4,8 @@ from typing import Callable, TypeAlias, TypedDict
 import streamlit as st
 import tensorflow as tf
 
-from ..data_classes import model as model_cls
-from ..enums.activations import activations
+import mlui.data_classes.model as model_cls
+from mlui.enums import activations
 
 LayerConnection: TypeAlias = str | list[str] | int | None
 
@@ -120,7 +120,9 @@ class Dense(LayerWidget):
             st.number_input("Number of units:", value=1, min_value=1, max_value=10_000)
         )
 
-        self.activation = st.selectbox("Activation function:", list(activations))
+        self.activation = st.selectbox(
+            "Activation function:", list(activations.classes)
+        )
         self.connect_to = st.selectbox("Connect layer to:", list(self.model.layers))
 
     @property
@@ -135,9 +137,9 @@ class Dense(LayerWidget):
         return {
             "name": self.layer_name,
             "units": self.units_num,
-            "activation": activations[self.activation]
+            "activation": activations.classes[self.activation]
             if self.activation
-            else activations["Linear"],
+            else activations.classes["Linear"],
         }
 
     @property

@@ -1,7 +1,7 @@
 import streamlit as st
 
-from ..data_classes import data as data_cls
-from ..managers import data_manager as dm
+import mlui.data_classes.data as data_cls
+import mlui.managers.data_manager as dm
 
 
 def show_dataframe_ui(data: data_cls.Data) -> None:

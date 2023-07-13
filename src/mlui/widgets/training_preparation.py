@@ -1,9 +1,9 @@
 import streamlit as st
 
-from ..data_classes import data as data_cls
-from ..data_classes import model as model_cls
-from ..managers import data_manager as dm
-from ..managers import errors as err
+import mlui.data_classes.data as data_cls
+import mlui.data_classes.model as model_cls
+import mlui.managers.data_manager as dm
+import mlui.managers.errors as err
 
 
 def set_columns_ui(data: data_cls.Data, model: model_cls.Model) -> None:

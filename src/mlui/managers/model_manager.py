@@ -9,13 +9,13 @@ import streamlit as st
 import streamlit.delta_generator as dg
 import tensorflow as tf
 
-from ..data_classes import data as data_cls
-from ..data_classes import model as model_cls
-from ..managers import data_manager as dm
-from ..managers import errors as err
-from ..widgets import callbacks as wc
-from ..widgets import layers as wl
-from ..widgets import optimizers as wo
+import mlui.data_classes.data as data_cls
+import mlui.data_classes.model as model_cls
+import mlui.managers.data_manager as dm
+import mlui.managers.errors as err
+import mlui.widgets.callbacks as wc
+import mlui.widgets.layers as wl
+import mlui.widgets.optimizers as wo
 
 
 def model_exists(model: model_cls.Model) -> bool:

@@ -1,8 +1,8 @@
 import streamlit as st
 
-from ..data_classes import data as data_cls
-from ..data_classes import model as model_cls
-from ..widgets import upload as up
+import mlui.data_classes.data as data_cls
+import mlui.data_classes.model as model_cls
+import mlui.widgets.upload as up
 
 st.set_page_config(page_title="Uploading", page_icon="⬆️")
 

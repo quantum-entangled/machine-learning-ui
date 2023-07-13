@@ -8,9 +8,9 @@ import plotly as ply
 import plotly.express as px
 import sklearn.model_selection as sk
 
-from ..data_classes import data as data_cls
-from ..data_classes import model as model_cls
-from ..managers import errors as err
+import mlui.data_classes.data as data_cls
+import mlui.data_classes.model as model_cls
+import mlui.managers.errors as err
 
 
 def file_exists(data: data_cls.Data) -> bool:

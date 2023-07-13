@@ -1,9 +1,9 @@
 import streamlit as st
 
-from ..data_classes import data as data_cls
-from ..data_classes import model as model_cls
-from ..managers import model_manager as mm
-from ..widgets import training as tr
+import mlui.data_classes.data as data_cls
+import mlui.data_classes.model as model_cls
+import mlui.managers.model_manager as mm
+import mlui.widgets.training as tr
 
 st.set_page_config(page_title="Training", page_icon="🏋️‍♂️")
 

@@ -2,7 +2,7 @@ from typing import Type
 
 import tensorflow as tf
 
-from ..widgets import layers as wl
+import mlui.widgets.layers as wl
 
 classes: dict[str, Type[tf.keras.layers.Layer]] = {
     "Input": tf.keras.Input,

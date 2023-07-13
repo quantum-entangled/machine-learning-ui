@@ -1,10 +1,10 @@
 import streamlit as st
 
-from ..data_classes import data as data_cls
-from ..data_classes import model as model_cls
-from ..managers import data_manager as dm
-from ..managers import model_manager as mm
-from ..widgets import training_preparation as tp
+import mlui.data_classes.data as data_cls
+import mlui.data_classes.model as model_cls
+import mlui.managers.data_manager as dm
+import mlui.managers.model_manager as mm
+import mlui.widgets.training_preparation as tp
 
 st.set_page_config(page_title="Training Preparation", page_icon="⚙️")
 
