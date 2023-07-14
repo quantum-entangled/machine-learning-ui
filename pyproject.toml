@@ -20,7 +20,6 @@ python = "~3.11.0"
 pandas = "~2.0.3"
 numpy = "~1.24.3"
 tensorflow-io-gcs-filesystem = "0.31.0"
-tensorflow-intel = "2.12.1"
 tensorflow = "2.12.1"
 pydot = "~1.4.2"
 streamlit = "~1.24.1"
@@ -44,6 +43,12 @@ optional = true
 Sphinx = "^7.0.1"
 furo = "^2023.5.20"
 myst-parser = "^2.0.0"
+
+[tool.poetry.group.windows]
+optional = true
+
+[tool.poetry.group.windows.dependencies]
+tensorflow-intel = "2.12.1"
 
 [tool.pytest.ini_options]
 filterwarnings = ["ignore::DeprecationWarning"]
