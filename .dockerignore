@@ -1,0 +1,9 @@
+# Git-related
+.git/
+.github/
+.gitattributes
+.gitignore
+
+# Cache / Environment
+.venv/
+**/__pycache__/
