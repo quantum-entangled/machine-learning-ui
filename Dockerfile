@@ -1,5 +1,5 @@
 # Environment stage
-FROM python:3.11.4-slim-bookworm AS env-base
+FROM python:3.11.4-slim-bullseye AS env-base
 
 ARG APP_ENV
 
@@ -9,7 +9,7 @@ ENV APP_ENV=${APP_ENV} \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONHASHSEED=random \
-    # pip
+    # Pip
     PIP_NO_CACHE_DIR=0 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_DEFAULT_TIMEOUT=100 \
@@ -23,7 +23,7 @@ ENV APP_ENV=${APP_ENV} \
     APP_PATH="/opt/app" \
     VENV_PATH="/opt/app/.venv"
 
-# Attach Poetry and virtual environment to path
+# Attach Poetry and Virtual Environment to Path
 ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 
 RUN apt-get update && apt-get upgrade -y && \
