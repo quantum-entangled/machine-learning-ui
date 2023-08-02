@@ -1,0 +1,6 @@
+services:
+  app:
+    image: ivanshalamov/mlui:latest
+    container_name: mlui-app
+    ports:
+      - "8501:8501"
