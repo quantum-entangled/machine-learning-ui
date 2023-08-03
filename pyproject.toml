@@ -29,10 +29,10 @@ plotly = "~5.15.0"
 [tool.poetry.group.dev.dependencies]
 black = "~23.7.0"
 
-[tool.poetry.group.test]
+[tool.poetry.group.tests]
 optional = true
 
-[tool.poetry.group.test.dependencies]
+[tool.poetry.group.tests.dependencies]
 pytest = "^7.4.0"
 pytest-cov = "^4.1.0"
 

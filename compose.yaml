@@ -1,6 +1,18 @@
+name: mlui
+
 services:
   app:
-    image: ivanshalamov/mlui:latest
-    container_name: mlui-app
+    container_name: app-dev
+    build:
+      context: ./
+      args:
+        - APP_ENV=DEV
+    image: mlui-dev
     ports:
       - "8501:8501"
+    volumes:
+      - ./src/:/opt/app/src
+      - ./docs/:/opt/app/docs
+      - ./tests/:/opt/app/tests
+      - ./poetry.lock:/opt/app/poetry.lock
+      - ./pyproject.toml:/opt/app/pyproject.toml
