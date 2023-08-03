@@ -39,40 +39,61 @@ ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 RUN groupadd --gid $GROUP_ID user && \
     adduser user --ingroup user --gecos '' --disabled-password --uid $USER_ID && \
     mkdir -p /usr/src/app && \
-    chown -R user:user /usr/src/app
+    mkdir -p /opt/poetry && \
+    chown -R user:user /usr/src/app && \
+    chown -R user:user /opt/poetry
 
-RUN apt-get update && apt-get upgrade -y && \
+RUN apt-get update && \
     apt-get install --no-install-recommends -y graphviz
 
 
 # Build stage
 FROM env-base as build-base
 
-RUN apt-get install --no-install-recommends -y curl && \
+RUN apt-get upgrade -y && \
+    apt-get install --no-install-recommends -y curl && \
     curl -sSL https://install.python-poetry.org | python3 -
 
 WORKDIR $APP_PATH
 
-COPY --chown=user:user poetry.lock pyproject.toml ./
+COPY poetry.lock pyproject.toml README.md LICENSE ./
 
-RUN poetry install --no-root --no-directory \
+RUN poetry self add setuptools@~68.0.0 && \
+    poetry install --no-root --no-directory \
     $(if [ "$APP_ENV" = "PROD" ]; then echo '--only main'; \
     elif [ "$APP_ENV" = "DEV" ]; then echo '--with docs,tests'; fi)
 
+COPY ./src ./src/
 
-# Development stage
-FROM env-base as dev
+RUN poetry install --only-root
+
+
+# App stage
+FROM env-base as app-base
+
+RUN apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
+    apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 WORKDIR $APP_PATH
 
 USER user
 
-COPY --chown=user:user --from=build-base $POETRY_HOME $POETRY_HOME
 COPY --chown=user:user --from=build-base $APP_PATH ./
-COPY . ./
-
-RUN poetry install --only-root
 
 EXPOSE 8501
 
 ENTRYPOINT streamlit run src/mlui/🏠_Home.py
+
+
+# Development stage
+FROM app-base as dev
+
+COPY --chown=user:user --from=build-base $POETRY_HOME $POETRY_HOME
+
+COPY --chown=user:user . ./
+
+
+# Production stage
+FROM app-base as prod
+
+RUN rm -f poetry.lock pyproject.toml

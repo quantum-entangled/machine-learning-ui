@@ -5,14 +5,15 @@ services:
     container_name: app-dev
     build:
       context: ./
+      target: dev
       args:
         - APP_ENV=DEV
-    image: mlui-dev
+    image: mlui-dev:latest
     ports:
       - "8501:8501"
     volumes:
-      - ./src/:/opt/app/src
-      - ./docs/:/opt/app/docs
-      - ./tests/:/opt/app/tests
-      - ./poetry.lock:/opt/app/poetry.lock
-      - ./pyproject.toml:/opt/app/pyproject.toml
+      - ./src/:/usr/src/app/src
+      - ./docs/:/usr/src/app/docs
+      - ./tests/:/usr/src/app/tests
+      - ./poetry.lock:/usr/src/app/poetry.lock
+      - ./pyproject.toml:/usr/src/app/pyproject.toml
