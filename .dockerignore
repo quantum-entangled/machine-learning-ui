@@ -1,83 +1,84 @@
 # Git-related
 .git/
 .github/
-.gitattributes
-.gitignore
+**/.gitattributes
+**/.gitignore
 
 # Docker
 Dockerfile
 compose.yaml
 compose.dev.yaml
+.dockerignore
 
 # Environments
-.env/
-.venv/
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+**/.env/
+**/.venv/
+**/env/
+**/venv/
+**/ENV/
+**/env.bak/
+**/venv.bak/
 
 # VSCode
-.history/
-*.vsix
+**/.history/
+**/*.vsix
 
 # PyCharm
-.idea_modules/
-.idea/
+**/.idea_modules/
+**/.idea/
 
 # File-based project format
-*.iws
+**/*.iws
 
 # Python byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
 
 # Distribution / packaging
-__pypackages__/
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+**/__pypackages__/
+**/.Python
+**/build/
+**/develop-eggs/
+**/dist/
+**/downloads/
+**/eggs/
+**/.eggs/
+**/lib/
+**/lib64/
+**/parts/
+**/sdist/
+**/var/
+**/wheels/
+**/share/python-wheels/
+**/*.egg-info/
+**/.installed.cfg
+**/*.egg
+**/MANIFEST
 
 # Tests / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-cover/
+**/htmlcov/
+**/.tox/
+**/.nox/
+**/.coverage
+**/.coverage.*
+**/.cache
+**/nosetests.xml
+**/coverage.xml
+**/*.cover
+**/*.py,cover
+**/.hypothesis/
+**/.pytest_cache/
+**/cover/
 
 # Jupyter Notebook
-.ipynb_checkpoints/
+**/.ipynb_checkpoints/
 
 # IPython
-profile_default/
-ipython_config.py
+**/profile_default/
+**/ipython_config.py
 
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
+# Mypy
+**/.mypy_cache/
+**/.dmypy.json
+**/dmypy.json

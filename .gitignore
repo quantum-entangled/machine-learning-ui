@@ -67,7 +67,7 @@ cover/
 profile_default/
 ipython_config.py
 
-# mypy
+# Mypy
 .mypy_cache/
 .dmypy.json
 dmypy.json

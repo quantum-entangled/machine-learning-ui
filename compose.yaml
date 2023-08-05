@@ -1,10 +1,10 @@
-name: mlui
+name: machine-learning-ui
 
 services:
   app:
     container_name: app-dev
     build:
-      context: ./
+      context: .
       target: dev
       args:
         - APP_ENV=DEV
