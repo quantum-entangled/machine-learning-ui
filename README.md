@@ -26,6 +26,7 @@ The app was originally developed as part of research project, funded by **St. Pe
 
 
 ## Installing via Poetry
+1. Install Python 3.11: [Official Website](https://www.python.org/downloads/).
 1. Install Poetry for your system by following the official guide: [Poetry Installation](https://python-poetry.org/docs/#installation). Remember to add Poetry to your Path.
 1. In the terminal, run `poetry config virtualenvs.in-project true`.
 1. Clone the repository to your local machine and navigate to its root folder using `cd`.
