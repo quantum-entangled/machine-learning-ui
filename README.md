@@ -27,6 +27,7 @@ The app was originally developed as part of research project, funded by **St. Pe
 
 ## Installing via Poetry
 1. Install Poetry for your system by following the official guide: [Poetry Installation](https://python-poetry.org/docs/#installation). Remember to add Poetry to your Path.
+1. In the terminal, run `poetry config virtualenvs.in-project true`.
 1. Clone the repository to your local machine and navigate to its root folder using `cd`.
 1. In the terminal, run `poetry install` for basic usage or `poetry install --with docs,tests` for development (comma-separated without spaces). On Windows, include `windows` in the `--with` flag; this is necessary for TensorFlow to function correctly.
 1. Start the app by running `streamlit run src/mlui/''$'\360\237\217\240''_Home.py'`. Access the app by navigating to the provided URL.
