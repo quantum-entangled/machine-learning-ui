@@ -1,9 +1,8 @@
 name: docker-build-push
 
 on:
-  push:
-    tags:
-      - '*'
+  release:
+    types: [published]
 
 jobs:
   build-push:
