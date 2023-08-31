@@ -29,7 +29,7 @@ jobs:
         run: poetry env use 3.11
       - 
         name: Install dependencies
-        run: poetry install --no-root --no-directory --only docs --no-interaction
+        run: poetry install --no-directory --with docs --without dev --no-interaction
       -
         name: Build HTML page via Sphinx
         run: poetry run sphinx-build -E -b html docs/src/ docs/build/html
