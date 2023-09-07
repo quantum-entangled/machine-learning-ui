@@ -72,6 +72,23 @@ class RAdamParams(OptimizerParams):
     beta_2: float
 
 
+class MADGRADParams(OptimizerParams):
+    """Type annotation for the MADGRAD optimizer."""
+
+    learning_rate: float
+    momentum: float
+    weight_decay: float
+
+class LARSParams(OptimizerParams):
+    """Type annotation for the LARS optimizer."""
+
+    learning_rate: float
+    momentum: float
+    weight_decay: float
+    dampening: float
+    nesterov: bool
+
+
 class OptimizerWidget(abc.ABC):
     """Base class for an optimizer's widget."""
 
@@ -275,6 +292,7 @@ class AdaMod(OptimizerWidget):
 
 
 class Apollo(OptimizerWidget):
+    """Apollo optimizer widget."""
 
     def __init__(self):
         self.learning_rate = float(
@@ -291,7 +309,7 @@ class Apollo(OptimizerWidget):
             st.number_input(
                 "Beta:",
                 min_value=0.0,
-                max_value=1,
+                max_value=1.0,
                 value=0.9,
                 step=0.005,
                 format="%e",
@@ -302,7 +320,7 @@ class Apollo(OptimizerWidget):
                 "Weight Decay:",
                 min_value=0.0,
                 max_value=0.001,
-                value=0,
+                value=0.0,
                 step=0.00005,
                 format="%e",
             )
@@ -310,7 +328,7 @@ class Apollo(OptimizerWidget):
         self.weight_decay_type = str(
             st.selectbox(
                 "Weight Decay Type:",
-                ("L2", "Decoupled", "Stable")
+                ("L2", "Decoupled", "Stable"),
             )
         )
 
@@ -325,6 +343,7 @@ class Apollo(OptimizerWidget):
 
 
 class LAMB(OptimizerWidget):
+    """LAMB optimizer widget."""
 
     def __init__(self):
         self.learning_rate = float(
@@ -368,12 +387,13 @@ class LAMB(OptimizerWidget):
 
 
 class Lookahead(OptimizerWidget):
+    """Lookahead optimizer widget."""
 
     def __init__(self):
         self.optimizer = tf.keras.optimizers.Optimizer(
             st.selectbox(
                 "Optimizer:",
-                (tf.keras.optimizers.SGD(), tf.keras.optimizers.Adam(), tf.keras.optimizers.RMSprop(),
+                options=(tf.keras.optimizers.SGD(), tf.keras.optimizers.Adam(), tf.keras.optimizers.RMSprop(),
                  tf.keras.optimizers.Adamax(), tf.keras.optimizers.Adagrad())
             )
         )
@@ -386,6 +406,7 @@ class Lookahead(OptimizerWidget):
 
 
 class RAdam(OptimizerWidget):
+    """RAdam optimizer widget."""
 
     def __init__(self) -> None:
         self.learning_rate = float(
@@ -420,9 +441,116 @@ class RAdam(OptimizerWidget):
         )
 
     @property
-    def params(self) -> AdamParams:
+    def params(self) -> RAdamParams:
         return {
             "learning_rate": self.learning_rate,
             "beta_1": self.beta_1,
             "beta_2": self.beta_2,
         }
+
+
+class MADGRAD(OptimizerWidget):
+    """MADGRAD optimizer widget."""
+
+    def __init__(self) -> None:
+        self.learning_rate = float(
+            st.number_input(
+                "Learning rate:",
+                min_value=0.0,
+                max_value=0.1,
+                value=0.01,
+                step=0.005,
+                format="%e",
+            )
+        )
+        self.momentum = float(
+            st.number_input(
+                "Momentum:",
+                min_value=0.0,
+                max_value=0.999,
+                value=0.9,
+                step=0.001,
+                format="%.3f",
+            )
+        )
+        self.weight_decay = float(
+            st.number_input(
+                "Weight decay:",
+                min_value=0.0,
+                max_value=0.999,
+                value=0.0,
+                step=0.001,
+                format="%.3f",
+            )
+        )
+
+    @property
+    def params(self) -> MADGRADParams:
+        return {
+            "learning_rate": self.learning_rate,
+            "momentum": self.momentum,
+            "weight_decay": self.weight_decay,
+        }
+
+
+class LARS(OptimizerWidget):
+    """LARS optimizer widget."""
+
+    def __init__(self) -> None:
+        self.learning_rate = float(
+            st.number_input(
+                "Learning rate:",
+                min_value=0.0,
+                max_value=0.1,
+                value=0.01,
+                step=0.005,
+                format="%e",
+            )
+        )
+        self.momentum = float(
+            st.number_input(
+                "Momentum:",
+                min_value=0.0,
+                max_value=0.999,
+                value=0.9,
+                step=0.001,
+                format="%.3f",
+            )
+        )
+        self.weight_decay = float(
+            st.number_input(
+                "Weight decay:",
+                min_value=0.0,
+                max_value=0.999,
+                value=0.0,
+                step=0.001,
+                format="%.3f",
+            )
+        )
+        self.dampening = float(
+            st.number_input(
+                "Dampening for momentum:",
+                min_value=0.0,
+                max_value=0.1,
+                value=0.0,
+                step=0.001,
+                format="%.3f",
+            )
+        )
+        self.nesterov = bool(
+            st.selectbox(
+                "Nesterov momentum:",
+                (False, True),
+            )
+        )
+
+    @property
+    def params(self) -> LARSParams:
+        return {
+            "learning_rate": self.learning_rate,
+            "momentum": self.momentum,
+            "weight_decay": self.weight_decay,
+            "dampening": self.dampening,
+            "nesterov": self.nesterov,
+        }
+

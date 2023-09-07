@@ -1,6 +1,6 @@
 from typing import Type
 
-from streamlit_integration.CustomOptimizers import AdaMod, Apollo
+from CustomOptimizers import AdaMod, Apollo, MADGRAD, LARS
 import tensorflow_addons as tfa
 import tensorflow as tf
 import widgets.optimizers as wo
@@ -14,6 +14,8 @@ classes: dict[str, tf.keras.optimizers.Optimizer] = {
     "LAMB": tfa.optimizers.LAMB,
     "Lookahead": tfa.optimizers.Lookahead,
     "RAdam": tfa.optimizers.RectifiedAdam,
+    "MADGRAD": MADGRAD,
+    "LARS": LARS,
 }
 
 widgets: dict[str, Type[wo.OptimizerWidget]] = {
@@ -25,4 +27,6 @@ widgets: dict[str, Type[wo.OptimizerWidget]] = {
     "LAMB": wo.LAMB,
     "Lookahead": wo.Lookahead,
     "RAdam": wo.RAdam,
+    "MADGRAD": wo.MADGRAD,
+    "LARS": wo.LARS,
 }
