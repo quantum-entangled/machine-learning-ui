@@ -11,10 +11,39 @@ The app was originally developed as part of research project, funded by **St. Pe
 ### For Usage
 
 1. Install Docker for your system by following the official guide: [Docker Installation](https://docs.docker.com/engine/install/).
-1. Open Docker Desktop, use the search bar to find `ivanshalamov/machine-learning-ui`, and pull the `latest` image.
-1. In the "Images" tab, click the `Run` button for the pulled image in the "Actions" column. Enter a name for the container (e.g., `machine-learning-ui-app`) in the "Container name" section. Specify an available port (e.g., `8501`) in the "Ports" section, then run the image.
-1. Navigate to the "Containers" tab and click the hyperlink in the "Ports" column to access the app.
-1. To stop the app, go to the "Containers" tab again and click `Stop` in the "Actions" column. You can easily restart it later from there without any additional steps.
+1. Open Docker Desktop, navigate to the search bar at the top or press `Ctrl+K`, type `ivanshalamov/machine-learning-ui`, and pull the `latest` image. Wait for it to download.
+
+    <details>
+        <summary>Visual Instruction</summary>
+        <img src="docs/src/gifs/docker_search.gif" />
+    </details>
+
+1. In the "Images" tab, click the `Run` button for the pulled image in the "Actions" column. In the popped-up window, enter a name for the container (e.g., `machine-learning-ui-app`) in the "Container name" section. Specify an available port (e.g., `8501`) in the "Ports" section, then run the image.
+
+    <details>
+        <summary>Visual Instruction</summary>
+        <img src="docs/src/gifs/docker_image_run.gif" />
+    </details>
+
+1. Navigate to the "Containers" tab and click the blue link in the "Ports" column to access the app.
+
+    <details>
+        <summary>Visual Instruction</summary>
+        <img src="docs/src/gifs/docker_app_navigate.gif" />
+    </details>
+
+1. To stop the app, go to the "Containers" tab again and click `Stop` in the "Actions" column.
+
+    <details>
+        <summary>Visual Instruction</summary>
+        <img src="docs/src/gifs/docker_container_stop.gif" />
+    </details>
+
+> To restart the app, you don't need to repeat all the steps. Just go to the "Containers" tab and click `Start` in the "Actions" column. Then, use the blue link to access the app.
+    <details>
+        <summary>Visual Instruction</summary>
+        <img src="docs/src/gifs/docker_container_restart.gif" />
+    </details>
 
 ### For Development
 1. Install Docker for your system by following the official guide: [Docker Installation](https://docs.docker.com/engine/install/).
