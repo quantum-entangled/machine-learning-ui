@@ -54,6 +54,10 @@ class OutputsUnderfilledError(Exception):
     """When some of the output layers are not filled with the data columns."""
 
 
+class IncorrectTestDataPercentage(Exception):
+    """When the test data percentage is incorrect."""
+
+
 class SameMetricError(Exception):
     """When trying to set the already attached metric to the layer."""
 

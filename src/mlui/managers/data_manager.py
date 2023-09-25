@@ -284,7 +284,12 @@ def split_data(test_size: float, data: data_cls.Data, model: model_cls.Model) ->
             "Please, set the data columns for all the output layers!"
         )
 
-    train, test = sk.train_test_split(data.file, test_size=test_size)
+    try:
+        train, test = sk.train_test_split(data.file, test_size=test_size)
+    except ValueError as error:
+        raise err.IncorrectTestDataPercentage(
+            f"Incorrect percent of test data!"
+        ) from error
 
     data.input_train_data = {
         name: train[values].to_numpy() for name, values in data.input_columns.items()
