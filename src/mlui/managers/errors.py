@@ -2,6 +2,10 @@ class UploadError(Exception):
     """For errors during the uploading of files/models."""
 
 
+class FileEmptyError(Exception):
+    """When trying to upload an empty file."""
+
+
 class NoModelNameError(Exception):
     """When trying to create a model with no name."""
 

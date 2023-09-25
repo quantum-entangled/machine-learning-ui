@@ -26,7 +26,7 @@ def upload_file_ui(data: data_cls.Data, model: model_cls.Model) -> None:
         try:
             dm.upload_file(uploaded_file, data, model)
             st.success("File is uploaded and ready to be processed!", icon="✅")
-        except err.UploadError as error:
+        except (err.UploadError, err.FileEmptyError) as error:
             st.error(error, icon="❌")
 
 
