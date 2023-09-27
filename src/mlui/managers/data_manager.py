@@ -54,6 +54,7 @@ def upload_file(
     try:
         data.file = pd.read_csv(buff, header=0, skipinitialspace=True)
         refresh_data(data)
+
         if not file_exists(data):
             raise err.FileEmptyError(f"The uploaded file is empty!")
     except ValueError as error:
