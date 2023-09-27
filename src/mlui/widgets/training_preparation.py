@@ -82,5 +82,9 @@ def split_data_ui(data: data_cls.Data, model: model_cls.Model) -> None:
         try:
             dm.split_data(test_size, data, model)
             st.success("Dataset is split!", icon="✅")
-        except (err.InputsUnderfilledError, err.OutputsUnderfilledError) as error:
+        except (
+            err.InputsUnderfilledError,
+            err.OutputsUnderfilledError,
+            err.IncorrectTestDataPercentage,
+        ) as error:
             st.error(error, icon="❌")

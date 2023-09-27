@@ -54,6 +54,8 @@ def upload_file(
     try:
         data.file = pd.read_csv(buff, header=0, skipinitialspace=True)
         refresh_data(data)
+        if not file_exists(data):
+            raise err.FileEmptyError(f"The uploaded file is empty!")
     except ValueError as error:
         raise err.UploadError(f"Unable to upload the file!") from error
 
@@ -282,7 +284,12 @@ def split_data(test_size: float, data: data_cls.Data, model: model_cls.Model) ->
             "Please, set the data columns for all the output layers!"
         )
 
-    train, test = sk.train_test_split(data.file, test_size=test_size)
+    try:
+        train, test = sk.train_test_split(data.file, test_size=test_size)
+    except ValueError as error:
+        raise err.IncorrectTestDataPercentage(
+            f"Incorrect percent of test data!"
+        ) from error
 
     data.input_train_data = {
         name: train[values].to_numpy() for name, values in data.input_columns.items()

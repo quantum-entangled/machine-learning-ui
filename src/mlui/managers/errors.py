@@ -2,6 +2,10 @@ class UploadError(Exception):
     """For errors during the uploading of files/models."""
 
 
+class FileEmptyError(Exception):
+    """When trying to upload an empty file."""
+
+
 class NoModelNameError(Exception):
     """When trying to create a model with no name."""
 
@@ -48,6 +52,10 @@ class InputsUnderfilledError(Exception):
 
 class OutputsUnderfilledError(Exception):
     """When some of the output layers are not filled with the data columns."""
+
+
+class IncorrectTestDataPercentage(Exception):
+    """When the test data percentage is incorrect."""
 
 
 class SameMetricError(Exception):
