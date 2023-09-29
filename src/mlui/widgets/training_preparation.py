@@ -72,7 +72,7 @@ def split_data_ui(data: data_cls.Data, model: model_cls.Model) -> None:
             "Select the percent of test data:",
             min_value=0.0,
             max_value=1.0,
-            value=0.0,
+            value=0.15,
             step=0.05,
         )
     )
