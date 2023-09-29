@@ -1,5 +1,10 @@
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, TypeAlias
+
+import tensorflow as tf
+
+Metrics: TypeAlias = dict[str, tf.keras.metrics.Metric]
+LayerMetrics: TypeAlias = dict[str, Metrics]
 
 
 @dataclass
@@ -16,6 +21,6 @@ class Model:
     compiled: bool = False
     optimizer: Any = None
     losses: dict[str, Any] = field(default_factory=dict)
-    metrics: dict[str, list[Any]] = field(default_factory=dict)
+    metrics: LayerMetrics = field(default_factory=dict)
     callbacks: list[Any] = field(default_factory=list)
     training_history: dict[str, list[Any]] = field(default_factory=dict)

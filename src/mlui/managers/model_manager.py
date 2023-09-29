@@ -114,7 +114,7 @@ def refresh_model(model: model_cls.Model) -> None:
         name: layer.shape[1] for name, layer in zip(output_names, outputs)
     }
     model.losses = {name: list() for name in model.output_layers}
-    model.metrics = {name: list() for name in model.output_layers}
+    model.metrics = {name: dict() for name in model.output_layers}
 
 
 def add_layer(
@@ -375,9 +375,9 @@ def set_loss(
     model.losses[layer] = loss_cls()
 
 
-def set_metric(
+def set_metrics(
     layer: str,
-    metric_cls: Type[tf.keras.metrics.Metric],
+    metrics_to_set: model_cls.Metrics,
     model: model_cls.Model,
 ) -> None:
     """Set the metric for the model's output layer.
@@ -386,8 +386,8 @@ def set_metric(
     ----------
     layer : str
         Name of the layer to which the metric will be attached.
-    metric_cls : Metric
-        TensorFlow metric class.
+    metrics_to_set : Metrics
+        Names and instances of TensorFlow metrics classes.
     model : Model
         Model container object.
 
@@ -397,8 +397,6 @@ def set_metric(
         When model is not instantiated.
     NoOutputLayersError
         When there are no output layers in the model.
-    SameMetricError
-        When trying to set the already attached metric to the layer.
     """
     if not model_exists(model):
         raise err.NoModelError("Please, create or upload a model!")
@@ -406,10 +404,7 @@ def set_metric(
     if not model.output_layers:
         raise err.NoOutputLayersError("Please, set the model outputs!")
 
-    if metric_cls in [type(metric) for metric in model.metrics[layer]]:
-        raise err.SameMetricError("Please, select the distinct metric!")
-
-    model.metrics[layer].append(metric_cls())
+    model.metrics[layer] = metrics_to_set
 
 
 def compile_model(model: model_cls.Model) -> None:
@@ -438,8 +433,13 @@ def compile_model(model: model_cls.Model) -> None:
     if not all(model.losses.values()):
         raise err.NoLossError("Please, set the loss function for each output layer!")
 
+    metrics = {
+        layer_name: layer_metrics.values()
+        for layer_name, layer_metrics in model.metrics.items()
+    }
+
     model.instance.compile(
-        optimizer=model.optimizer, loss=model.losses, metrics=model.metrics
+        optimizer=model.optimizer, loss=model.losses, metrics=metrics
     )
     model.compiled = True
 
