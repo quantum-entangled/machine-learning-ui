@@ -17,7 +17,7 @@ class AdamParams(OptimizerParams):
 
 class AdaboundParams(OptimizerParams):
     """Type annotation for the Adam optimizer"""
-    learing_rate: float
+    learning_rate: float
     final_lr: float
     beta_1: float
     beta_2: float
@@ -110,38 +110,42 @@ class Adam(OptimizerWidget):
 class Adaboud(OptimizerWidget):
     """Adabound Optimizer widget"""
     def __init__(self) -> None:
-        self.learing_rate= float(
+        self.learning_rate= float(
             st.number_input(
                 "learning rate",
                 min_value= 0.0,
                 max_value = 0.1,
+                value=0.001,
                 step = 0.001,
                 format ="%e",
             )
         )
         self.final_lr= float(
             st.number_input(
-                "learning rate",
+                "final_lr rate",
                 min_value= 0.0,
                 max_value = 1.0,
+                value=0.1,
                 step = 0.005,
                 format ="%e",
             )
         )
-        self.bata_1= float(
+        self.beta_1= float(
             st.number_input(
-                "learning rate",
+                "beta_1",
                 min_value= 0.0,
-                max_value =1,
+                max_value =1.0,
+                value=0.1,
                 step = 0.005,
                 format ="%.3f",
             )
         )
-        self.bata_2= float(
+        self.beta_2= float(
             st.number_input(
-                "learning rate",
+                "beta_2",
                 min_value= 0.0,
-                max_value =1,
+                max_value =1.0,
+                value=0.1,
                 step = 0.005,
                 format ="%.3f",
             )
@@ -152,8 +156,8 @@ class Adaboud(OptimizerWidget):
         return{
             "learing_rate":self.learning_rate,
             "final_lr":self.final_lr,
-            "beta_1":self.bata_1,
-            "beta_2":self.bata_2,
+            "beta_1":self.beta_1,
+            "beta_2":self.beta_2,
         }
 
 class RMSprop(OptimizerWidget):

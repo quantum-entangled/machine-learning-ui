@@ -3,7 +3,7 @@ from typing import Union, Callable, Dict, Optional
 import numpy as np
 import tensorflow as tf
 from tensorflow import keras
-from typeguard import typechecked
+
 
 
 
@@ -29,7 +29,7 @@ class AdaBound(keras.optimizers.Optimizer):
           (https://openreview.net/forum?id=Bkg3g2R9FX)
     """
 
-    @typechecked
+
     def __init__(
             self,
             learning_rate=0.001,
