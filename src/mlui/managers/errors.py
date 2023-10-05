@@ -58,10 +58,6 @@ class IncorrectTestDataPercentage(Exception):
     """When the test data percentage is incorrect."""
 
 
-class SameMetricError(Exception):
-    """When trying to set the already attached metric to the layer."""
-
-
 class NoOptimizerError(Exception):
     """When no optimizer is set for the model."""
 

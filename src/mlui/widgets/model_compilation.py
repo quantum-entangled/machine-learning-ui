@@ -2,6 +2,7 @@ import streamlit as st
 
 import mlui.data_classes.model as model_cls
 from mlui.enums import losses, metrics, optimizers
+
 from ..managers import errors as err
 from ..managers import model_manager as mm
 
@@ -64,19 +65,21 @@ def set_metrics_ui(model: model_cls.Model) -> None:
     st.header("Set Metrics")
 
     layer = str(st.selectbox("Select layer:", list(model.output_layers), key="metric"))
-    metric = str(st.selectbox("Select metric class:", list(metrics.classes)))
-    metric_cls = metrics.classes[metric]
-    set_metric_btn = st.button("Set Metric")
+    layer_metrics = list(model.metrics[layer])
+    selected_metrics = st.multiselect(
+        "Select metrics for this layer:", list(metrics.classes), layer_metrics
+    )
+    set_metrics_btn = st.button("Set Metrics")
 
-    if set_metric_btn:
+    if set_metrics_btn:
         try:
-            mm.set_metric(layer, metric_cls, model)
-            st.success("Metric is set!", icon="✅")
-        except (
-            err.NoModelError,
-            err.NoOutputLayersError,
-            err.SameMetricError,
-        ) as error:
+            metrics_to_set = {
+                name: metrics.classes[name]() for name in selected_metrics
+            }
+
+            mm.set_metrics(layer, metrics_to_set, model)
+            st.success("Metrics are set!", icon="✅")
+        except (err.NoModelError, err.NoOutputLayersError) as error:
             st.error(error, icon="❌")
 
 
