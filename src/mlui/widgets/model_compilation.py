@@ -19,8 +19,11 @@ def set_optimizer_ui(model: model_cls.Model) -> None:
 
     optimizer = str(st.selectbox("Select optimizer class:", list(optimizers.classes)))
     optimizer_cls = optimizers.classes[optimizer]
-    optimizer_widget = optimizers.widgets[optimizer]()
-    optimizer_params = optimizer_widget.params
+
+    with st.expander("Optimizer's Parameters"):
+        optimizer_widget = optimizers.widgets[optimizer]()
+        optimizer_params = optimizer_widget.params
+
     set_optimizer_btn = st.button("Set Optimizer")
 
     if set_optimizer_btn:
