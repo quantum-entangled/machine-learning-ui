@@ -76,8 +76,8 @@ class Input(LayerWidget):
             Model container object.
         """
         self.model = model
-        self.layer_name = str(
-            st.text_input("Layer name:", max_chars=50, placeholder="Enter Layer Name")
+        self.layer_name = st.text_input(
+            "Layer name:", max_chars=50, placeholder="Enter Layer Name"
         )
         self.input_shape = int(
             st.number_input(
@@ -113,13 +113,12 @@ class Dense(LayerWidget):
             Model container object.
         """
         self.model = model
-        self.layer_name = str(
-            st.text_input("Layer name:", max_chars=50, placeholder="Enter Layer Name")
+        self.layer_name = st.text_input(
+            "Layer name:", max_chars=50, placeholder="Enter Layer Name"
         )
         self.units_num = int(
             st.number_input("Number of units:", value=1, min_value=1, max_value=10_000)
         )
-
         self.activation = st.selectbox(
             "Activation function:", list(activations.classes)
         )
@@ -165,8 +164,8 @@ class Concatenate(LayerWidget):
             Model container object.
         """
         self.model = model
-        self.layer_name = str(
-            st.text_input("Layer name:", max_chars=50, placeholder="Enter Layer Name")
+        self.layer_name = st.text_input(
+            "Layer name:", max_chars=50, placeholder="Enter Layer Name"
         )
         self.concatenate = st.multiselect(
             "Select layers (at least 2):", options=list(self.model.layers)
