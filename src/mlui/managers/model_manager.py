@@ -472,6 +472,25 @@ def set_callback(
     model.callbacks.append(callback_cls(**callback_params))
 
 
+def reset_callbacks(model: model_cls.Model) -> None:
+    """Reset all existing callbacks of the model.
+
+    Parameters
+    ----------
+    model : Model
+        Model container object.
+
+    Raises
+    ------
+    NoModelError
+        When model is not instantiated.
+    """
+    if not model_exists(model):
+        raise err.NoModelError("Please, create or upload a model!")
+
+    model.callbacks.clear()
+
+
 def fit_model(
     batch_size: int,
     num_epochs: int,

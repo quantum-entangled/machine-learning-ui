@@ -19,15 +19,29 @@ def set_callbacks_ui(model: model_cls.Model) -> None:
 
     callback = str(st.selectbox("Select callback class:", list(callbacks.classes)))
     callback_cls = callbacks.classes[callback]
-    callback_widget = callbacks.widgets[callback]()
-    callback_params = callback_widget.params
+
+    with st.expander("Callback's Parameters"):
+        callback_widget = callbacks.widgets[callback]()
+        callback_params = callback_widget.params
+
     set_callback_btn = st.button("Set Callback")
+
+    st.markdown("To reset all existing callbacks, please press this button:")
+
+    reset_callbacks_btn = st.button("Reset All Callbacks")
 
     if set_callback_btn:
         try:
             mm.set_callback(callback_cls, callback_params, model)
             st.success("Callback is set!", icon="✅")
         except (err.NoModelError, err.SameCallbackError) as error:
+            st.error(error, icon="❌")
+
+    if reset_callbacks_btn:
+        try:
+            mm.reset_callbacks(model)
+            st.success("Callbacks are reset!", icon="✅")
+        except err.NoModelError as error:
             st.error(error, icon="❌")
 
 
