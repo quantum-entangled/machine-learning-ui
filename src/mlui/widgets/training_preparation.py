@@ -39,22 +39,20 @@ def set_columns_ui(data: data_cls.Data, model: model_cls.Model) -> None:
     if layer_type and layer:
         layer_columns = dm.get_layer_columns(layer_type, layer, data)
         options = data.available_columns + layer_columns
+        columns = st.multiselect(
+            "Select columns for this layer (order is important):",
+            options,
+            layer_columns,
+            max_selections=shapes[layer],
+        )
+        add_columns_btn = st.button("Set Columns")
 
-        with st.form("Columns Form"):
-            columns = st.multiselect(
-                "Select columns for this layer (order is important):",
-                options,
-                layer_columns,
-                max_selections=shapes[layer],
-            )
-            add_columns_btn = st.form_submit_button("Set Columns")
-
-            if add_columns_btn:
-                try:
-                    dm.set_columns(layer_type, layer, columns, data, model)
-                    st.success("Columns are set!", icon="✅")
-                except (err.NoColumnsSelectedError, err.LayerOverfilledError) as error:
-                    st.error(error, icon="❌")
+        if add_columns_btn:
+            try:
+                dm.set_columns(layer_type, layer, columns, data, model)
+                st.success("Columns are set!", icon="✅")
+            except (err.NoColumnsSelectedError, err.LayerOverfilledError) as error:
+                st.error(error, icon="❌")
 
 
 def split_data_ui(data: data_cls.Data, model: model_cls.Model) -> None:
