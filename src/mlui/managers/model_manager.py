@@ -3,8 +3,8 @@ import os
 import tempfile
 from typing import Type
 
-import plotly as ply
-import plotly.express as px
+import altair as alt
+import pandas as pd
 import streamlit as st
 import streamlit.delta_generator as dg
 import tensorflow as tf
@@ -556,27 +556,32 @@ def fit_model(
         validation_split=val_split,
         callbacks=model.callbacks + [batch_callback, epoch_callback],
     )
-    model.training_history = history.history
+    df = pd.DataFrame(history.history)
+    epochs_num = len(model.training_history)
+
+    df.insert(0, "epoch", range(epochs_num + 1, epochs_num + len(df) + 1))
+
+    model.training_history = pd.concat([model.training_history, df])
 
 
 def show_history_plot(
-    y: str, color: str, model: model_cls.Model
-) -> ply.graph_objs.Figure:
+    logs_to_show: list[str], color_scheme: str, model: model_cls.Model
+) -> alt.Chart:
     """Show the history plot.
 
     Parameters
     ----------
-    y : str
-        Y-axis column name.
-    color : str
-        Color of the line.
+    logs_to_show : list of str
+        Y-axis columns names.
+    color_scheme : str
+        Color scheme of the plot.
     model : Model
         Model container object.
 
     Returns
     -------
-    Figure
-        Plotly figure object.
+    Chart
+        Altair chart object.
 
     Raises
     ------
@@ -588,15 +593,24 @@ def show_history_plot(
     if not model_exists(model):
         raise err.NoModelError("Please, create or upload a model!")
 
-    if not model.training_history:
+    if model.training_history.empty:
         raise err.ModelNotTrainedError("Please, train the model first!")
 
-    y_data = model.training_history[y]
-    x_data = range(1, len(y_data) + 1)
-    fig = px.line(x=x_data, y=y_data, labels={"x": "Epoch", "y": y}, markers=True)
-    fig.update_traces(line_color=color)
+    logs_to_show.insert(0, "epoch")
 
-    return fig
+    df = model.training_history.loc[:, logs_to_show]
+    melted_df = df.melt("epoch", var_name="log_name", value_name="log_value")
+    chart = (
+        alt.Chart(melted_df)
+        .mark_line(point=True)
+        .encode(
+            x="epoch",
+            y="log_value",
+            color=alt.Color("log_name").scale(scheme=color_scheme),
+        )
+    )
+
+    return chart
 
 
 def evaluate_model(
