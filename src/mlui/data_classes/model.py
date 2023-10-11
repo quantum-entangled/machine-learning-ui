@@ -21,6 +21,7 @@ class Model:
     input_shapes: dict[str, int] = field(default_factory=dict)
     output_shapes: dict[str, int] = field(default_factory=dict)
     compiled: bool = False
+    trained: bool = False
     optimizer: Any = None
     losses: dict[str, Any] = field(default_factory=dict)
     metrics: LayerMetrics = field(default_factory=dict)

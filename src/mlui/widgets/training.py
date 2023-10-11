@@ -104,6 +104,14 @@ def show_history_plot_ui(model: model_cls.Model) -> None:
     """
     st.header("History Plot")
 
+    if not model.trained:
+        st.info(
+            "You will be able to view the training history plot "
+            "once you train the model.",
+            icon="💡",
+        )
+        return
+
     logs = model.training_history.drop("epoch", axis=1).columns
     history_type = st.multiselect("Select logs to plot:", logs)
     schemes = ["set1", "set2", "set3"]

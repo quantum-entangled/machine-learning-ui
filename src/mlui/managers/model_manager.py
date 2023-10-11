@@ -562,6 +562,7 @@ def fit_model(
     df.insert(0, "epoch", range(epochs_num + 1, epochs_num + len(df) + 1))
 
     model.training_history = pd.concat([model.training_history, df])
+    model.trained = True
 
 
 def show_history_plot(
@@ -593,7 +594,7 @@ def show_history_plot(
     if not model_exists(model):
         raise err.NoModelError("Please, create or upload a model!")
 
-    if model.training_history.empty:
+    if not model.trained:
         raise err.ModelNotTrainedError("Please, train the model first!")
 
     logs_to_show.insert(0, "epoch")
