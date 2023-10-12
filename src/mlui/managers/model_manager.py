@@ -565,17 +565,15 @@ def fit_model(
     model.trained = True
 
 
-def show_history_plot(
-    logs_to_show: list[str], color_scheme: str, model: model_cls.Model
-) -> alt.Chart:
+def show_history_plot(Y: list[str], chart_params, model: model_cls.Model) -> alt.Chart:
     """Show the history plot.
 
     Parameters
     ----------
-    logs_to_show : list of str
+    Y : list of str
         Y-axis columns names.
-    color_scheme : str
-        Color scheme of the plot.
+    chart_params : dict
+        Parameters for the chart layout.
     model : Model
         Model container object.
 
@@ -597,18 +595,30 @@ def show_history_plot(
     if not model.trained:
         raise err.ModelNotTrainedError("Please, train the model first!")
 
-    logs_to_show.insert(0, "epoch")
-
-    df = model.training_history.loc[:, logs_to_show]
+    df = model.training_history.loc[:, ["epoch", *Y]]
     melted_df = df.melt("epoch", var_name="log_name", value_name="log_value")
     chart = (
         alt.Chart(melted_df)
-        .mark_line(point=True)
+        .mark_line(point=chart_params["points"])
         .encode(
-            x="epoch",
-            y="log_value",
-            color=alt.Color("log_name").scale(scheme=color_scheme),
+            x=alt.X("epoch")
+            .axis(tickCount=chart_params["X_ticks"], grid=chart_params["X_grid"])
+            .scale(domain=chart_params["X_domain"])
+            .title(chart_params["X_title"]),
+            y=alt.Y("log_value")
+            .axis(tickCount=chart_params["Y_ticks"], grid=chart_params["Y_grid"])
+            .scale(zero=chart_params["Y_zero"])
+            .title(chart_params["Y_title"]),
+            color=alt.Color("log_name")
+            .scale(scheme=chart_params["scheme"])
+            .legend(
+                orient=chart_params["legend_orient"],
+                direction=chart_params["legend_direction"],
+                title=chart_params["legend_title"],
+            ),
         )
+        .interactive(bind_x=chart_params["X_inter"], bind_y=chart_params["Y_inter"])
+        .properties(height=chart_params["height"])
     )
 
     return chart

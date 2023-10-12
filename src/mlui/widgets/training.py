@@ -112,15 +112,66 @@ def show_history_plot_ui(model: model_cls.Model) -> None:
         )
         return
 
-    logs = model.training_history.drop("epoch", axis=1).columns
-    history_type = st.multiselect("Select logs to plot:", logs)
-    schemes = ["set1", "set2", "set3"]
-    color_scheme = str(st.selectbox("Select color scheme:", schemes))
+    opts = model.training_history.columns.drop("epoch")
+    df_len = len(model.training_history)
+    Y = st.multiselect("Select Y column(s):", opts)
+    params = dict()
+
+    with st.expander("Chart's Parameters"):
+        schemes = ("set1", "set2", "set3")
+        legend_orients = (
+            "left",
+            "right",
+            "top",
+            "bottom",
+            "top-left",
+            "top-right",
+            "bottom-left",
+            "bottom-right",
+        )
+        legend_directions = ("vertical", "horizontal")
+        params["scheme"] = str(st.selectbox("Select color scheme:", schemes))
+        params["X_ticks"] = st.number_input(
+            "Number of X-axis ticks:", 0, df_len + 100, df_len, 1
+        )
+        params["Y_ticks"] = st.number_input(
+            "Number of Y-axis ticks:", 0, df_len + 100, df_len, 1
+        )
+        params["X_domain"] = st.slider(
+            "X-axis domain range:",
+            -100.0,
+            df_len + 100.0,
+            (0.5, df_len + 0.5),
+            1.0,
+        )
+        params["X_title"] = st.text_input(
+            "X-axis title:", "Epoch", 30, placeholder="No title if None"
+        )
+        params["Y_title"] = st.text_input(
+            "Y-axis title:", "Value", 30, placeholder="No title if None"
+        )
+        params["legend_orient"] = st.select_slider(
+            "Legend orientation:", legend_orients, "bottom"
+        )
+        params["legend_direction"] = st.select_slider(
+            "Legend direction:", legend_directions, "horizontal"
+        )
+        params["legend_title"] = st.text_input(
+            "Legend title:", None, 30, placeholder="No title if None"
+        )
+        params["height"] = st.number_input("Plot height:", 300, 1000, 500, 50)
+        params["points"] = st.toggle("Show Point Markers", True)
+        params["Y_zero"] = st.toggle("Include zero on Y-axis")
+        params["X_grid"] = st.toggle("Show X-axis Grid", True)
+        params["Y_grid"] = st.toggle("Show Y-axis Grid", True)
+        params["X_inter"] = st.toggle("Interactive X-axis", True)
+        params["Y_inter"] = st.toggle("Interactive Y-axis", True)
+
     plot_history_btn = st.button("Plot History")
 
     if plot_history_btn:
         try:
-            chart = mm.show_history_plot(history_type, color_scheme, model)
+            chart = mm.show_history_plot(Y, params, model)
             st.altair_chart(chart, use_container_width=True)
         except (err.NoModelError, err.ModelNotTrainedError) as error:
             st.error(error, icon="❌")
