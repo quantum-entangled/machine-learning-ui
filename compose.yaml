@@ -1,0 +1,19 @@
+name: machine-learning-ui
+
+services:
+  app:
+    container_name: app-dev
+    build:
+      context: .
+      target: dev
+      args:
+        - APP_ENV=DEV
+    image: mlui-dev:latest
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./src/:/app/src
+      - ./docs/:/app/docs
+      - ./tests/:/app/tests
+      - ./poetry.lock:/app/poetry.lock
+      - ./pyproject.toml:/app/pyproject.toml

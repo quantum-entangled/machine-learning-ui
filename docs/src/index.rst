@@ -21,17 +21,17 @@ The app was originally developed as part of research project, funded by **St. Pe
    :caption: Local Installation
    :maxdepth: 2
    
-   LocalInstallation.rst
+   local_installation.rst
 
 .. toctree::
    :caption: User Guide
    :maxdepth: 2
 
-   UserGuide.rst
-   AcceptedInput.rst   
+   user_guide.rst
+   accepted_input.rst  
 
 .. toctree::
    :caption: Developer Guide
    :maxdepth: 2
 
-   APIDocs.rst
+   api.rst
