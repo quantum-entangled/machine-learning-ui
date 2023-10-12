@@ -35,7 +35,7 @@ class LARS(tf.keras.optimizers.Optimizer):
     @tf.function
     def _resource_apply_dense(self, grad, var, apply_state=None):
         var_dtype = var.dtype.base_dtype
-        lr_t = self._decayed_lr(var.dtype)
+        lr_t = self._decayed_lr(var_dtype)
         eps = tf.convert_to_tensor(self.epsilon, var_dtype)
         dampening = tf.convert_to_tensor(self.dampening, var_dtype)
         weight_decay = self._get_hyper("weight_decay", var_dtype)

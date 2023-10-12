@@ -79,6 +79,7 @@ class MADGRADParams(OptimizerParams):
     momentum: float
     weight_decay: float
 
+
 class LARSParams(OptimizerParams):
     """Type annotation for the LARS optimizer."""
 
@@ -87,6 +88,15 @@ class LARSParams(OptimizerParams):
     weight_decay: float
     dampening: float
     nesterov: bool
+
+
+class AdaHessianParams(OptimizerParams):
+    """Type annotation for the AdaHessian optimizer."""
+
+    learning_rate: float
+    beta_1: float
+    beta_2: float
+    weight_decay: float
 
 
 class OptimizerWidget(abc.ABC):
@@ -312,7 +322,7 @@ class Apollo(OptimizerWidget):
                 max_value=1.0,
                 value=0.9,
                 step=0.005,
-                format="%e",
+                format="%.3f",
             )
         )
         self.weight_decay = float(
@@ -322,7 +332,7 @@ class Apollo(OptimizerWidget):
                 max_value=0.001,
                 value=0.0,
                 step=0.00005,
-                format="%e",
+                format="%.3f",
             )
         )
         self.weight_decay_type = str(
@@ -468,7 +478,7 @@ class MADGRAD(OptimizerWidget):
                 "Momentum:",
                 min_value=0.0,
                 max_value=0.999,
-                value=0.9,
+                value=0.0,
                 step=0.001,
                 format="%.3f",
             )
@@ -552,5 +562,60 @@ class LARS(OptimizerWidget):
             "weight_decay": self.weight_decay,
             "dampening": self.dampening,
             "nesterov": self.nesterov,
+        }
+
+
+class AdaHessian(OptimizerWidget):
+    """AdaHessian optimizer widget."""
+
+    def __init__(self) -> None:
+        self.learning_rate = float(
+            st.number_input(
+                "Learning rate:",
+                min_value=0.0,
+                max_value=0.5,
+                value=0.15,
+                step=0.005,
+                format="%e",
+            )
+        )
+        self.beta_1 = float(
+            st.number_input(
+                "Decay 1:",
+                min_value=0.0,
+                max_value=1.0,
+                value=0.9,
+                step=0.001,
+                format="%.3f",
+            )
+        )
+        self.beta_2 = float(
+            st.number_input(
+                "Decay 2:",
+                min_value=0.0,
+                max_value=1.0,
+                value=0.999,
+                step=0.001,
+                format="%.3f",
+            )
+        )
+        self.weight_decay = float(
+            st.number_input(
+                "Weight decay:",
+                min_value=0.0,
+                max_value=0.1,
+                value=0.0,
+                step=0.001,
+                format="%.3f",
+            )
+        )
+
+    @property
+    def params(self) -> AdaHessianParams:
+        return {
+            "learning_rate": self.learning_rate,
+            "beta_1": self.beta_1,
+            "beta_2": self.beta_2,
+            "weight_decay": self.weight_decay,
         }
 
