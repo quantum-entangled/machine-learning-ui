@@ -4,6 +4,7 @@ import pytest
 import itertools
 import collections as clns
 import pandas as pd
+import numpy as np
 import plotly as ply
 import tensorflow as tf
 
@@ -37,6 +38,22 @@ def test_upload_file(csv_str):
 def test_error_upload_file(data: data_cls.Data, model: model_cls.Model):
     with pytest.raises(err.UploadError):
         with io.BytesIO(bytes("1,2\n1,1\n2,2,garbage\n3,3", "utf-8")) as buff:
+            dm.upload_file(buff, data, model)
+
+    with pytest.raises(err.UploadError):
+        with io.BytesIO(bytes("1,2,3\n1,1,1\n2,aaa,2\n3,3,3", "utf-8")) as buff:
+            dm.upload_file(buff, data, model)
+
+    with pytest.raises(err.UploadError):
+        with io.BytesIO(bytes("1,2,3\n1,1,1\n2,inf,2\n3,3,3", "utf-8")) as buff:
+            dm.upload_file(buff, data, model)
+
+    with pytest.raises(err.UploadError):
+        with io.BytesIO(bytes("1;2;3\n1;1;1\n2;2;2\n3;3;3", "utf-8")) as buff:
+            dm.upload_file(buff, data, model)
+
+    with pytest.raises(err.UploadError):
+        with io.BytesIO(bytes("1,2\n1,1,4,4\n2,2\n3,3", "utf-8")) as buff:
             dm.upload_file(buff, data, model)
 
 
