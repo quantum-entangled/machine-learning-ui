@@ -1,13 +1,12 @@
 from multimethod import isa
 import collections
 from collections.abc import Iterable
+from typing import Any
 
-# utils to support multimethod dispatching
 
-
-def is_none(x):
+def is_none(x: Any):
     return x is None
 
 
-def is_seq(x):
+def is_seq(x: Iterable | str):
     return isa(Iterable)(x) and not isa(str)(x)
