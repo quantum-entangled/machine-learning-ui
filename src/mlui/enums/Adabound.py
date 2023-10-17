@@ -1,204 +1,208 @@
-from typing import Union, Callable, Dict, Optional
-
-import numpy as np
-import tensorflow as tf
-from tensorflow import keras
+"""Adabound optimizer implementation"""
 
 
+import tensorflow.compat.v2 as tf
+from keras import backend
+from keras.optimizers import Optimizer
 
+class AdaBound(Optimizer):
+    """
+    Args:
+        lr (float, optional): Adam learning rate (default: 1e-3)
+        betas (Tuple[float, float], optional): coefficients used for computing
+        running averages of gradient and its square (default: (0.9, 0.999))
+        final_lr (float, optional): final (SGD) learning rate (default: 0.1)
+        gamma (float, optional): convergence speed of the bound functions (default: 1e-3)
+        eps (float, optional): term added to the denominator to improve
+            numerical stability (default: 1e-8)
+        weight_decay (float, optional): weight decay (L2 penalty) (default: 0)
+        amsbound (boolean, optional): whether to use the AMSBound variant of this algorithm
+    .. Adaptive Gradient Methods with Dynamic Bound of Learning Rate:
+        https://openreview.net/forum?id=Bkg3g2R9FX
 
-
-
-class AdaBound(keras.optimizers.Optimizer):
-    """AdamBound optimizer.
-
-    # Arguments
-        learning_rate: float >= 0. Learning rate.
-        base_lr: float >= 0. Used for loading the optimizer. Do not set the argument manually.
-        final_lr: float >= 0. Final  learning rate.
-        beta_1: float, 0 < beta < 1. Generally close to 1.
-        beta_2: float, 0 < beta < 1. Generally close to 1.
-        gamma: float, 0 < gamma < 1. Convergence speed of the bound functions.
-        epsilon: float >= 0. defaults keras.backend.epsilon().
-        decay: float >= 0. Learning rate decay over each update.
-        weight_decay: float >= 0. Weight decay.
-        amsgrad: boolean. Whether to apply the AMSGrad variant of this algorithm.
-
-        # References
+    # References
         - [Adaptive Gradient Methods with Dynamic Bound of Learning Rate]
           (https://openreview.net/forum?id=Bkg3g2R9FX)
+       
     """
-
-
     def __init__(
-            self,
-            learning_rate=0.001,
-            base_lr=None,
-            final_lr=0.1,
-            beta1=0.9,
-            beta2=0.999,
-            gamma=0.001,
-            epsilon=1e-8,
-            weight_decay=0.0,
-            amsgrad: bool = False,
-            name: str = "AdaBound",
-            **kwargs
+        self,
+        learning_rate=0.001,
+        base_lr = None,
+        final_lr=0.1,
+        beta_1=0.9,
+        beta_2=0.999,
+        gamma = 1e-3,
+        epsilon=1e-7,
+        amsgrad=False,
+        weight_decay=None,
+        clipnorm=None,
+        clipvalue=None,
+        global_clipnorm=None,
+        use_ema=False,
+        ema_momentum=0.99,
+        ema_overwrite_frequency=None,
+        jit_compile=True,
+        name="AdaBound",
+        **kwargs
     ):
-        super(AdaBound, self).__init__(name=name, **kwargs)
 
-        if isinstance(learning_rate, Dict):
-            learning_rate = tf.keras.optimizers.schedules.deserialize(learning_rate)
-
-        if isinstance(weight_decay, Dict):
-            weight_decay = tf.keras.optimizers.schedules.deserialize(weight_decay)
-
+        super().__init__(
+            name=name,
+            weight_decay=weight_decay,
+            clipnorm=clipnorm,
+            clipvalue=clipvalue,
+            global_clipnorm=global_clipnorm,
+            use_ema=use_ema,
+            ema_momentum=ema_momentum,
+            ema_overwrite_frequency=ema_overwrite_frequency,
+            jit_compile=jit_compile,
+            **kwargs
+        )
+        
         if base_lr is None:
             if isinstance(learning_rate, tf.keras.optimizers.schedules.LearningRateSchedule):
                 base_lr = learning_rate(0)
             else:
                 base_lr = learning_rate
-
-        self._set_hyper("learning_rate", kwargs.get("lr", learning_rate))
-        self._set_hyper("base_lr", base_lr)
-        self._set_hyper("final_lr", final_lr)
-        self._set_hyper("beta_1", beta1)
-        self._set_hyper("beta_2", beta2)
-        self._set_hyper("gamma", gamma)
-        self._set_hyper("decay", self._initial_decay)
-        self._set_hyper("weight_decay", weight_decay)
-        self.epsilon = epsilon or tf.keras.backend.epsilon()
+        self._learning_rate = self._build_learning_rate(learning_rate)
+        self.base_lr = base_lr
+        self.fianl_lr = final_lr
+        self.beta_1 = beta_1
+        self.beta_2 = beta_2
+        self.gamma = gamma
+        self.epsilon = epsilon
         self.amsgrad = amsgrad
-        self._has_weight_decay = weight_decay != 0.0
 
-    def _create_slots(self, var_list):
-        for var in var_list:
-            self.add_slot(var, "m")
-        for var in var_list:
-            self.add_slot(var, "v")
-        if self.amsgrad:
+
+
+    def build(self, var_list):
+         """ AdaBound optimizer has 3 types of variables: momentums, velocities and
+        velocity_hat (only set when amsgrad is applied),
+
+        Args:
+            var_list: list of model variables to build Adam variables on.
+        """
+         
+         super().build(var_list)
+
+         if hasattr(self,"_built") and self._built:
+             return
+         
+         self._built  = True
+         self._momentums = []
+         self._velocities = []
+         for var in var_list:
+             self._momentums.append(
+                 self.add_variable_from_reference(
+                    model_variable=var, variable_name="m"
+                )
+             )
+
+             self._velocities.append(
+                 self.add_variable_from_reference(
+                     model_variable=var, variable_name="v"
+                 )
+             )
+
+         if self.amsgard:
+            self._velocity_hats = []
             for var in var_list:
-                self.add_slot(var, "vhat")
+                self._velocity_hats.append(
+                    self.add_variable_from_reference(
+                        model_variable=var, variable_name="vhat"
+                    )
+                )   
+             
 
-    def _decayed_weight(self, var_dtype):
-        wd_t = self._get_hyper("weight_decay", var_dtype)
-        if isinstance(wd_t, tf.keras.optimizers.schedules.LearningRateSchedule):
-            wd_t = tf.cast(wd_t(self.iterations), var_dtype)
-        return wd_t
+    def update_step(self, gradient, variable):
+         """Update step given gradient and the associated model variable."""
+         lr_t = tf.cast(self.learning_rate,variable.dtype)
+         base_lr = tf.cast(self.base_lr,variable.dtype)
+         final_lr = tf.cast(self.fianl_lr,variable.dtype)
+         local_step = tf.cast(self.iterations+1,variable.dtype)
+         beta_1_t = tf.cast(self.beta_1,variable.dtype)
+         beta_2_t = tf.cast(self.beta_2,variable.dtype)
+         beta_1_power = tf.pow(tf.cast(self.beta_1,variable.dtype),local_step)
+         beta_2_power = tf.pow(tf.cast(self.beta_2,variable.dtype),local_step)
+         gamma = tf.cast(self.gamma,variable.dtype)
+         epsilon_t =tf.cast(self.epsilon,variable.dtype)
+       
 
-    # tensorflow functions
-    def _resource_apply_dense(self, grad, var):
-        var_dtype = var.dtype.base_dtype
-        lr_t = self._decayed_lr(var_dtype)
-        wd_t = self._decayed_weight(var_dtype)
-        base_lr = self._get_hyper("base_lr", var_dtype)
-        final_lr = self._get_hyper("final_lr", var_dtype)
-        m = self.get_slot(var, "m")
-        v = self.get_slot(var, "v")
-        beta1_t = self._get_hyper("beta1", var_dtype)
-        beta2_t = self._get_hyper("beta2", var_dtype)
-        gamma = self._get_hyper("gamma", var_dtype)
-        epsilon_t = tf.convert_to_tensor(self.epsilon, var_dtype)
-        local_step = tf.cast(self.iterations + 1, var_dtype)
-        beta1_power = tf.pow(beta1_t, local_step)
-        beta2_power = tf.pow(beta2_t, local_step)
+         var_key = self._var_key(variable)
+         m = self._momentums[self._index_dict[var_key]]
+         v = self._velocities[self._index_dict[var_key]]
 
-        if self._has_weight_decay:
-            # grad = grad + war*decay
-            grad += wd_t * var
-        # m_t  = bate1*m + (1-beta1)*grad
-        m_t = m.assign(beta1_t * m + (1.0 - beta1_t) * grad, use_locking=self._use_locking)
-
-        # v_t = bet2*v+(1-beta2)*(grad*grad)
-        v_t = v.assign(beta2_t * v + (1.0 - beta2_t) * tf.square(grad), use_locking=self._use_locking)
-
-        if self.amsgrad:
-            vhat = self.get_slot(var, "vhat")
-            vhat_t = vhat.assign(tf.maximum(vhat, v_t), use_locking=self._use_locking)
-            denominator = tf.sqrt(vhat_t) + epsilon_t
-        else:
-            vhat_t = None
-            denominator = tf.sqrt(v_t) + epsilon_t
-
-        final_lr = final_lr * lr_t / base_lr
-        lower_bound = final_lr * (1.0 - 1.0 / (gamma * local_step + 1.0))
-        upper_bound = final_lr * (1.0 + 1.0 / (gamma * local_step))
-        lr_t = lr_t * (tf.sqrt(1.0 - beta2_power) / (1.0 - beta1_power))
-        lr_t = tf.clip_by_value(lr_t / denominator, lower_bound, upper_bound)
-        var_update = var.assign_sub(lr_t * m_t, use_locking=self._use_locking)
-
-        updates = [var_update, m_t, v_t]
-        if self.amsgrad:
-            updates.append(vhat_t)
-        return tf.group(*updates)
-
-
-
-    # tensorflow functions
-    def _resource_apply_sparse(self, grad, var, indices):
-        var_dtype = var.dtype.base_dtype
-        lr_t = self._decayed_lr(var_dtype)
-        wd_t = self._decayed_weight(var_dtype)
-        base_lr = self._get_hyper("base_lr", var_dtype)
-        final_lr = self._get_hyper("final_lr", var_dtype)
-        m = self.get_slot(var, "m")
-        v = self.get_slot(var, "v")
-        beta1_t = self._get_hyper("beta1", var_dtype)
-        beta2_t = self._get_hyper("beta2", var_dtype)
-        gamma = self._get_hyper("gamma", var_dtype)
-        epsilon_t = tf.convert_to_tensor(self.epsilon, var_dtype)
-        local_step = tf.cast(self.iterations + 1, var_dtype)
-        beta1_power = tf.pow(beta1_t, local_step)
-        beta2_power = tf.pow(beta2_t, local_step)
-
-        if self._has_weight_decay:
-            grad = grad + wd_t * tf.squeeze(tf.gather(tf.expand_dims(var, axis=0), indices, axis=1), axis=0)
-
-        m_scaled_g_values = grad * (1 - beta1_t)
-        m_t = m.assign(m * beta1_t, use_locking=self._use_locking)
-        with tf.control_dependencies([m_t]):
-            m_t = self._resource_scatter_add(m, indices, m_scaled_g_values)
-
-        v_scaled_g_values = (grad * grad) * (1 - beta2_t)
-        v_t = v.assign(v * beta2_t, use_locking=self._use_locking)
-        with tf.control_dependencies([v_t]):
-            v_t = self._resource_scatter_add(v, indices, v_scaled_g_values)
-
-        if self.amsgrad:
-            vhat = self.get_slot(var, "vhat")
-            vhat_t = vhat.assign(tf.maximum(vhat, v_t), use_locking=self._use_locking)
-            denominator = tf.sqrt(vhat_t) + epsilon_t
-        else:
-            vhat_t = None
-            denominator = tf.sqrt(v_t) + epsilon_t
-
-        final_lr = final_lr * lr_t / base_lr
-        lower_bound = final_lr * (1.0 - 1.0 / (gamma * local_step + 1.0))
-        upper_bound = final_lr * (1.0 + 1.0 / (gamma * local_step))
-        lr_t = lr_t * (tf.sqrt(1.0 - beta2_power) / (1.0 - beta1_power))
-        lr_t = tf.clip_by_value(lr_t / denominator, lower_bound, upper_bound)
-        with tf.control_dependencies([m_t]):
-            var_update = self._resource_scatter_add(
-                var, indices, tf.gather(-lr_t * m_t, indices)
+         if isinstance (gradient,tf.IndexedSlices):
+             # Sparse gradients
+            m.assign_add(-m * (1 - self.beta_1))
+            m.scatter_add(
+                tf.IndexedSlices(
+                    gradient.values * (1 - self.beta_1), gradient.indices
+                )
+            )
+            v.assign_add(-v * (1 - self.beta_2))
+            v.scatter_add(
+                tf.IndexedSlices(
+                    tf.square(gradient.values) * (1 - self.beta_2),
+                    gradient.indices,
+                )
             )
 
-        updates = [var_update, m_t, v_t]
-        if self.amsgrad:
-            updates.append(vhat_t)
-        return tf.group(*updates)
+            if self.amsgrad:
+                v_hat = self._velocity_hats[self._index_dict[var_key]]
+                v_hat.assign(tf.maximum(v_hat, v))
+                denom = tf.sqrt(v_hat) + epsilon_t
+            else:
+                denom = tf.sqrt(v) + epsilon_t 
+
+
+            final_lr = final_lr * lr_t / base_lr
+            lower_bound = final_lr * (1.0 - 1.0 / (gamma * local_step + 1.0))
+            upper_bound = final_lr * (1.0 + 1.0 / (gamma * local_step))
+            lr_t = lr_t * (tf.sqrt(1.0 - beta_2_power) / (1.0 - beta_1_power))
+            lr_t = tf.clip_by_value(lr_t / denom, lower_bound, upper_bound)
+
+            variable.assign_sub(lr_t * m)
+         else:
+             # Dense gradients.
+             m.assign_add((gradient - m) * (1 - self.beta_1))
+             v.assign_add((tf.square(gradient) - v) * (1 - self.beta_2))
+
+             if self.amsgrad:
+                v_hat = self._velocity_hats[self._index_dict[var_key]]
+                v_hat.assign(tf.maximum(v_hat, v))
+                denom = tf.sqrt(v_hat) + epsilon_t
+             else:
+                denom = tf.sqrt(v) + epsilon_t 
+
+             final_lr = final_lr * lr_t / base_lr
+             lower_bound = final_lr * (1.0 - 1.0 / (gamma * local_step + 1.0))
+             upper_bound = final_lr * (1.0 + 1.0 / (gamma * local_step))
+             lr_t = lr_t * (tf.sqrt(1.0 - beta_2_power) / (1.0 - beta_1_power))
+             lr_t = tf.clip_by_value(lr_t / denom, lower_bound, upper_bound)
+
+             variable.assign_sub(lr_t * m)
 
     def get_config(self):
         config = super().get_config()
+
         config.update(
             {
-                "learning_rate": self._serialize_hyperparameter("learning_rate"),
+                "learning_rate": self._serialize_hyperparameter(
+                    self._learning_rate
+                ),
                 "base_lr": self._serialize_hyperparameter("base_lr"),
                 "final_lr": self._serialize_hyperparameter("final_lr"),
-                "beta_1": self._serialize_hyperparameter("beta_1"),
-                "beta_2": self._serialize_hyperparameter("beta_2"),
-                "gamma": self._serialize_hyperparameter("gamma"),
-                "weight_decay": self._serialize_hyperparameter("weight_decay"),
+                "beta_1": self.beta_1,
+                "beta_2": self.beta_2,
+                "gamma": self.gamma,
                 "epsilon": self.epsilon,
-                "amsgrad": self.amsgrad
+                "amsgrad": self.amsgrad,
             }
         )
         return config
+
+          
+
+
