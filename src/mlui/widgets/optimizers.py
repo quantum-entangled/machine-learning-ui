@@ -107,7 +107,7 @@ class Adam(OptimizerWidget):
         }
 
 
-class Adaboud(OptimizerWidget):
+class Adabound(OptimizerWidget):
     """Adabound Optimizer widget"""
     def __init__(self) -> None:
         self.learning_rate= float(

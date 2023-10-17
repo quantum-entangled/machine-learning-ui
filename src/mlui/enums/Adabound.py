@@ -8,15 +8,31 @@ from keras.optimizers import Optimizer
 class AdaBound(Optimizer):
     """
     Args:
-        lr (float, optional): Adam learning rate (default: 1e-3)
-        betas (Tuple[float, float], optional): coefficients used for computing
-        running averages of gradient and its square (default: (0.9, 0.999))
-        final_lr (float, optional): final (SGD) learning rate (default: 0.1)
-        gamma (float, optional): convergence speed of the bound functions (default: 1e-3)
-        eps (float, optional): term added to the denominator to improve
-            numerical stability (default: 1e-8)
-        weight_decay (float, optional): weight decay (L2 penalty) (default: 0)
-        amsbound (boolean, optional): whether to use the AMSBound variant of this algorithm
+        learning_rate : float 
+            Adam learning rate (default: 1e-3)
+
+        base_lr: float >= 0.
+             Used for loading the optimizer. Do not set the argument manually.    
+
+        
+        final_lr : float
+                  final (SGD) learning rate (default: 0.1)
+
+        beta1,beta2 : float between [0,1] 
+            coefficients used for computingrunning averages of gradient and its square (default: (0.9, 0.999))
+          
+        gamma : float
+                convergence speed of the bound functions (default: 1e-3)
+
+        eps : float
+            term added to the denominator to improve numerical stability (default: 1e-8)
+
+        weight_decay : float 
+             weight decay (L2 penalty) (default: 0)
+
+        amsbound :boolean
+                whether to use the AMSBound variant of this algorithm
+                
     .. Adaptive Gradient Methods with Dynamic Bound of Learning Rate:
         https://openreview.net/forum?id=Bkg3g2R9FX
 
@@ -81,7 +97,7 @@ class AdaBound(Optimizer):
         velocity_hat (only set when amsgrad is applied),
 
         Args:
-            var_list: list of model variables to build Adam variables on.
+            var_list: list of model variables to build AdaBound variables on.
         """
          
          super().build(var_list)
@@ -116,7 +132,8 @@ class AdaBound(Optimizer):
              
 
     def update_step(self, gradient, variable):
-         """Update step given gradient and the associated model variable."""
+         """Update step given gradient and the associated model variable.
+         """
          lr_t = tf.cast(self.learning_rate,variable.dtype)
          base_lr = tf.cast(self.base_lr,variable.dtype)
          final_lr = tf.cast(self.fianl_lr,variable.dtype)
