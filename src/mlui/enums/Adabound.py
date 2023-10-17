@@ -121,8 +121,7 @@ class AdaBound(Optimizer):
          base_lr = tf.cast(self.base_lr,variable.dtype)
          final_lr = tf.cast(self.fianl_lr,variable.dtype)
          local_step = tf.cast(self.iterations+1,variable.dtype)
-         beta_1_t = tf.cast(self.beta_1,variable.dtype)
-         beta_2_t = tf.cast(self.beta_2,variable.dtype)
+        
          beta_1_power = tf.pow(tf.cast(self.beta_1,variable.dtype),local_step)
          beta_2_power = tf.pow(tf.cast(self.beta_2,variable.dtype),local_step)
          gamma = tf.cast(self.gamma,variable.dtype)
