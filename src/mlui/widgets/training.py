@@ -19,15 +19,29 @@ def set_callbacks_ui(model: model_cls.Model) -> None:
 
     callback = str(st.selectbox("Select callback class:", list(callbacks.classes)))
     callback_cls = callbacks.classes[callback]
-    callback_widget = callbacks.widgets[callback]()
-    callback_params = callback_widget.params
+
+    with st.expander("Callback's Parameters"):
+        callback_widget = callbacks.widgets[callback]()
+        callback_params = callback_widget.params
+
     set_callback_btn = st.button("Set Callback")
+
+    st.markdown("To reset all existing callbacks, please press this button:")
+
+    reset_callbacks_btn = st.button("Reset All Callbacks")
 
     if set_callback_btn:
         try:
             mm.set_callback(callback_cls, callback_params, model)
             st.success("Callback is set!", icon="✅")
         except (err.NoModelError, err.SameCallbackError) as error:
+            st.error(error, icon="❌")
+
+    if reset_callbacks_btn:
+        try:
+            mm.reset_callbacks(model)
+            st.success("Callbacks are reset!", icon="✅")
+        except err.NoModelError as error:
             st.error(error, icon="❌")
 
 
@@ -90,21 +104,15 @@ def show_history_plot_ui(model: model_cls.Model) -> None:
     """
     st.header("History Plot")
 
-    col_1, col_2 = st.columns(2)
-
-    with col_1:
-        history_type = str(
-            st.selectbox("Select logs to plot:", list(model.training_history))
-        )
-
-    with col_2:
-        color = st.color_picker("Line color:", "#0000FF")
-
+    logs = model.training_history.drop("epoch", axis=1).columns
+    history_type = st.multiselect("Select logs to plot:", logs)
+    schemes = ["set1", "set2", "set3"]
+    color_scheme = str(st.selectbox("Select color scheme:", schemes))
     plot_history_btn = st.button("Plot History")
 
     if plot_history_btn:
         try:
-            fig = mm.show_history_plot(history_type, color, model)
-            st.plotly_chart(fig, use_container_width=True)
+            chart = mm.show_history_plot(history_type, color_scheme, model)
+            st.altair_chart(chart, use_container_width=True)
         except (err.NoModelError, err.ModelNotTrainedError) as error:
             st.error(error, icon="❌")

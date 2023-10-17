@@ -43,9 +43,12 @@ def add_layers_ui(model: model_cls.Model) -> None:
 
     layer = str(st.selectbox("Select layer class:", list(layers.classes)))
     layer_cls = layers.classes[layer]
-    layer_widget = layers.widgets[layer](model=model)
-    layer_params = layer_widget.params
-    layer_connection = layer_widget.connection
+
+    with st.expander("Layer's Parameters"):
+        layer_widget = layers.widgets[layer](model=model)
+        layer_params = layer_widget.params
+        layer_connection = layer_widget.connection
+
     add_layer_btn = st.button("Add Layer")
 
     if add_layer_btn:
