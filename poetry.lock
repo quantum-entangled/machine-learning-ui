@@ -799,37 +799,6 @@ files = [
 numpy = ">=1.17.3"
 
 [[package]]
-name = "hypothesis"
-version = "6.84.3"
-description = "A library for property-based testing"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "hypothesis-6.84.3-py3-none-any.whl", hash = "sha256:4dd7de7a341a80c10d3e6beca12c084aab84c48ea270c1b9b8cee7e4aa5d7be2"},
-    {file = "hypothesis-6.84.3.tar.gz", hash = "sha256:b4117f4138e81986cf62ad4e1410a021adeaa52e4b0326419da626cd7d3b6250"},
-]
-
-[package.dependencies]
-attrs = ">=19.2.0"
-sortedcontainers = ">=2.1.0,<3.0.0"
-
-[package.extras]
-all = ["backports.zoneinfo (>=0.2.1)", "black (>=19.10b0)", "click (>=7.0)", "django (>=3.2)", "dpcontracts (>=0.4)", "lark (>=0.10.1)", "libcst (>=0.3.16)", "numpy (>=1.17.3)", "pandas (>=1.1)", "pytest (>=4.6)", "python-dateutil (>=1.4)", "pytz (>=2014.1)", "redis (>=3.0.0)", "rich (>=9.0.0)", "tzdata (>=2023.3)"]
-cli = ["black (>=19.10b0)", "click (>=7.0)", "rich (>=9.0.0)"]
-codemods = ["libcst (>=0.3.16)"]
-dateutil = ["python-dateutil (>=1.4)"]
-django = ["django (>=3.2)"]
-dpcontracts = ["dpcontracts (>=0.4)"]
-ghostwriter = ["black (>=19.10b0)"]
-lark = ["lark (>=0.10.1)"]
-numpy = ["numpy (>=1.17.3)"]
-pandas = ["pandas (>=1.1)"]
-pytest = ["pytest (>=4.6)"]
-pytz = ["pytz (>=2014.1)"]
-redis = ["redis (>=3.0.0)"]
-zoneinfo = ["backports.zoneinfo (>=0.2.1)", "tzdata (>=2023.3)"]
-
-[[package]]
 name = "idna"
 version = "3.6"
 description = "Internationalized Domain Names in Applications (IDNA)"
@@ -1438,17 +1407,6 @@ numpy = {version = ">=1.23.3", markers = "python_version > \"3.10\""}
 
 [package.extras]
 dev = ["absl-py", "pyink", "pylint (>=2.6.0)", "pytest", "pytest-xdist"]
-
-[[package]]
-name = "multimethod"
-version = "1.9.1"
-description = "Multiple argument dispatching."
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "multimethod-1.9.1-py3-none-any.whl", hash = "sha256:52f8f1f2b9d5a4c7adfdcc114dbeeebe3245a4420801e8807e26522a79fb6bc2"},
-    {file = "multimethod-1.9.1.tar.gz", hash = "sha256:1589bf52ca294667fd15527ea830127c763f5bfc38562e3642591ffd0fd9d56f"},
-]
 
 [[package]]
 name = "mypy-extensions"
@@ -2326,17 +2284,6 @@ files = [
 ]
 
 [[package]]
-name = "sortedcontainers"
-version = "2.4.0"
-description = "Sorted Containers -- Sorted List, Sorted Dict, Sorted Set"
-optional = false
-python-versions = "*"
-files = [
-    {file = "sortedcontainers-2.4.0-py2.py3-none-any.whl", hash = "sha256:a163dcaede0f1c021485e957a39245190e74249897e2ae4b2aa38595db237ee0"},
-    {file = "sortedcontainers-2.4.0.tar.gz", hash = "sha256:25caa5a06cc30b6b83d11423433f65d1f9d76c4c6a0c90e3379eaa43b9bfdb88"},
-]
-
-[[package]]
 name = "soupsieve"
 version = "2.5"
 description = "A modern CSS selector implementation for Beautiful Soup."
@@ -3171,4 +3118,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.11.0"
-content-hash = "93d0073659ce92ad4769d03adc92e01744f92ef45abe6e4d139f1e5df1a4fb89"
+content-hash = "362cc629cb1ab052e88aa6eeed8579ab68cebefcf935115b87fdb9941c9e53ff"

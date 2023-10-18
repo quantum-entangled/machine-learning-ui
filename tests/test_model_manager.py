@@ -5,10 +5,6 @@ import pandas as pd
 import streamlit as st
 import plotly as ply
 
-from hypothesis import given, settings
-from hypothesis.strategies import floats
-from hypothesis_csv.strategies import csv as csv_strategie
-
 from mlui.data_classes import model as model_cls
 from mlui.data_classes import data as data_cls
 from mlui.managers import model_manager as mm
@@ -373,9 +369,7 @@ def test_set_callback(model: model_cls.Model, model_with_layers: model_cls.Model
         )
 
 
-@given(csv_str=csv_strategie(columns=[floats(), floats()], lines=20))
-@settings(deadline=None)
-def test_training(csv_str):
+def test_training(csv_str: str):
     data = data_cls.Data()
     model = model_cls.Model()
     csv_file = bytes(csv_str, "utf-8")

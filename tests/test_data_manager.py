@@ -4,12 +4,8 @@ import pytest
 import itertools
 import collections as clns
 import pandas as pd
-import numpy as np
 import plotly as ply
 import tensorflow as tf
-
-from hypothesis import given, settings
-from hypothesis_csv.strategies import csv as csv_strategie
 
 import mlui.managers.data_manager as dm
 import mlui.data_classes.data as data_cls
@@ -19,8 +15,7 @@ import mlui.managers.errors as err
 import mlui.managers.model_manager as mm
 
 
-@given(csv_str=csv_strategie())
-def test_upload_file(csv_str):
+def test_upload_file(csv_str: str):
     data = data_cls.Data()
     model = model_cls.Model()
     csv_file = bytes(csv_str, "utf-8")
@@ -35,30 +30,37 @@ def test_upload_file(csv_str):
     assert data.available_columns == data.columns.copy()
 
 
-def test_error_upload_file(data: data_cls.Data, model: model_cls.Model):
+def test_error_upload_file(
+    data: data_cls.Data,
+    model: model_cls.Model,
+    empty_csv: str,
+    csv_with_multiindex: str,
+    csv_with_diff_types: str,
+    csv_invalid_delimiter: str,
+    csv_invalid_indentations: str,
+):
     with pytest.raises(err.UploadError):
-        with io.BytesIO(bytes("1,2\n1,1\n2,2,garbage\n3,3", "utf-8")) as buff:
+        with io.BytesIO(bytes(empty_csv, "utf-8")) as buff:
             dm.upload_file(buff, data, model)
 
     with pytest.raises(err.UploadError):
-        with io.BytesIO(bytes("1,2,3\n1,1,1\n2,aaa,2\n3,3,3", "utf-8")) as buff:
+        with io.BytesIO(bytes(csv_with_multiindex, "utf-8")) as buff:
             dm.upload_file(buff, data, model)
 
     with pytest.raises(err.UploadError):
-        with io.BytesIO(bytes("1,2,3\n1,1,1\n2,inf,2\n3,3,3", "utf-8")) as buff:
+        with io.BytesIO(bytes(csv_with_diff_types, "utf-8")) as buff:
             dm.upload_file(buff, data, model)
 
     with pytest.raises(err.UploadError):
-        with io.BytesIO(bytes("1;2;3\n1;1;1\n2;2;2\n3;3;3", "utf-8")) as buff:
+        with io.BytesIO(bytes(csv_invalid_delimiter, "utf-8")) as buff:
             dm.upload_file(buff, data, model)
 
     with pytest.raises(err.UploadError):
-        with io.BytesIO(bytes("1,2\n1,1,4,4\n2,2\n3,3", "utf-8")) as buff:
+        with io.BytesIO(bytes(csv_invalid_indentations, "utf-8")) as buff:
             dm.upload_file(buff, data, model)
 
 
-@given(csv_str=csv_strategie())
-def test_file_exists(csv_str):
+def test_file_exists(csv_str: str):
     data = data_cls.Data()
     model = model_cls.Model()
     csv_file = bytes(csv_str, "utf-8")
@@ -73,8 +75,7 @@ def test_file_exists(csv_str):
         assert dm.file_exists(data) is False
 
 
-@given(csv_str=csv_strategie())
-def test_show_data_stats(csv_str):
+def test_show_data_stats(csv_str: str):
     data = data_cls.Data()
     model = model_cls.Model()
     csv_file = bytes(csv_str, "utf-8")
@@ -89,9 +90,7 @@ def test_show_data_stats(csv_str):
         assert data_stats is None
 
 
-@given(csv_str=csv_strategie())
-@settings(deadline=None)
-def test_show_data_plot(csv_str):
+def test_show_data_plot(csv_str: str):
     data = data_cls.Data()
     model = model_cls.Model()
     csv_file = bytes(csv_str, "utf-8")
@@ -108,9 +107,7 @@ def test_show_data_plot(csv_str):
             assert isinstance(plot, ply.graph_objs.Figure)
 
 
-@given(csv_str=csv_strategie())
-@settings(deadline=None)
-def test_set_and_get_layer_columns(csv_str):
+def test_set_and_get_layer_columns(csv_str: str):
     csv_file = bytes(csv_str, "utf-8")
     with io.BytesIO(csv_file) as buff:
         file = pd.read_csv(buff, header=0, skipinitialspace=True)
@@ -252,9 +249,7 @@ def test_layers_are_filled(data: data_cls.Data, model: model_cls.Model):
     assert dm.layers_are_filled("Output", data, model) is True
 
 
-@given(csv_str=csv_strategie())
-@settings(deadline=None)
-def test_split_data(csv_str):
+def test_split_data(csv_str: str):
     data = data_cls.Data()
     model = model_cls.Model()
     csv_file = bytes(csv_str, "utf-8")
