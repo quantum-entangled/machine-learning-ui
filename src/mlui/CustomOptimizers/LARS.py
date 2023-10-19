@@ -1,9 +1,31 @@
+"""LARS optimizer implementation."""
+
 import tensorflow as tf
 from tensorflow.python.keras import backend_config
 import numpy as np
 
 
 class LARS(tf.keras.optimizers.Optimizer):
+    r"""Optimizer that implements the LARS algorithm.
+
+    Layer-wise Adaptive Rate Scaling, is an optimization algorithm widely used in deep learning.
+    It is designed to improve the convergence speed and performance of neural network models during the training process.
+    LARS combines the benefits of adaptive learning rates and layer-wise parameter scaling.
+
+     Args:
+       learning_rate (float): learning rate (default: 1e-3)
+       momentum (float): momentum factor (default: 0.9)
+       dampening (float): dampening for momentum (default: 0)
+       epsilon (float): term added to the denominator to improve numerical stability (default: 1e-8)
+       weight_decay (float): weight decay (L2 penalty) (default: 0)
+       nesterov (bool): enables Nesterov momentum (default: False)
+       trust_coefficien (float)t: trust coefficient for computing LR (default: 0.001)
+
+     Reference:
+        - [Yang You, Igor Gitman, Boris Ginsburg, 2017]
+    (https://arxiv.org/abs/1708.03888)
+      """
+
     _HAS_AGGREGATE_GRAD = True
 
     def __init__(

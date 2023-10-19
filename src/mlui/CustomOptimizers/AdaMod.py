@@ -1,3 +1,5 @@
+"""AdaMod optimizer implementation."""
+
 from tensorflow.python.framework import ops
 from tensorflow.python.keras import backend_config
 from keras.optimizers.optimizer_v2 import optimizer_v2
@@ -8,6 +10,23 @@ from tensorflow.python.ops import state_ops
 
 
 class AdaMod(optimizer_v2.OptimizerV2):
+    r"""Optimizer that implements the AdaMod algorithm.
+
+    An optimizer that adjusts the learning rates for each parameter based on historical statistics,
+     preventing them from becoming excessively large and avoiding non-convergence issues, ultimately leading to improved performance.
+
+      Args:
+        learning_rate (float): learning rate (default: 1e-3)
+        beta_1 (float): exponential decay rate for the 1st moment estimates (default: 0.9)
+        beta_2 (float): exponential decay rate for the 2nd moment estimates (default: 0.999)
+        beta_3 (float): smoothing coefficient for adaptive learning rates (default: 0.9999)
+        epsilon (float): term added to the denominator to improve numerical stability (default: 1e-8)
+
+      Reference:
+        - [Jianbang Ding, Xuancheng Ren, Ruixuan Luo, Xu Sun, 2019]
+    (https://arxiv.org/abs/1910.12249)
+      """
+
     def __init__(
         self,
         learning_rate=0.001,

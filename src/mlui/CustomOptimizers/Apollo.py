@@ -1,8 +1,30 @@
+"""Apollo optimizer implementation."""
+
 import tensorflow as tf
 import numpy as np
 
 
 class Apollo(tf.keras.optimizers.Optimizer):
+    r"""Optimizer that implements the Apollo algorithm.
+
+    Apollo is a nonconvex stochastic optimization method that incorporates the curvature of the loss function by
+    approximating the Hessian using a diagonal matrix. It is a quasi-Newton approach.
+
+     Args:
+        learning_rate (float): learning rate (default: 1e-2)
+        beta (float): coefficient used for computing running averages of gradient (default: 0.9)
+        epsilon (float): term added to the denominator to improve numerical stability (default: 1e-4)
+        rebound (str): recified bound for diagonal hessian: “constant” | “belief” (default: “constant”)
+        warmup (int): number of warmup steps (default: 500)
+        init_lr (float): initial learning rate for warmup (default: 1e-5)
+        weight_decay (float): weight decay coefficient (default: 0)
+        weight_decay_type (str): type of weight decay:  “L2” | “decoupled” | “stable” (default: “L2”)
+
+      Reference:
+        - [Xuezhe Ma, 2020]
+    (https://arxiv.org/abs/2009.13586)
+      """
+
     _HAS_AGGREGATE_GRAD = True
 
     def __init__(

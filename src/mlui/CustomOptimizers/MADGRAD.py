@@ -1,17 +1,37 @@
+"""MADGRAD optimizer implementation."""
+
 import tensorflow as tf
 from tensorflow.python.keras import backend_config
 import numpy as np
 
 
 class MADGRAD(tf.keras.optimizers.Optimizer):
+    r"""Optimizer that implements the MADGRAD algorithm.
+
+    MADGRAD is an optimization algorithm used in deep learning.
+    It combines adaptive learning rates and momentum to efficiently navigate the loss landscape during training.
+    With its ability to dynamically adjust the learning rate and smooth out oscillations using momentum,
+    MADGRAD offers fast convergence and improved optimization performance.
+
+     Args:
+       learning_rate (float): learning rate (default: 1e-2)
+       momentum (float): momentum value in the range [0,1) (default: 0)
+       weight_decay (float): weight decay (L2 penalty) (default: 0)
+       epsilon (float): term added to the denominator to improve numerical stability (default: 1e-6)
+
+    Reference:
+        - [Aaron Defazio, Samy Jelassi, 2021]
+    (https://arxiv.org/abs/2101.11075)
+      """
+
     _HAS_AGGREGATE_GRAD = True
 
     def __init__(
         self,
         learning_rate=0.01,
-        momentum=0.9,
+        momentum=0.0,
         weight_decay=0.0,
-        epsilon=1e-06,
+        epsilon=1e-6,
         name="MADGRAD",
         **kwargs
     ):
