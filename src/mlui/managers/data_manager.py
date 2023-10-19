@@ -1,5 +1,6 @@
 import collections as clns
 import io
+import re
 import itertools as it
 from typing import Literal
 
@@ -29,6 +30,44 @@ def file_exists(data: data_cls.Data) -> bool:
     return False if data.file.empty else True
 
 
+def is_file_correct(csv: str) -> bool:
+    """Checking if file structure is correct.
+
+    Parameters
+    ----------
+    csv : str
+        CSV file as a string.
+
+    Returns
+    -------
+    bool
+        False if file contains :
+        - not numbers in columns
+        - multi-indexes (different number of columns in rows)
+        - less than 2 columns
+        - less than 2 lines
+        - incorrect indentation or separators
+
+        True otherwise.
+    """
+    rows = csv.split("\n")
+    if len(rows) < 2:
+        return False
+
+    columns = rows[0].split(",")
+    len_columns = len(columns)
+    if len_columns < 2:
+        return False
+
+    regex_str = r"^(((((\d+\.\d+)|(\d*)),){%d}((\d+\.\d+)|(\d*)))|)$" % (len_columns - 1)
+    regex = re.compile(regex_str)
+
+    for row in rows[1:]:
+        if not regex.match(row):
+            return False
+    return True
+
+
 def upload_file(
     buff: io.BytesIO | None, data: data_cls.Data, model: model_cls.Model
 ) -> None:
@@ -47,13 +86,24 @@ def upload_file(
     ------
     UploadError
         For errors with uploading procedure.
+    IncorrectFileStructure
+        When the file structure is incorrect.
+    FileEmptyError
+        When trying to upload an empty file.
     """
     if not buff:
         return
 
     try:
-        data.file = pd.read_csv(buff, header=0, skipinitialspace=True)
-        refresh_data(data)
+        csv = buff.read().decode("utf-8")
+
+        if is_file_correct(csv):
+            data.file = pd.read_csv(
+                io.BytesIO(bytes(csv, "utf-8")), header=0, skipinitialspace=True
+            )
+            refresh_data(data)
+        else:
+            raise err.IncorrectFileStructure(f"The file has an incorrect structure!")
 
         if not file_exists(data):
             raise err.FileEmptyError(f"The uploaded file is empty!")

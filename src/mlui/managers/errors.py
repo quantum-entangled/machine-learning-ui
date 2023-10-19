@@ -2,6 +2,10 @@ class UploadError(Exception):
     """For errors during the uploading of files/models."""
 
 
+class IncorrectFileStructure(Exception):
+    """When the file structure is incorrect."""
+
+
 class FileEmptyError(Exception):
     """When trying to upload an empty file."""
 
