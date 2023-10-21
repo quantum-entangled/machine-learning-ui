@@ -1,7 +1,7 @@
 import io
 import os
 import tempfile
-from typing import Type
+from typing import Literal, Type, TypedDict
 
 import altair as alt
 import pandas as pd
@@ -16,6 +16,39 @@ import mlui.managers.errors as err
 import mlui.widgets.callbacks as wc
 import mlui.widgets.layers as wl
 import mlui.widgets.optimizers as wo
+
+
+class ChartParams(TypedDict):
+    """Type annotation for the chart parameters."""
+
+    scheme: str
+    X_ticks: int | float
+    Y_ticks: int | float
+    X_l_lim: int | float
+    X_r_lim: int | float
+    Y_l_lim: int | float
+    Y_r_lim: int | float
+    X_title: str | None
+    Y_title: str | None
+    legend_or: Literal[
+        "left",
+        "right",
+        "top",
+        "bottom",
+        "top-left",
+        "top-right",
+        "bottom-left",
+        "bottom-right",
+    ]
+    legend_dir: Literal["vertical", "horizontal"]
+    legend_title: str | None
+    height: int | float
+    points: bool
+    Y_zero: bool
+    X_grid: bool
+    Y_grid: bool
+    X_inter: bool
+    Y_inter: bool
 
 
 def model_exists(model: model_cls.Model) -> bool:
@@ -565,14 +598,16 @@ def fit_model(
     model.trained = True
 
 
-def show_history_plot(Y: list[str], chart_params, model: model_cls.Model) -> alt.Chart:
+def show_history_plot(
+    Y: list[str], chart_params: ChartParams, model: model_cls.Model
+) -> alt.Chart:
     """Show the history plot.
 
     Parameters
     ----------
     Y : list of str
         Y-axis columns names.
-    chart_params : dict
+    chart_params : ChartParams
         Parameters for the chart layout.
     model : Model
         Model container object.
@@ -603,17 +638,20 @@ def show_history_plot(Y: list[str], chart_params, model: model_cls.Model) -> alt
         .encode(
             x=alt.X("epoch")
             .axis(tickCount=chart_params["X_ticks"], grid=chart_params["X_grid"])
-            .scale(domain=chart_params["X_domain"])
+            .scale(domain=(chart_params["X_l_lim"], chart_params["X_r_lim"]))
             .title(chart_params["X_title"]),
             y=alt.Y("log_value")
             .axis(tickCount=chart_params["Y_ticks"], grid=chart_params["Y_grid"])
-            .scale(zero=chart_params["Y_zero"])
+            .scale(
+                zero=chart_params["Y_zero"],
+                domain=(chart_params["Y_l_lim"], chart_params["Y_r_lim"]),
+            )
             .title(chart_params["Y_title"]),
             color=alt.Color("log_name")
             .scale(scheme=chart_params["scheme"])
             .legend(
-                orient=chart_params["legend_orient"],
-                direction=chart_params["legend_direction"],
+                orient=chart_params["legend_or"],
+                direction=chart_params["legend_dir"],
                 title=chart_params["legend_title"],
             ),
         )

@@ -113,65 +113,82 @@ def show_history_plot_ui(model: model_cls.Model) -> None:
         return
 
     opts = model.training_history.columns.drop("epoch")
-    df_len = len(model.training_history)
     Y = st.multiselect("Select Y column(s):", opts)
-    params = dict()
+    df_len = len(model.training_history)
+    X_L = -0.5 * df_len
+    X_R = df_len + 0.5 * df_len
+    Y_min = model.training_history.loc[:, Y].min(axis=1).min(axis=0)
+    Y_max = model.training_history.loc[:, Y].max(axis=1).max(axis=0)
+    Y_L = Y_min - 0.5 * Y_max
+    Y_R = Y_max + 0.5 * Y_max
+    schemes = ("set1", "set2", "set3")
+    legend_ors = (
+        "left",
+        "right",
+        "top",
+        "bottom",
+        "top-left",
+        "top-right",
+        "bottom-left",
+        "bottom-right",
+    )
+    legend_dirs = ("vertical", "horizontal")
+    title_ph = "No title if None"
 
     with st.expander("Chart's Parameters"):
-        schemes = ("set1", "set2", "set3")
-        legend_orients = (
-            "left",
-            "right",
-            "top",
-            "bottom",
-            "top-left",
-            "top-right",
-            "bottom-left",
-            "bottom-right",
+        scheme = st.selectbox("Select color scheme:", schemes, 0)
+        X_ticks = st.number_input("Number of X-axis ticks:", 0, int(X_R), df_len, 1)
+        Y_ticks = st.number_input("Number of Y-axis ticks:", 0, int(X_R), df_len, 1)
+        X_l_lim = st.number_input("X-axis left border:", X_L, X_R, 0.5, 1.0)
+        X_r_lim = st.number_input("X-axis right border:", X_L, X_R, df_len + 0.5, 1.0)
+        Y_l_lim = st.number_input(
+            "Y-axis left border:", Y_L, Y_R, Y_min - 0.05 * Y_min, 1.0
         )
-        legend_directions = ("vertical", "horizontal")
-        params["scheme"] = str(st.selectbox("Select color scheme:", schemes))
-        params["X_ticks"] = st.number_input(
-            "Number of X-axis ticks:", 0, df_len + 100, df_len, 1
+        Y_r_lim = st.number_input(
+            "Y-axis right border:", Y_L, Y_R, Y_max + 0.05 * Y_max, 1.0
         )
-        params["Y_ticks"] = st.number_input(
-            "Number of Y-axis ticks:", 0, df_len + 100, df_len, 1
-        )
-        params["X_domain"] = st.slider(
-            "X-axis domain range:",
-            -100.0,
-            df_len + 100.0,
-            (0.5, df_len + 0.5),
-            1.0,
-        )
-        params["X_title"] = st.text_input(
-            "X-axis title:", "Epoch", 30, placeholder="No title if None"
-        )
-        params["Y_title"] = st.text_input(
-            "Y-axis title:", "Value", 30, placeholder="No title if None"
-        )
-        params["legend_orient"] = st.select_slider(
-            "Legend orientation:", legend_orients, "bottom"
-        )
-        params["legend_direction"] = st.select_slider(
-            "Legend direction:", legend_directions, "horizontal"
-        )
-        params["legend_title"] = st.text_input(
-            "Legend title:", None, 30, placeholder="No title if None"
-        )
-        params["height"] = st.number_input("Plot height:", 300, 1000, 500, 50)
-        params["points"] = st.toggle("Show Point Markers", True)
-        params["Y_zero"] = st.toggle("Include zero on Y-axis")
-        params["X_grid"] = st.toggle("Show X-axis Grid", True)
-        params["Y_grid"] = st.toggle("Show Y-axis Grid", True)
-        params["X_inter"] = st.toggle("Interactive X-axis", True)
-        params["Y_inter"] = st.toggle("Interactive Y-axis", True)
+        X_title = st.text_input("X-axis title:", "Epoch", 30, placeholder=title_ph)
+        Y_title = st.text_input("Y-axis title:", "Value", 30, placeholder=title_ph)
+        legend_or = st.selectbox("Legend orientation:", legend_ors, 3)
+        legend_dir = st.selectbox("Legend direction:", legend_dirs, 1)
+        legend_title = st.text_input("Legend title:", None, 30, placeholder=title_ph)
+        height = st.number_input("Plot height:", 300, 1000, 500, 50)
+        points = st.toggle("Show Point Markers", True)
+        Y_zero = st.toggle("Include zero on Y-axis")
+        X_grid = st.toggle("Show X-axis Grid", True)
+        Y_grid = st.toggle("Show Y-axis Grid", True)
+        X_inter = st.toggle("Interactive X-axis", True)
+        Y_inter = st.toggle("Interactive Y-axis", True)
 
     plot_history_btn = st.button("Plot History")
 
     if plot_history_btn:
         try:
-            chart = mm.show_history_plot(Y, params, model)
+            chart = mm.show_history_plot(
+                Y,
+                {
+                    "scheme": scheme if scheme else "set1",
+                    "X_ticks": X_ticks,
+                    "Y_ticks": Y_ticks,
+                    "X_l_lim": X_l_lim,
+                    "X_r_lim": X_r_lim,
+                    "Y_l_lim": Y_l_lim if Y_l_lim else Y_min,
+                    "Y_r_lim": Y_r_lim if Y_r_lim else Y_max,
+                    "X_title": X_title,
+                    "Y_title": Y_title,
+                    "legend_or": legend_or if legend_or else "bottom",
+                    "legend_dir": legend_dir if legend_dir else "horizontal",
+                    "legend_title": legend_title,
+                    "height": height,
+                    "points": points,
+                    "Y_zero": Y_zero,
+                    "X_grid": X_grid,
+                    "Y_grid": Y_grid,
+                    "X_inter": X_inter,
+                    "Y_inter": Y_inter,
+                },
+                model,
+            )
             st.altair_chart(chart, use_container_width=True)
         except (err.NoModelError, err.ModelNotTrainedError) as error:
             st.error(error, icon="❌")
