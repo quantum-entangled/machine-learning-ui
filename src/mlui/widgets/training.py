@@ -137,8 +137,8 @@ def show_history_plot_ui(model: model_cls.Model) -> None:
 
     with st.expander("Chart's Parameters"):
         scheme = st.selectbox("Select color scheme:", schemes, 0)
-        X_ticks = st.number_input("Number of X-axis ticks:", 0, int(X_R), df_len, 1)
-        Y_ticks = st.number_input("Number of Y-axis ticks:", 0, int(X_R), df_len, 1)
+        X_ticks = st.number_input("Number of X-axis ticks:", 0, 100, 10, 1)
+        Y_ticks = st.number_input("Number of Y-axis ticks:", 0, 100, 10, 1)
         X_l_lim = st.number_input("X-axis left border:", X_L, X_R, 0.5, 1.0)
         X_r_lim = st.number_input("X-axis right border:", X_L, X_R, df_len + 0.5, 1.0)
         Y_l_lim = st.number_input(
