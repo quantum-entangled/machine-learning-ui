@@ -2110,6 +2110,36 @@ files = [
 ]
 
 [[package]]
+name = "tensorflow-addons"
+version = "0.22.0"
+description = "TensorFlow Addons."
+optional = false
+python-versions = "*"
+files = [
+    {file = "tensorflow_addons-0.22.0-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:c07f339511e995062ca78bcb8b0d568d652b5537059c2980cc49503416dfb7ba"},
+    {file = "tensorflow_addons-0.22.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:e55f97bc1caf63a4dbfa0ffe88f73df3149879ee29a2168ed835fbd2cd117031"},
+    {file = "tensorflow_addons-0.22.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:7f2f07a6310b212632e39f0f91173ebbab480c02552bd2069ac84f0961046bb4"},
+    {file = "tensorflow_addons-0.22.0-cp310-cp310-win_amd64.whl", hash = "sha256:030c29d218aa14f20817c1ba14c4661df2f3c2f5ef8ee0dee3558efadc973bd6"},
+    {file = "tensorflow_addons-0.22.0-cp311-cp311-macosx_10_14_x86_64.whl", hash = "sha256:e870854e7e789551829b68ebba55956bc19dc465390c894cf5cbdb64ee048ef6"},
+    {file = "tensorflow_addons-0.22.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:ba1cf2e960c4242895dbb6a1024b9edb9b60dbfe832280352796903bb39be4bd"},
+    {file = "tensorflow_addons-0.22.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:13c84498d27fca9dc8769393ff6a20c29ba8c80922be40a39fe29a1bb2d386c5"},
+    {file = "tensorflow_addons-0.22.0-cp311-cp311-win_amd64.whl", hash = "sha256:ede78884ee378d1bd30a7f625bb421cee4d2d16179a1b71113e9e66ae95a3aa5"},
+    {file = "tensorflow_addons-0.22.0-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:e21fd8fb92e06c3199f5b47a77be40968ef3e23d6f35334ee21e0ab459fb80f5"},
+    {file = "tensorflow_addons-0.22.0-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:d3d7a83aeecb046541668b561469a0946190ce6a0954f93df2926cc9f45b34dd"},
+    {file = "tensorflow_addons-0.22.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:5ef1812f2f98f6b596bf421d46a961037015dd4f92448a2e94818ce9affd41c3"},
+    {file = "tensorflow_addons-0.22.0-cp39-cp39-win_amd64.whl", hash = "sha256:64bc8ae285117abaf00fa46443dafa532e423f30bceb1ebca41a26f07a11a849"},
+]
+
+[package.dependencies]
+packaging = "*"
+typeguard = ">=2.7,<3.0.0"
+
+[package.extras]
+tensorflow = ["tensorflow (>=2.12.0,<2.15.0)"]
+tensorflow-cpu = ["tensorflow-cpu (>=2.12.0,<2.15.0)"]
+tensorflow-gpu = ["tensorflow-gpu (>=2.12.0,<2.15.0)"]
+
+[[package]]
 name = "tensorflow-cpu"
 version = "2.12.1"
 description = "TensorFlow is an open source machine learning framework for everyone."
@@ -2302,6 +2332,21 @@ files = [
     {file = "tornado-6.3.2-cp38-abi3-win_amd64.whl", hash = "sha256:0c325e66c8123c606eea33084976c832aa4e766b7dff8aedd7587ea44a604cdf"},
     {file = "tornado-6.3.2.tar.gz", hash = "sha256:4b927c4f19b71e627b13f3db2324e4ae660527143f9e1f2e2fb404f3a187e2ba"},
 ]
+
+[[package]]
+name = "typeguard"
+version = "2.13.3"
+description = "Run-time type checker for Python"
+optional = false
+python-versions = ">=3.5.3"
+files = [
+    {file = "typeguard-2.13.3-py3-none-any.whl", hash = "sha256:5e3e3be01e887e7eafae5af63d1f36c849aaa94e3a0112097312aabfa16284f1"},
+    {file = "typeguard-2.13.3.tar.gz", hash = "sha256:00edaa8da3a133674796cf5ea87d9f4b4c367d77476e185e80251cc13dfbb8c4"},
+]
+
+[package.extras]
+doc = ["sphinx-autodoc-typehints (>=1.2.0)", "sphinx-rtd-theme"]
+test = ["mypy", "pytest", "typing-extensions"]
 
 [[package]]
 name = "typing-extensions"
@@ -2546,4 +2591,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.11.0"
-content-hash = "ede2c69188d54dab3da29645991a4a07b6f3b7f77031e2344d61561e0194f91a"
+content-hash = "759b8e1da716319b1f81be431fa264ea11ca5d02d3c0ddf8b2d9ce6a2aa4d8f9"
