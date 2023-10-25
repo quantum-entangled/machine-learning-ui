@@ -1,4 +1,4 @@
-"""Adabound optimizer implementation"""
+
 
 
 import tensorflow.compat.v2 as tf
@@ -7,7 +7,15 @@ from keras.optimizers import Optimizer
 
 class AdaBound(Optimizer):
     """
-    Args:
+    Adabound optimizer implementation 
+    # References
+        - [Adaptive Gradient Methods with Dynamic Bound of Learning Rate]
+          (https://openreview.net/forum?id=Bkg3g2R9FX)
+
+
+
+    Parameters
+    -----------
         learning_rate : float 
             Adam learning rate (default: 1e-3)
 
@@ -31,15 +39,7 @@ class AdaBound(Optimizer):
              weight decay (L2 penalty) (default: 0)
 
         amsbound :boolean
-                whether to use the AMSBound variant of this algorithm
-                
-    .. Adaptive Gradient Methods with Dynamic Bound of Learning Rate:
-        https://openreview.net/forum?id=Bkg3g2R9FX
-
-    # References
-        - [Adaptive Gradient Methods with Dynamic Bound of Learning Rate]
-          (https://openreview.net/forum?id=Bkg3g2R9FX)
-       
+                whether to use the AMSBound variant of this algorithm   
     """
     def __init__(
         self,
@@ -96,7 +96,8 @@ class AdaBound(Optimizer):
          """ AdaBound optimizer has 3 types of variables: momentums, velocities and
         velocity_hat (only set when amsgrad is applied),
 
-        Args:
+        parameters
+        ----------
             var_list: list of model variables to build AdaBound variables on.
         """
          
