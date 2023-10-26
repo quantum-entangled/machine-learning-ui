@@ -10,25 +10,24 @@ class LARS(tf.keras.optimizers.legacy.Optimizer):
     It is designed to improve the convergence speed and performance of neural network models during the training process.
     LARS combines the benefits of adaptive learning rates and layer-wise parameter scaling.
     Reference:
-    - [Yang You, Igor Gitman, Boris Ginsburg, 2017]
-    (https://arxiv.org/abs/1708.03888)
+    - [Yang You, Igor Gitman, Boris Ginsburg, 2017] <https://arxiv.org/abs/1708.03888>_
 
     Parameters
     ----------
-    learning_rate: float
-       The learning rate (default: 1e-3)
-    momentum: float
-       The momentum factor (default: 0.9)
-    dampening: float
-       The dampening for momentum (default: 0)
-    epsilon: float
-       The term added to the denominator to improve numerical stability (default: 1e-8)
-    weight_decay: float
-       The weight decay (L2 penalty) (default: 0)
-    nesterov: bool
-       The enables Nesterov momentum (default: False)
-    trust_coefficien: float
-       The trust coefficient for computing LR (default: 0.001)
+    learning_rate : float, default: 1e-3
+       The learning rate.
+    momentum : float, default: 0.9
+       The momentum factor.
+    dampening : float, default: 0.0
+       The dampening for momentum.
+    epsilon : float, default: 1e-8
+       The term added to the denominator to improve numerical stability.
+    weight_decay : float, default: 0.0
+       The weight decay (L2 penalty).
+    nesterov : bool, default: False
+       The enables Nesterov momentum.
+    trust_coefficient : float, default: 0.001
+       The trust coefficient for computing LR.
     """
 
     _HAS_AGGREGATE_GRAD = True

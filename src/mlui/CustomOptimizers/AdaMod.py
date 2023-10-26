@@ -15,21 +15,20 @@ class AdaMod(tf.keras.optimizers.legacy.Optimizer):
     preventing them from becoming excessively large and avoiding non-convergence issues,
     ultimately leading to improved performance.
     Reference:
-    - [Jianbang Ding, Xuancheng Ren, Ruixuan Luo, Xu Sun, 2019]
-    (https://arxiv.org/abs/1910.12249)
+    - [Jianbang Ding, Xuancheng Ren, Ruixuan Luo, Xu Sun, 2019] <https://arxiv.org/abs/1910.12249>_
 
     Parameters
     ----------
-    learning_rate: float
-        The learning rate (default: 1e-3)
-    beta_1: float
-        The exponential decay rate for the 1st moment estimates (default: 0.9)
-    beta_2: float
-        The exponential decay rate for the 2nd moment estimates (default: 0.999)
-    beta_3: float
-        The smoothing coefficient for adaptive learning rates (default: 0.9999)
-    epsilon: float
-        The term added to the denominator to improve numerical stability (default: 1e-8)
+    learning_rate : float, default: 1e-3
+        The learning rate.
+    beta_1 : float, default: 0.9
+        The exponential decay rate for the 1st moment estimates.
+    beta_2 : float, default: 0.999
+        The exponential decay rate for the 2nd moment estimates.
+    beta_3 : float, default: 0.9999
+        The smoothing coefficient for adaptive learning rates.
+    epsilon : float, default: 1e-8
+        The term added to the denominator to improve numerical stability.
     """
 
     def __init__(

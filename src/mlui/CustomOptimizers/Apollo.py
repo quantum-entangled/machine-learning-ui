@@ -10,27 +10,26 @@ class Apollo(tf.keras.optimizers.legacy.Optimizer):
     approximating the Hessian using a diagonal matrix.
     It is a quasi-Newton approach.
     Reference:
-    - [Xuezhe Ma, 2020]
-    (https://arxiv.org/abs/2009.13586)
+    - [Xuezhe Ma, 2020] <https://arxiv.org/abs/2009.13586>_
 
     Parameters
     ----------
-    learning_rate: float
-        The learning rate (default: 1e-2)
-    beta: float
-        The coefficient used for computing running averages of gradient (default: 0.9)
-    epsilon: float
-        The term added to the denominator to improve numerical stability (default: 1e-4)
-    rebound: str
-        The recified bound for diagonal hessian: “constant” | “belief” (default: “constant”)
-    warmup: int
-        The number of warmup steps (default: 500)
-    init_lr: float
-        The initial learning rate for warmup (default: 1e-5)
-    weight_decay: float
-        The weight decay coefficient (default: 0)
-    weight_decay_type: str
-        The type of weight decay:  “L2” | “decoupled” | “stable” (default: “L2”)
+    learning_rate : float, default: 1e-2
+        The learning rate.
+    beta : float, default: 0.9
+        The coefficient used for computing running averages of gradient.
+    epsilon : float, default: 1e-4
+        The term added to the denominator to improve numerical stability.
+    rebound : str, default: “constant”
+        The recified bound for diagonal hessian: “constant” | “belief”.
+    warmup : int, default: 500
+        The number of warmup steps.
+    init_lr : float, default: 1e-5
+        The initial learning rate for warmup.
+    weight_decay : float, default: 0.0
+        The weight decay coefficient.
+    weight_decay_type : str, default: “L2”
+        The type of weight decay:  “L2” | “decoupled” | “stable”.
     """
 
     _HAS_AGGREGATE_GRAD = True

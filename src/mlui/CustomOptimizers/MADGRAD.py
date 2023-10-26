@@ -13,19 +13,18 @@ class MADGRAD(tf.keras.optimizers.legacy.Optimizer):
     out oscillations using momentum,
     MADGRAD offers fast convergence and improved optimization performance.
     Reference:
-    - [Aaron Defazio, Samy Jelassi, 2021]
-    (https://arxiv.org/abs/2101.11075)
+    - [Aaron Defazio, Samy Jelassi, 2021] <https://arxiv.org/abs/2101.11075>_
 
     Parameters
     ----------
-    learning_rate: float
-        The learning rate (default: 1e-2)
-    momentum: float
-        The momentum value in the range [0,1) (default: 0)
-    weight_decay: float
-        The weight decay (L2 penalty) (default: 0)
-    epsilon: float
-        The term added to the denominator to improve numerical stability (default: 1e-6)
+    learning_rate : float, default: 1e-2
+        The learning rate.
+    momentum : float, default: 0.0
+        The momentum value in the range [0,1).
+    weight_decay : float, default: 0.0
+        The weight decay (L2 penalty).
+    epsilon : float, default: 1e-6
+        The term added to the denominator to improve numerical stability.
     """
 
     _HAS_AGGREGATE_GRAD = True
