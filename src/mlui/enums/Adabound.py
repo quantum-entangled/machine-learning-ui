@@ -89,7 +89,7 @@ class AdaBound(Optimizer):
 
     def build(self, var_list):
         """AdaBound optimizer has 3 types of variables: momentums, velocities and
-        velocity_hat (only set when AMSGrad is applied),
+        velocity_hat (only set when AMSGrad is applied).
 
         parameters
         ----------
