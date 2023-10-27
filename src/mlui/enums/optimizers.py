@@ -9,7 +9,7 @@ classes: dict[str, tf.keras.optimizers.Optimizer] = {
     "Adam": tf.keras.optimizers.Adam,
     "RMSprop": tf.keras.optimizers.RMSprop,
     "SGD": tf.keras.optimizers.SGD,
-    "Adabound":AdaBound, 
+    "Adabound": AdaBound,
 }
 
 widgets: dict[str, Type[wo.OptimizerWidget]] = {
