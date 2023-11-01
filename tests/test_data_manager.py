@@ -15,9 +15,7 @@ import mlui.managers.errors as err
 import mlui.managers.model_manager as mm
 
 
-def test_upload_file(csv_str: str):
-    data = data_cls.Data()
-    model = model_cls.Model()
+def test_upload_file(data: data_cls.Data, model: model_cls.Model, csv_str: str):
     csv_file = bytes(csv_str, "utf-8")
     with io.BytesIO(csv_file) as buff:
         dm.upload_file(buff, data, model)
@@ -60,9 +58,7 @@ def test_error_upload_file(
             dm.upload_file(buff, data, model)
 
 
-def test_file_exists(csv_str: str):
-    data = data_cls.Data()
-    model = model_cls.Model()
+def test_file_exists(data: data_cls.Data, model: model_cls.Model, csv_str: str):
     csv_file = bytes(csv_str, "utf-8")
     with io.BytesIO(csv_file) as buff:
         dm.upload_file(buff, data, model)
@@ -75,9 +71,7 @@ def test_file_exists(csv_str: str):
         assert dm.file_exists(data) is False
 
 
-def test_show_data_stats(csv_str: str):
-    data = data_cls.Data()
-    model = model_cls.Model()
+def test_show_data_stats(data: data_cls.Data, model: model_cls.Model, csv_str: str):
     csv_file = bytes(csv_str, "utf-8")
     with io.BytesIO(csv_file) as buff:
         dm.upload_file(buff, data, model)
@@ -90,9 +84,7 @@ def test_show_data_stats(csv_str: str):
         assert data_stats is None
 
 
-def test_show_data_plot(csv_str: str):
-    data = data_cls.Data()
-    model = model_cls.Model()
+def test_show_data_plot(data: data_cls.Data, model: model_cls.Model, csv_str: str):
     csv_file = bytes(csv_str, "utf-8")
     with io.BytesIO(csv_file) as buff:
         dm.upload_file(buff, data, model)
@@ -195,10 +187,9 @@ def test_errors_set_columns(data: data_cls.Data, model: model_cls.Model):
         dm.set_columns("Input", "input", [1, 2], data, model)
 
 
-def test_layers_are_filled(data: data_cls.Data, model: model_cls.Model):
-    model_name = "test_model"
-    mm.create_model(model_name, model)
-
+def test_layers_are_filled(data: data_cls.Data, not_empty_model: model_cls.Model):
+    model = not_empty_model
+    
     input_1_params = wl.InputParams(name="input_1", shape=(1,))
     mm.add_layer(
         layer_cls=tf.keras.Input,
@@ -249,9 +240,8 @@ def test_layers_are_filled(data: data_cls.Data, model: model_cls.Model):
     assert dm.layers_are_filled("Output", data, model) is True
 
 
-def test_split_data(csv_str: str):
-    data = data_cls.Data()
-    model = model_cls.Model()
+def test_split_data(data: data_cls.Data, not_empty_model: model_cls.Model, csv_str: str):
+    model = not_empty_model
     csv_file = bytes(csv_str, "utf-8")
     with io.BytesIO(csv_file) as buff:
         dm.upload_file(buff, data, model)
@@ -259,9 +249,6 @@ def test_split_data(csv_str: str):
         file = pd.read_csv(buff, header=0, skipinitialspace=True)
 
     columns_names = list(file.columns)
-
-    model_name = "test_model"
-    mm.create_model(model_name, model)
 
     layers_shapes = dict()
 

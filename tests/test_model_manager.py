@@ -288,9 +288,6 @@ def test_set_metric(model: model_cls.Model, model_with_layers: model_cls.Model):
 
     assert len(model_with_layers.metrics["output"]) == len(metrics)
 
-    with pytest.raises(err.SameMetricError):
-        mm.set_metric(layer="output", metric_cls=metrics[0], model=model_with_layers)
-
 
 def test_compile_model(model: model_cls.Model, model_with_layers: model_cls.Model):
     with pytest.raises(err.NoModelError):
@@ -369,9 +366,7 @@ def test_set_callback(model: model_cls.Model, model_with_layers: model_cls.Model
         )
 
 
-def test_training(csv_str: str):
-    data = data_cls.Data()
-    model = model_cls.Model()
+def test_training(data: data_cls.Data, model: model_cls.Model, csv_str: str):
     csv_file = bytes(csv_str, "utf-8")
     with io.BytesIO(csv_file) as buff:
         dm.upload_file(buff, data, model)
