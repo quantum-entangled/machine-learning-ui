@@ -43,7 +43,12 @@ def upload_file(buff: io.BytesIO, data: data_cls.Data) -> None:
     Raises
     ------
     ParsingFileError
-        When the uploaded file has structure inconsistencies.
+        When the uploaded file has structure inconsistencies:
+            - The file doesn't contain the expected delimiter (',' or ';').
+            - The file doesn't contain a header.
+            - The file contains less than 2 columns.
+            - The file contains less than 2 lines.
+            - The file contains lines with missing columns.
     FileEmptyError
         When trying to upload an empty file.
     UploadError
