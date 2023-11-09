@@ -2,6 +2,14 @@ class UploadError(Exception):
     """For errors during the uploading of files/models."""
 
 
+class ParsingFileError(Exception):
+    """When the uploaded file has structure inconsistencies."""
+
+
+class FileHasWrongValues(Exception):
+    """When the file contains NaN and/or object values."""
+
+
 class FileEmptyError(Exception):
     """When trying to upload an empty file."""
 

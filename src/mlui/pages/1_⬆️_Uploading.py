@@ -14,5 +14,5 @@ data = st.session_state.data
 model = st.session_state.model
 
 with st.container():
-    up.upload_file_ui(data, model)
+    up.upload_file_ui(data)
     up.upload_model_ui(model)

@@ -1,4 +1,5 @@
 import collections as clns
+import csv
 import io
 import itertools as it
 from typing import Literal
@@ -29,36 +30,69 @@ def file_exists(data: data_cls.Data) -> bool:
     return False if data.file.empty else True
 
 
-def upload_file(
-    buff: io.BytesIO | None, data: data_cls.Data, model: model_cls.Model
-) -> None:
+def upload_file(buff: io.BytesIO, data: data_cls.Data) -> None:
     """Read a file to the pandas format.
 
     Parameters
     ----------
-    buff : File-like object or None
+    buff : File-like object
         Buffer object to upload.
     data : Data
         Data container object.
-    model : Model
-        Model container object.
 
     Raises
     ------
+    ParsingFileError
+        When the uploaded file has structure inconsistencies.
+    FileEmptyError
+        When trying to upload an empty file.
     UploadError
         For errors with uploading procedure.
     """
-    if not buff:
-        return
+    csv_file = buff.read().decode("utf-8")
+    sniffer = csv.Sniffer()
+    delimiter = sniffer.sniff(csv_file).delimiter
+    has_header = sniffer.has_header(csv_file)
+
+    if delimiter not in (",", ";"):
+        raise err.ParsingFileError(
+            "The file doesn't contain the expected delimiter (',' or ';')"
+        )
+
+    if not has_header:
+        raise err.ParsingFileError("The file doesn't contain a header!")
+
+    reader = csv.reader(csv_file, delimiter=delimiter, skipinitialspace=True)
+    header_len = len(next(reader))
+
+    if header_len < 2:
+        raise err.ParsingFileError("The file contains less than 2 columns!")
+
+    if reader.line_num < 2:
+        raise err.ParsingFileError("The file contains less than 2 lines!")
+
+    for line in reader:
+        if len(line) < header_len:
+            raise err.ParsingFileError("The file contains lines with missing columns!")
 
     try:
-        data.file = pd.read_csv(buff, header=0, skipinitialspace=True)
-        refresh_data(data)
+        df = pd.read_csv(buff, header=0, skipinitialspace=True)
+        object_cols = df.columns[df.dtypes == "object"].to_list()
 
-        if not file_exists(data):
-            raise err.FileEmptyError(f"The uploaded file is empty!")
-    except ValueError as error:
-        raise err.UploadError(f"Unable to upload the file!") from error
+        # Do we still need this if we check csv beforehand?
+        if df.empty:
+            raise err.FileEmptyError("The uploaded file is empty!")
+
+        if object_cols:
+            data.has_object_cols = True
+
+        if df.isna().values.any():
+            data.has_nans = True
+
+        data.file = df
+        refresh_data(data)
+    except ValueError:
+        raise err.UploadError("Unable to upload the file!")
 
 
 def refresh_data(data: data_cls.Data) -> None:

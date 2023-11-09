@@ -7,15 +7,13 @@ import mlui.managers.errors as err
 import mlui.managers.model_manager as mm
 
 
-def upload_file_ui(data: data_cls.Data, model: model_cls.Model) -> None:
+def upload_file_ui(data: data_cls.Data) -> None:
     """Generate UI for uploading a file.
 
     Parameters
     ----------
     data : Data
         Data container object.
-    model : Model
-        Model container object.
     """
     st.header("Upload File")
     st.markdown("Upload a file from your system by clicking the `Browse files` button.")
@@ -24,9 +22,15 @@ def upload_file_ui(data: data_cls.Data, model: model_cls.Model) -> None:
 
     if uploaded_file:
         try:
-            dm.upload_file(uploaded_file, data, model)
+            dm.upload_file(uploaded_file, data)
             st.success("File is uploaded and ready to be processed!", icon="✅")
-        except (err.UploadError, err.FileEmptyError) as error:
+
+            if data.has_nans:
+                st.info("The file contains NaN values, make sure to process them!")
+
+            if data.has_object_cols:
+                st.info("The file contains object columns, make sure to encode them!")
+        except (err.ParsingFileError, err.FileEmptyError, err.UploadError) as error:
             st.error(error, icon="❌")
 
 

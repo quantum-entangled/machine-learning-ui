@@ -90,6 +90,7 @@ def fit_model_ui(data: data_cls.Data, model: model_cls.Model) -> None:
             err.NoModelError,
             err.DataNotSplitError,
             err.ModelNotCompiledError,
+            err.FileHasWrongValues,
         ) as error:
             st.error(error, icon="❌")
 

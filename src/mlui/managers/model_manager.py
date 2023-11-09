@@ -119,8 +119,8 @@ def upload_model(buff: io.BytesIO | None, model: model_cls.Model) -> None:
             tmp.write(buff.getbuffer())
             model.instance = tf.keras.models.load_model(tmp.name)
             refresh_model(model)
-    except ValueError as error:
-        raise err.UploadError("Unable to upload the model!") from error
+    except ValueError:
+        raise err.UploadError("Unable to upload the model!")
 
 
 def refresh_model(model: model_cls.Model) -> None:
@@ -560,6 +560,8 @@ def fit_model(
         When the dataset is not split into training and testing sets.
     ModelNotCompiledError
         When the model is not compiled.
+    FileHasWrongValues
+        When the file contains NaN and/or object values.
     """
     if not model_exists(model):
         raise err.NoModelError("Please, create or upload a model!")
@@ -569,6 +571,12 @@ def fit_model(
 
     if not model.compiled:
         raise err.ModelNotCompiledError("Please, compile the model first!")
+
+    if data.has_nans:
+        raise err.FileHasWrongValues("Please, remove the NaN values from the file!")
+
+    if data.has_object_cols:
+        raise err.FileHasWrongValues("Please, encode all the object values!")
 
     batch_callback = tf.keras.callbacks.LambdaCallback(
         on_batch_end=lambda batch, logs: batch_container.write(

@@ -10,6 +10,8 @@ class Data:
     """Data container."""
 
     file: pd.DataFrame = field(default_factory=pd.DataFrame)
+    has_object_cols: bool = False
+    has_nans: bool = False
     columns: list[str] = field(default_factory=list)
     columns_counter: clns.Counter[str] = field(default_factory=clns.Counter)
     available_columns: list[str] = field(default_factory=list)
