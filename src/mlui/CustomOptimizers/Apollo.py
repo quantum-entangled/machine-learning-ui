@@ -1,8 +1,9 @@
+from keras.optimizers.optimizer import Optimizer
 import tensorflow as tf
 import numpy as np
 
 
-class Apollo(tf.keras.optimizers.legacy.Optimizer):
+class Apollo(Optimizer):
     """Optimizer that implements the Apollo algorithm.
 
     Apollo is a nonconvex stochastic optimization method
@@ -31,9 +32,6 @@ class Apollo(tf.keras.optimizers.legacy.Optimizer):
     weight_decay_type : str, default: “L2”
         The type of weight decay:  “L2” | “decoupled” | “stable”.
     """
-
-    _HAS_AGGREGATE_GRAD = True
-
     def __init__(
             self,
             learning_rate=0.01,
@@ -44,62 +42,114 @@ class Apollo(tf.keras.optimizers.legacy.Optimizer):
             rebound="constant",
             weight_decay=0.0,
             weight_decay_type="L2",
+            clipnorm=None,
+            clipvalue=None,
+            global_clipnorm=None,
+            use_ema=False,
+            ema_momentum=0.99,
+            ema_overwrite_frequency=None,
+            jit_compile=True,
             name="Apollo",
             **kwargs
     ):
+        super().__init__(
+            name=name,
+            weight_decay=weight_decay,
+            clipnorm=clipnorm,
+            clipvalue=clipvalue,
+            global_clipnorm=global_clipnorm,
+            use_ema=use_ema,
+            ema_momentum=ema_momentum,
+            ema_overwrite_frequency=ema_overwrite_frequency,
+            jit_compile=jit_compile,
+            **kwargs
+        )
+
         if rebound not in ['constant', 'belief']:
             raise ValueError("Invalid recitifed bound: {}".format(rebound))
         if init_lr is None:
-            init_lr=0.00001
+            init_lr=learning_rate/1000
 
-        super(Apollo, self).__init__(name, **kwargs)
-        self._set_hyper("learning_rate", kwargs.get("lr", learning_rate))
-        self._set_hyper("beta", beta)
+        self._learning_rate = self._build_learning_rate(learning_rate)
+        self.beta = beta
         self.epsilon = epsilon
-        self.init_lr=init_lr
-        self.warmup=warmup
+        self.init_lr = init_lr
+        self.warmup = warmup
         self.rebound_type = rebound
-        self._set_hyper("weight_decay", weight_decay)
         self.weight_decay_type = weight_decay_type
 
-    def _create_slots(self, var_list):
-        for var in var_list:
-            self.add_slot(var, "exp_avg_grad")
-        for var in var_list:
-            self.add_slot(var, "approx_hessian")
-        for var in var_list:
-            self.add_slot(var, "update")
+    def build(self, var_list):
+        """Initialize optimizer variables.
 
+        Apollo optimizer has 3 types of variables: exponential moving average
+        of gradient values, exponential moving average of squared gradient
+        values and previous update direction
+
+        Parameters
+        ----------
+        var_list
+            List of model variables to build Apollo variables on.
+        """
+
+        super().build(var_list)
+
+        if hasattr(self, "_built") and self._built:
+            return
+
+        self._built = True
+        self._exp_avg_grads = []
+        self._approx_hessians = []
+        self._updates = []
+        for var in var_list:
+            self._exp_avg_grads.append(
+                self.add_variable_from_reference(
+                    model_variable=var, variable_name="exp_avg_grad"
+                )
+            )
+
+            self._approx_hessians.append(
+                self.add_variable_from_reference(
+                    model_variable=var, variable_name="B"
+                )
+            )
+
+            self._updates.append(
+                self.add_variable_from_reference(
+                    model_variable=var, variable_name="d_p"
+                )
+            )
 
     @tf.function
-    def _resource_apply_dense(self, grad, var):
-        var_dtype = var.dtype.base_dtype
-        curr_lr = self._decayed_lr(var_dtype)
-        weight_decay = self._get_hyper("weight_decay", var_dtype)
+    def update_step(self, gradient, variable):
+        """Update step given gradient and the associated model variable."""
+
+        curr_lr = tf.cast(self.learning_rate, variable.dtype)
+        weight_decay = tf.cast(self.weight_decay, variable.dtype)
         wdt = self.weight_decay_type
-        beta = self._get_hyper("beta", var_dtype)
-        eps = tf.convert_to_tensor(self.epsilon, var_dtype)
-        warmup_t=tf.convert_to_tensor(self.warmup, var_dtype)
-        init_lr_t=tf.convert_to_tensor(self.init_lr, var_dtype)
-        step = tf.cast(self.iterations + 1, var_dtype)
+        beta = tf.cast(self.beta, variable.dtype)
+        eps = tf.cast(self.beta, variable.dtype)
+        warmup = tf.cast(self.beta, variable.dtype)
+        init_lr_t = tf.cast(self.init_lr, variable.dtype)
+        step = tf.cast(self.iterations + 1, variable.dtype)
+
+        var_key = self._var_key(variable)
+        exp_avg_grad = self._exp_avg_grads[self._index_dict[var_key]]
+        B = self._approx_hessians[self._index_dict[var_key]]
+        d_p = self._updates[self._index_dict[var_key]]
 
         # Calculate current lr
-        if step <= warmup_t:
-            curr_lr = init_lr_t + (curr_lr - init_lr_t) * step / warmup_t
-
-        # Perform step weight decay
-        if weight_decay != 0 and wdt == "L2":
-            grad = grad + var*weight_decay
-
-        exp_avg_grad = self.get_slot(var, "exp_avg_grad")
-        B = self.get_slot(var, "approx_hessian")
-        d_p = self.get_slot(var, "update")
+        if step <= warmup:
+            curr_lr = init_lr_t + (curr_lr - init_lr_t) * step / warmup
 
         bias_correction = 1 - beta ** step
         alpha = (1 - beta) / bias_correction
 
+        # Perform step weight decay
+        if weight_decay != 0 and wdt == "L2":
+            gradient = gradient + variable * weight_decay
+
         # calc the diff grad
-        delta_grad = grad - exp_avg_grad
+        delta_grad = gradient - exp_avg_grad
         if self.rebound_type == "belief":
             rebound = tf.norm(delta_grad, ord=np.inf)
         else:
@@ -107,15 +157,15 @@ class Apollo(tf.keras.optimizers.legacy.Optimizer):
             eps = eps / rebound
 
         # Update the running average grad
-        exp_avg_grad_t = exp_avg_grad.assign_add(delta_grad * alpha, use_locking=self._use_locking)
+        exp_avg_grad_t = exp_avg_grad.assign_add(delta_grad * alpha)
 
-        denom = tf.norm(d_p, ord=4)+eps
+        denom = tf.norm(d_p, ord=4) + eps
         d_p_t = d_p / denom
         v_sq = d_p_t ** 2
         delta = tf.math.reduce_sum((delta_grad / denom) * d_p_t) * (-alpha) - tf.math.reduce_sum(B * v_sq)
 
         # Update B
-        B_t = B.assign_add(v_sq * delta, use_locking=self._use_locking)
+        B_t = B.assign_add(v_sq * delta)
 
         # calc direction of parameter updates
         if self.rebound_type == 'belief':
@@ -128,18 +178,16 @@ class Apollo(tf.keras.optimizers.legacy.Optimizer):
         # Perform step weight decay (decoupled)
         if weight_decay != 0 and wdt != "L2":
             if wdt == "stable":
-                weight_decay_t = weight_decay/tf.reduce_mean(denom)
+                weight_decay_t = weight_decay / tf.reduce_mean(denom)
             else:
                 weight_decay_t = weight_decay
-            d_p_t = d_p.assign(d_p_t + var*weight_decay_t)
+            d_p_t = d_p.assign(d_p_t + variable * weight_decay_t)
 
-        var.assign_add(d_p_t * -curr_lr, use_locking=self._use_locking)
-
-    def _resource_apply_sparse(self, grad, var, indices, apply_state=None):
-        raise RuntimeError("Apollo does not support sparse gradients.")
+        variable.assign_add(d_p_t * -curr_lr)
 
     def get_config(self):
         config = super().get_config()
+
         config.update(
             {
                 "learning_rate": self._serialize_hyperparameter("learning_rate"),
@@ -147,6 +195,7 @@ class Apollo(tf.keras.optimizers.legacy.Optimizer):
                 "epsilon": self.epsilon,
                 "rebound": self.rebound_type,
                 "weight_decay": self._serialize_hyperparameter("weight_decay"),
+
             }
         )
         return config
