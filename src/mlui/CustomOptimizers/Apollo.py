@@ -127,8 +127,8 @@ class Apollo(Optimizer):
         weight_decay = tf.cast(self.weight_decay, variable.dtype)
         wdt = self.weight_decay_type
         beta = tf.cast(self.beta, variable.dtype)
-        eps = tf.cast(self.beta, variable.dtype)
-        warmup = tf.cast(self.beta, variable.dtype)
+        eps = tf.cast(self.epsilon, variable.dtype)
+        warmup = tf.cast(self.warmup, variable.dtype)
         init_lr_t = tf.cast(self.init_lr, variable.dtype)
         step = tf.cast(self.iterations + 1, variable.dtype)
 
