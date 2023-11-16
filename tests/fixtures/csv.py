@@ -26,76 +26,33 @@ def empty_csv() -> str:
 
 @pytest.fixture
 def csv_with_multiindex() -> str:
-    return "\r\n".join([
-        "h1,h2", 
-        "2,2,5,7", 
-        "1,2", 
-        "1,1",             
-        "3,3",
-        ""
-    ])
+    return "\r\n".join(["h1,h2", "2,2,5,7", "1,2", "1,1", "3,3", ""])
 
 
 @pytest.fixture
 def csv_with_diff_types() -> str:
-    return "\r\n".join([
-        "h1,h2,h3", 
-        "1,2,2", 
-        "1,1,6", 
-        "2,aaaa,5", 
-        "3,3,6",
-        ""
-    ])
+    return "\r\n".join(["h1,h2,h3", "1,2,2", "1,1,6", "2,aaaa,5", "3,3,6", ""])
 
 
 @pytest.fixture
 def csv_with_inf() -> str:
-    return "\r\n".join([
-        "h1,h2,h3", 
-        "1,2,2", 
-        "1,1,6", 
-        "2,inf,5", 
-        "3,3,6",
-        ""
-    ])
+    return "\r\n".join(["h1,h2,h3", "1,2,2", "1,1,6", "2,inf,5", "3,3,6", ""])
 
 
 @pytest.fixture
 def csv_with_NaN() -> str:
-    return "\r\n".join([
-        "h1,h2,h3", 
-        "1,2,2", 
-        "1,1,6", 
-        "2,,5", 
-        "3,3,6",
-        ""
-    ])
+    return "\r\n".join(["h1,h2,h3", "1,2,2", "1,1,6", "2,,5", "3,3,6", ""])
 
 
 @pytest.fixture
 def csv_invalid_delimiter() -> str:
-    return "\r\n".join([
-        "h1;h2;h3", 
-        "1;2;2", 
-        "1;1;6", 
-        "2;7;5", 
-        "3;3;6",
-        ""
-    ])
+    return "\r\n".join(["h1;h2;h3", "1;2;2", "1;1;6", "2;7;5", "3;3;6", ""])
 
 
 @pytest.fixture
 def csv_invalid_indentations() -> str:
     return (
-        "\r\n".join([
-        "h1,h2,h3", 
-        "1,2,2" 
-        ])
+        "\r\n".join(["h1,h2,h3", "1,2,2"])
         + "\t"
-        + "\r\n".join([ 
-            "1,1,6", 
-            "2,7,5", 
-            "3,3,6",
-            ""
-        ])
+        + "\r\n".join(["1,1,6", "2,7,5", "3,3,6", ""])
     )

@@ -189,7 +189,7 @@ def test_errors_set_columns(data: data_cls.Data, model: model_cls.Model):
 
 def test_layers_are_filled(data: data_cls.Data, not_empty_model: model_cls.Model):
     model = not_empty_model
-    
+
     input_1_params = wl.InputParams(name="input_1", shape=(1,))
     mm.add_layer(
         layer_cls=tf.keras.Input,
@@ -240,7 +240,9 @@ def test_layers_are_filled(data: data_cls.Data, not_empty_model: model_cls.Model
     assert dm.layers_are_filled("Output", data, model) is True
 
 
-def test_split_data(data: data_cls.Data, not_empty_model: model_cls.Model, csv_str: str):
+def test_split_data(
+    data: data_cls.Data, not_empty_model: model_cls.Model, csv_str: str
+):
     model = not_empty_model
     csv_file = bytes(csv_str, "utf-8")
     with io.BytesIO(csv_file) as buff:

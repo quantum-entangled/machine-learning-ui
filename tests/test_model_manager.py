@@ -3,7 +3,7 @@ import pytest
 import tensorflow as tf
 import pandas as pd
 import streamlit as st
-import plotly as ply
+import altair as alt
 
 from mlui.data_classes import model as model_cls
 from mlui.data_classes import data as data_cls
@@ -268,23 +268,32 @@ def test_set_loss(model: model_cls.Model, model_with_layers: model_cls.Model):
         assert isinstance(model_with_layers.losses["output"], loss)
 
 
-def test_set_metric(model: model_cls.Model, model_with_layers: model_cls.Model):
+def test_set_metrics(model: model_cls.Model, model_with_layers: model_cls.Model):
     with pytest.raises(err.NoModelError):
-        mm.set_metric(layer="output", metric_cls=tf.keras.metrics.Metric, model=model)
+        mm.set_metrics(
+            layer="output", metrics_to_set=tf.keras.metrics.Metric, model=model
+        )
 
     with pytest.raises(err.NoOutputLayersError):
-        mm.set_metric(
-            layer="output", metric_cls=tf.keras.metrics.Metric, model=model_with_layers
+        mm.set_metrics(
+            layer="output",
+            metrics_to_set=tf.keras.metrics.Metric,
+            model=model_with_layers,
         )
 
     mm.set_outputs(["output"], model_with_layers)
 
-    metrics = list(em.classes.values())
+    metrics = em.classes
+    metrics_names = list(em.classes.keys())
+    metrics_to_set = {name: metrics[name]() for name in metrics_names}
 
-    for indx in range(len(metrics)):
-        mm.set_metric(layer="output", metric_cls=metrics[indx], model=model_with_layers)
+    mm.set_metrics(
+        layer="output", metrics_to_set=metrics_to_set, model=model_with_layers
+    )
+    assert model_with_layers.metrics["output"] == metrics_to_set
 
-        assert isinstance(model_with_layers.metrics["output"][indx], metrics[indx])
+    for name in metrics_names:
+        assert isinstance(model_with_layers.metrics["output"][name], metrics[name])
 
     assert len(model_with_layers.metrics["output"]) == len(metrics)
 
@@ -314,10 +323,12 @@ def test_compile_model(model: model_cls.Model, model_with_layers: model_cls.Mode
         model=model_with_layers,
     )
 
-    mm.set_metric(
-        layer="output",
-        metric_cls=tf.keras.metrics.MeanAbsoluteError,
-        model=model_with_layers,
+    metrics = em.classes
+    metrics_names = list(em.classes.keys())
+    metrics_to_set = {name: metrics[name]() for name in metrics_names}
+
+    mm.set_metrics(
+        layer="output", metrics_to_set=metrics_to_set, model=model_with_layers
     )
 
     mm.compile_model(model_with_layers)
@@ -327,10 +338,11 @@ def test_compile_model(model: model_cls.Model, model_with_layers: model_cls.Mode
     assert isinstance(
         model_with_layers.instance.loss["output"], tf.keras.losses.MeanAbsoluteError
     )
-    assert isinstance(
-        model_with_layers.instance.compiled_metrics._metrics["output"][0],
-        tf.keras.metrics.MeanAbsoluteError,
+    compiled_metrics = list(
+        model_with_layers.instance.compiled_metrics._metrics["output"]
     )
+    for indx in range(len(metrics)):
+        assert isinstance(compiled_metrics[indx], metrics[metrics_names[indx]])
 
 
 def test_set_callback(model: model_cls.Model, model_with_layers: model_cls.Model):
@@ -364,6 +376,21 @@ def test_set_callback(model: model_cls.Model, model_with_layers: model_cls.Model
             callback_params=wc.CallbackParams(),
             model=model_with_layers,
         )
+
+
+def test_reset_callbacks(model: model_cls.Model, model_with_layers: model_cls.Model):
+    with pytest.raises(err.NoModelError):
+        mm.reset_callbacks(model=model)
+
+    mm.set_callback(
+        callback_cls=tf.keras.callbacks.TerminateOnNaN,
+        callback_params=wc.CallbackParams(),
+        model=model_with_layers,
+    )
+    assert len(model_with_layers.callbacks) == 1
+
+    mm.reset_callbacks(model_with_layers)
+    assert len(model_with_layers.callbacks) == 0
 
 
 def test_training(data: data_cls.Data, model: model_cls.Model, csv_str: str):
@@ -408,9 +435,11 @@ def test_training(data: data_cls.Data, model: model_cls.Model, csv_str: str):
             layer="output", loss_cls=tf.keras.losses.MeanAbsoluteError, model=model
         )
 
-        mm.set_metric(
-            layer="output", metric_cls=tf.keras.metrics.MeanAbsoluteError, model=model
-        )
+        metrics = em.classes
+        metrics_names = list(em.classes.keys())
+        metrics_to_set = {name: metrics[name]() for name in metrics_names}
+
+        mm.set_metrics(layer="output", metrics_to_set=metrics_to_set, model=model)
 
         mm.compile_model(model)
 
@@ -441,9 +470,71 @@ def test_training(data: data_cls.Data, model: model_cls.Model, csv_str: str):
             model,
         )
 
+        opts = model.training_history.columns.drop("epoch")
+        Y = [opts[0], opts[1]]
+        df_len = len(model.training_history)
+        Y_min = model.training_history.loc[:, Y].min(axis=1).min(axis=0)
+        Y_max = model.training_history.loc[:, Y].max(axis=1).max(axis=0)
+        schemes = ("set1", "set2", "set3")
+        legend_ors = (
+            "left",
+            "right",
+            "top",
+            "bottom",
+            "top-left",
+            "top-right",
+            "bottom-left",
+            "bottom-right",
+        )
+        legend_dirs = ("vertical", "horizontal")
+        scheme = schemes[0]
+        X_ticks = 10
+        Y_ticks = 10
+        X_l_lim = 0.5
+        X_r_lim = df_len + 0.5
+        Y_l_lim = Y_min - 0.05 * Y_min
+        Y_r_lim = Y_max + 0.05 * Y_max
+        X_title = "X-axis title"
+        Y_title = "Y-axis title"
+        legend_or = legend_ors[3]
+        legend_dir = legend_dirs[1]
+        legend_title = "Title"
+        height = 500
+        points = True
+        Y_zero = True
+        X_grid = True
+        Y_grid = True
+        X_inter = True
+        Y_inter = True
+
+        chart = mm.show_history_plot(
+            Y,
+            {
+                "scheme": scheme if scheme else "set1",
+                "X_ticks": X_ticks,
+                "Y_ticks": Y_ticks,
+                "X_l_lim": X_l_lim,
+                "X_r_lim": X_r_lim,
+                "Y_l_lim": Y_l_lim if Y_l_lim else Y_min,
+                "Y_r_lim": Y_r_lim if Y_r_lim else Y_max,
+                "X_title": X_title,
+                "Y_title": Y_title,
+                "legend_or": legend_or if legend_or else "bottom",
+                "legend_dir": legend_dir if legend_dir else "horizontal",
+                "legend_title": legend_title,
+                "height": height,
+                "points": points,
+                "Y_zero": Y_zero,
+                "X_grid": X_grid,
+                "Y_grid": Y_grid,
+                "X_inter": X_inter,
+                "Y_inter": Y_inter,
+            },
+            model,
+        )
         assert isinstance(
-            mm.show_history_plot(list(model.training_history)[0], "#0000FF", model),
-            ply.graph_objs.Figure,
+            chart,
+            alt.Chart,
         )
 
         results = mm.evaluate_model(batch_size, data, model)
@@ -472,7 +563,7 @@ def test_training_errors(model: model_cls.Model, data: data_cls.Data):
         )
 
     with pytest.raises(err.NoModelError):
-        mm.show_history_plot([0], "b", model)
+        mm.show_history_plot([0], {}, model)
 
     with pytest.raises(err.NoModelError):
         mm.evaluate_model(batch_size, data, model)
@@ -484,7 +575,7 @@ def test_training_errors(model: model_cls.Model, data: data_cls.Data):
     mm.create_model(model_name, model)
 
     with pytest.raises(err.ModelNotTrainedError):
-        mm.show_history_plot([0], "b", model)
+        mm.show_history_plot([0], {}, model)
 
     with pytest.raises(err.DataNotSplitError):
         mm.fit_model(
