@@ -29,9 +29,7 @@ def file_exists(data: data_cls.Data) -> bool:
     return False if data.file.empty else True
 
 
-def upload_file(
-    buff: io.BytesIO | None, data: data_cls.Data, model: model_cls.Model
-) -> None:
+def upload_file(buff: io.BytesIO | None, data: data_cls.Data) -> None:
     """Read a file to the pandas format.
 
     Parameters
@@ -40,8 +38,6 @@ def upload_file(
         Buffer object to upload.
     data : Data
         Data container object.
-    model : Model
-        Model container object.
 
     Raises
     ------
@@ -56,9 +52,9 @@ def upload_file(
         refresh_data(data)
 
         if not file_exists(data):
-            raise err.FileEmptyError(f"The uploaded file is empty!")
-    except ValueError as error:
-        raise err.UploadError(f"Unable to upload the file!") from error
+            raise err.FileEmptyError("The uploaded file is empty!")
+    except ValueError:
+        raise err.UploadError("Unable to upload the file!")
 
 
 def refresh_data(data: data_cls.Data) -> None:
