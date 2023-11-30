@@ -1,9 +1,8 @@
+from keras.optimizers.optimizer import Optimizer
 import tensorflow as tf
-from tensorflow.python.keras import backend_config
-import numpy as np
 
 
-class MADGRAD(tf.keras.optimizers.legacy.Optimizer):
+class MADGRAD(Optimizer):
     """Optimizer that implements the MADGRAD algorithm.
 
     MADGRAD is an optimization algorithm used in deep learning.
@@ -27,85 +26,164 @@ class MADGRAD(tf.keras.optimizers.legacy.Optimizer):
         The term added to the denominator to improve numerical stability.
     """
 
-    _HAS_AGGREGATE_GRAD = True
-
     def __init__(
-        self,
-        learning_rate=0.01,
-        momentum=0.0,
-        weight_decay=0.0,
-        epsilon=1e-6,
-        name="MADGRAD",
-        **kwargs
+            self,
+            learning_rate=0.01,
+            momentum=0.0,
+            epsilon=1e-6,
+            weight_decay=0.0,
+            clipnorm=None,
+            clipvalue=None,
+            global_clipnorm=None,
+            use_ema=False,
+            ema_momentum=0.99,
+            ema_overwrite_frequency=None,
+            jit_compile=True,
+            name="MADGRAD",
+            **kwargs
     ):
-        super(MADGRAD, self).__init__(name, **kwargs)
-        self._set_hyper("learning_rate", kwargs.get("lr", learning_rate))
-        self._set_hyper("momentum", momentum)
-        self._set_hyper("weight_decay", weight_decay)
-        self.epsilon = epsilon or backend_config.epsilon()
+        super().__init__(
+            name=name,
+            clipnorm=clipnorm,
+            clipvalue=clipvalue,
+            global_clipnorm=global_clipnorm,
+            use_ema=use_ema,
+            ema_momentum=ema_momentum,
+            ema_overwrite_frequency=ema_overwrite_frequency,
+            jit_compile=jit_compile,
+            **kwargs
+        )
 
-    def _create_slots(self, var_list):
+        self._learning_rate = self._build_learning_rate(learning_rate)
+        self.momentum = momentum
+        self.weight_decay = weight_decay
+        self.epsilon = epsilon
+        if weight_decay != 0:
+            self.use_decay = True
+        else:
+            self.use_decay = False
+        if momentum != 0:
+            self.use_momentum = True
+        else:
+            self.use_momentum = False
+
+    def build(self, var_list):
+        """Initialize optimizer variables.
+
+        MADGRAD optimizer has 2 types of variables: exponential average
+        of gradient values, exponential average of squared gradient.
+
+        Parameters
+        ----------
+        var_list
+            List of model variables to build Apollo variables on.
+        """
+
+        super().build(var_list)
+
+        if hasattr(self, "_built") and self._built:
+            return
+
+        self._built = True
+        self._grad_sum = []
+        self._grad_sum_sq = []
         for var in var_list:
-            self.add_slot(var, "s")
-        for var in var_list:
-            self.add_slot(var, "grad_sum_sq")
-        #for var in var_list:
-            #self.add_slot(var, "x0")
+            self._grad_sum.append(
+                self.add_variable_from_reference(
+                    model_variable=var, variable_name="s"
+                )
+            )
 
-    @tf.function
-    def _resource_apply_dense(self, grad, var, apply_state=None):
-        var_dtype = var.dtype.base_dtype
-        lr_t = self._decayed_lr(var_dtype)
-        momentum = self._get_hyper("momentum", var_dtype)
-        step = tf.cast(self.iterations + 1, var_dtype)
-        decay = self._get_hyper("weight_decay", var_dtype)
-        eps = tf.convert_to_tensor(self.epsilon, var_dtype)
-        lr_t += eps
+            self._grad_sum_sq.append(
+                self.add_variable_from_reference(
+                    model_variable=var, variable_name="v"
+                )
+            )
 
-        vk = self.get_slot(var, "grad_sum_sq")
-        sk = self.get_slot(var, "s")
-        #x_0 = self.get_slot(var, "x0")
+    def update_step(self, gradient, variable):
+        """Update step given gradient and the associated model variable."""
+
+        lr_t = tf.cast(self.learning_rate, variable.dtype)
+        momentum = tf.cast(self.momentum, variable.dtype)
+        step = tf.cast(self.iterations + 1, variable.dtype)
+        decay = tf.cast(self.weight_decay, variable.dtype)
+
+        var_key = self._var_key(variable)
+        s = self._grad_sum[self._index_dict[var_key]]
+        v = self._grad_sum_sq[self._index_dict[var_key]]
 
         ck = 1 - momentum
-        lamb = lr_t*tf.math.sqrt(step)
+        lamb = lr_t * tf.sqrt(step)
 
-        # Apply weight decay
-        if decay != 0:
-            grad += decay*var
+        if isinstance(gradient, tf.IndexedSlices):
+            #Sparse gradients.
 
-        if momentum == 0:
-            # Compute x_0 from other known quantities
-            rms = tf.pow(vk, 1/3) + eps
-            x0 = var + tf.divide(sk, rms)
+            if self.use_momentum:
+                raise RuntimeError(
+                    "momentum != 0 is not compatible with "
+                    "sparse gradients"
+                )
+            if self.use_decay:
+                raise RuntimeError(
+                    "weight_decay option is not "
+                    "compatible with sparse gradients"
+                )
+            s.assign_add(s)
+            s.scatter_add(
+                tf.IndexedSlices(
+                    gradient.values * lamb, gradient.indices
+                )
+            )
+
+            v.assign_add(v)
+            v.scatter_add(
+                tf.IndexedSlices(
+                    tf.square(gradient.values) * lamb, gradient.indices
+                )
+            )
+
+            rms = tf.pow(v, 1 / 3) + self.epsilon
+            x0 = variable + tf.divide(s, rms)
+            var = x0 - tf.divide(s, rms)
+
+            variable.assign(var)
+
         else:
-            x0 = var
+            #Dence gradients.
 
+            if self.use_decay:
+                gradient += decay * variable
 
-        # Accumulate first and second moments
-        sk_plus_1 = sk.assign_add(lamb * grad, use_locking=self._use_locking)
-        vk_plus_1 = vk.assign_add(lamb * (grad * grad), use_locking=self._use_locking)
+            if not self.use_momentum:
+                rms = tf.pow(v, 1/3) + self.epsilon
+                x0 = variable + tf.divide(s, rms)
+            else:
+                x0 = variable
 
-        rms = tf.pow(vk_plus_1, 1/3) + eps
+            s.assign_add(lamb * gradient)
+            v.assign_add(lamb * (gradient * gradient))
 
-        if momentum == 0:
-            var_t = x0 - tf.divide(sk_plus_1, rms)
-        else:
-            z = x0 - tf.divide(sk_plus_1, rms)
+            rms = tf.pow(v, 1/3) + self.epsilon
 
-            var_t = var*(1 - ck) + z*ck
+            if not self.use_momentum:
+                var = x0 - tf.divide(s, rms)
+            else:
+                z = x0 - tf.divide(s, rms)
+                var = variable * (1 - ck) + z * ck
 
-        return var.assign(var_t, use_locking=self._use_locking)
-
-    def _resource_apply_sparse(self, grad, var, indices, apply_state=None):
-        raise RuntimeError('This implementation does not support sparse gradients.')
+            variable.assign(var)
 
     def get_config(self):
-        config = super(MADGRAD, self).get_config()
-        config.update({
-            'learning_rate': self._serialize_hyperparameter('learning_rate'),
-            'decay': self._serialize_hyperparameter('decay'),
-            'momentum': self._serialize_hyperparameter('momentum'),
-            'weight_decay': self._serialize_hyperparameter('weight_decay'),
-            'epsilon': self.epsilon,
-        })
+        config = super().get_config()
+
+        config.update(
+            {
+                'learning_rate': self._serialize_hyperparameter(
+                    self._learning_rate
+                ),
+                'momentum': self.momentum,
+                'weight_decay': self.weight_decay,
+                'epsilon': self.epsilon,
+            }
+        )
         return config
