@@ -1,14 +1,8 @@
+from keras.optimizers.optimizer import Optimizer
 import tensorflow as tf
-from tensorflow.python.framework import ops
-from tensorflow.python.keras import backend_config
-#from keras.optimizers.optimizer_v2 import optimizer_v2
-from tensorflow.python.ops import array_ops
-from tensorflow.python.ops import control_flow_ops
-from tensorflow.python.ops import math_ops
-from tensorflow.python.ops import state_ops
 
 
-class AdaMod(tf.keras.optimizers.legacy.Optimizer):
+class AdaMod(Optimizer):
     """Optimizer that implements the AdaMod algorithm.
 
     An optimizer that adjusts the learning rates for each parameter based on historical statistics,
@@ -32,106 +26,146 @@ class AdaMod(tf.keras.optimizers.legacy.Optimizer):
     """
 
     def __init__(
-        self,
-        learning_rate=0.001,
-        beta_1=0.9,
-        beta_2=0.999,
-        beta_3=0.9995,
-        epsilon=1e-8,
-        name="AdaMod",
-        **kwargs
+            self,
+            learning_rate=0.001,
+            beta_1=0.9,
+            beta_2=0.999,
+            beta_3=0.9995,
+            epsilon=1e-7,
+            weight_decay=None,
+            clipnorm=None,
+            clipvalue=None,
+            global_clipnorm=None,
+            use_ema=False,
+            ema_momentum=0.99,
+            ema_overwrite_frequency=None,
+            jit_compile=True,
+            name="AdaMod",
+            **kwargs
     ):
-        super(AdaMod, self).__init__(name, **kwargs)
-        self._set_hyper("learning_rate", kwargs.get("lr", learning_rate))
-        self._set_hyper("decay", self._initial_decay)
-        self._set_hyper("beta_1", beta_1)
-        self._set_hyper("beta_2", beta_2)
-        self._set_hyper("beta_3", beta_3)
-        self.epsilon = epsilon or backend_config.epsilon()
-
-    def _create_slots(self, var_list):
-        for var in var_list:
-            self.add_slot(var, "m")
-        for var in var_list:
-            self.add_slot(var, "v")
-        for var in var_list:
-            self.add_slot(var, "s")
-
-    def _prepare_local(self, var_device, var_dtype, apply_state):
-        super(AdaMod, self)._prepare_local(var_device, var_dtype, apply_state)
-
-        local_step = math_ops.cast(self.iterations + 1, var_dtype)
-        beta_1_t = array_ops.identity(self._get_hyper("beta_1", var_dtype))
-        beta_2_t = array_ops.identity(self._get_hyper("beta_2", var_dtype))
-        beta_3_t = array_ops.identity(self._get_hyper("beta_3", var_dtype))
-        beta_1_power = math_ops.pow(beta_1_t, local_step)
-        beta_2_power = math_ops.pow(beta_2_t, local_step)
-        lr = (apply_state[(var_device, var_dtype)]["lr_t"] *
-              (math_ops.sqrt(1 - beta_2_power) / (1 - beta_1_power)))
-        apply_state[(var_device, var_dtype)].update(
-            dict(
-                lr=lr,
-                epsilon=ops.convert_to_tensor(self.epsilon, var_dtype),
-                beta_1_t=beta_1_t,
-                beta_1_power=beta_1_power,
-                one_minus_beta_1_t=1 - beta_1_t,
-                beta_2_t=beta_2_t,
-                beta_2_power=beta_2_power,
-                one_minus_beta_2_t=1 - beta_2_t,
-                beta_3_t=beta_3_t,
-                one_minus_beta_3_t=1 - beta_3_t,
-            )
+        super().__init__(
+            name=name,
+            weight_decay=weight_decay,
+            clipnorm=clipnorm,
+            clipvalue=clipvalue,
+            global_clipnorm=global_clipnorm,
+            use_ema=use_ema,
+            ema_momentum=ema_momentum,
+            ema_overwrite_frequency=ema_overwrite_frequency,
+            jit_compile=jit_compile,
+            **kwargs
         )
+        self._learning_rate = self._build_learning_rate(learning_rate)
+        self.beta_1 = beta_1
+        self.beta_2 = beta_2
+        self.beta_3 = beta_3
+        self.epsilon = epsilon
 
-    def set_weights(self, weights):
-        params = self.weights
-        num_vars = int((len(params) - 1) / 2)
-        if len(weights) == 3 * num_vars + 1:
-            weights = weights[:len(params)]
-        super(AdaMod, self).set_weights(weights)
+    def build(self, var_list):
+        """Initialize optimizer variables.
 
-    def _resource_apply_dense(self, grad, var, apply_state=None):
-        var_device, var_dtype = var.device, var.dtype.base_dtype
-        coefficients = ((apply_state or {}).get((var_device, var_dtype))
-                        or self._fallback_apply_state(var_device, var_dtype))
+        AdaMod optimizer has 3 types of variables: exponential moving average
+        of gradient values, exponential moving average of squared gradient
+        values and exponential moving average of actual learning rates.
 
-        m = self.get_slot(var, "m")
-        m_scaled_g_values = grad * coefficients["one_minus_beta_1_t"]
-        m_t = state_ops.assign(m, m * coefficients["beta_1_t"] + m_scaled_g_values,
-                               use_locking=self._use_locking)
+        Parameters
+        ----------
+        var_list
+            List of model variables to build Apollo variables on.
+        """
 
-        v = self.get_slot(var, 'v')
-        v_scaled_g_values = (grad * grad) * coefficients['one_minus_beta_2_t']
-        v_t = state_ops.assign(v, v * coefficients['beta_2_t'] + v_scaled_g_values,
-                               use_locking=self._use_locking)
+        super().build(var_list)
+        if hasattr(self, "_built") and self._built:
+            return
+        self._built = True
+        self._momentums = []
+        self._velocities = []
+        self._exp_avg_lr = []
+        for var in var_list:
+            self._momentums.append(
+                self.add_variable_from_reference(
+                    model_variable=var, variable_name="m"
+                )
+            )
+            self._velocities.append(
+                self.add_variable_from_reference(
+                    model_variable=var, variable_name="v"
+                )
+            )
+            self._exp_avg_lr.append(
+                self.add_variable_from_reference(
+                    model_variable=var, variable_name="s"
+                )
+            )
 
-        denominator = math_ops.sqrt(v_t) + coefficients['epsilon']
+    def update_step(self, gradient, variable):
+        """Update step given gradient and the associated model variable."""
 
-        step_size = coefficients['lr'] / denominator
+        lr = tf.cast(self.learning_rate, variable.dtype)
+        local_step = tf.cast(self.iterations + 1, variable.dtype)
+        beta_1_power = tf.pow(tf.cast(self.beta_1, variable.dtype), local_step)
+        beta_2_power = tf.pow(tf.cast(self.beta_2, variable.dtype), local_step)
 
-        s = self.get_slot(var, 's')
-        s_t = state_ops.assign(s, s * coefficients['beta_3_t'] + coefficients['one_minus_beta_3_t'] * step_size,
-            use_locking=self._use_locking)
+        var_key = self._var_key(variable)
+        m = self._momentums[self._index_dict[var_key]]
+        v = self._velocities[self._index_dict[var_key]]
+        s = self._exp_avg_lr[self._index_dict[var_key]]
 
-        step_size = math_ops.minimum(step_size, s_t)
+        alpha = lr * tf.sqrt(1 - beta_2_power) / (1 - beta_1_power)
 
-        var_update = state_ops.assign_sub(
-            var, m_t * step_size,
-            use_locking=self._use_locking)
+        if isinstance(gradient, tf.IndexedSlices):
+            # Sparse gradients.
+            m.assign_add(-m * (1 - self.beta_1))
+            m.scatter_add(
+                tf.IndexedSlices(
+                    gradient.values * (1 - self.beta_1), gradient.indices
+                )
+            )
+            v.assign_add(-v * (1 - self.beta_2))
+            v.scatter_add(
+                tf.IndexedSlices(
+                    tf.square(gradient.values) * (1 - self.beta_2),
+                    gradient.indices,
+                )
+            )
 
-        return control_flow_ops.group(*[var_update, m_t, v_t, s_t])
+            denom = tf.sqrt(v) + self.epsilon
+            step_size = tf.fill(denom.shape, alpha)
+            step_size = tf.divide(step_size, denom)
+            s.assign_add(-s * (1 - self.beta_3))
+            s.scatter_add(
+                tf.IndexedSlices(
+                    step_size.values * (1 - self.beta_3), step_size.indices
+                )
+            )
+            step_size = tf.minimum(step_size, s)
 
-    def _resource_apply_sparse(self, grad, var, indices, apply_state=None):
-        raise RuntimeError('AdaMod does not support sparse gradients.')
+            variable.assign_sub(m * step_size)
+        else:
+            # Dense gradients.
+            m.assign_add((gradient - m) * (1 - self.beta_1))
+            v.assign_add((tf.square(gradient) - v) * (1 - self.beta_2))
+
+            denom = tf.sqrt(v) + self.epsilon
+            step_size = tf.fill(denom.shape, alpha)
+            step_size = tf.divide(step_size, denom)
+            s.assign_add((step_size - s) * (1 - self.beta_3))
+            step_size = tf.minimum(step_size, s)
+
+            variable.assign_sub(m * step_size)
 
     def get_config(self):
-        config = super(AdaMod, self).get_config()
-        config.update({
-            'learning_rate': self._serialize_hyperparameter('learning_rate'),
-            'decay': self._serialize_hyperparameter('decay'),
-            'beta_1': self._serialize_hyperparameter('beta_1'),
-            'beta_2': self._serialize_hyperparameter('beta_2'),
-            'beta_3': self._serialize_hyperparameter('beta_3'),
-            'epsilon': self.epsilon,
-        })
+        config = super().get_config()
+
+        config.update(
+            {
+                "learning_rate": self._serialize_hyperparameter(
+                    self._learning_rate
+                ),
+                "beta_1": self.beta_1,
+                "beta_2": self.beta_2,
+                "beta_3": self.beta_3,
+                "epsilon": self.epsilon,
+            }
+        )
         return config
