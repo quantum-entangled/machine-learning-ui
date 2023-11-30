@@ -54,7 +54,6 @@ class Apollo(Optimizer):
     ):
         super().__init__(
             name=name,
-            weight_decay=weight_decay,
             clipnorm=clipnorm,
             clipvalue=clipvalue,
             global_clipnorm=global_clipnorm,
@@ -72,6 +71,7 @@ class Apollo(Optimizer):
 
         self._learning_rate = self._build_learning_rate(learning_rate)
         self.beta = beta
+        self.weight_decay = weight_decay
         self.epsilon = epsilon
         self.init_lr = init_lr
         self.warmup = warmup
@@ -83,7 +83,7 @@ class Apollo(Optimizer):
 
         Apollo optimizer has 3 types of variables: exponential moving average
         of gradient values, exponential moving average of squared gradient
-        values and previous update direction
+        values and previous update direction.
 
         Parameters
         ----------
