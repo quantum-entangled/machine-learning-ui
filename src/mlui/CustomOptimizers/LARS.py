@@ -1,9 +1,9 @@
+from keras.optimizers.optimizer import Optimizer
 import tensorflow as tf
-from tensorflow.python.keras import backend_config
 import numpy as np
 
 
-class LARS(tf.keras.optimizers.legacy.Optimizer):
+class LARS(Optimizer):
     """Optimizer that implements the LARS algorithm.
 
     Layer-wise Adaptive Rate Scaling, is an optimization algorithm widely used in deep learning.
@@ -30,8 +30,6 @@ class LARS(tf.keras.optimizers.legacy.Optimizer):
        The trust coefficient for computing LR.
     """
 
-    _HAS_AGGREGATE_GRAD = True
-
     def __init__(
             self,
             learning_rate=0.01,
@@ -41,70 +39,119 @@ class LARS(tf.keras.optimizers.legacy.Optimizer):
             nesterov=False,
             trust_coefficient=0.001,
             epsilon=1e-8,
+            clipnorm=None,
+            clipvalue=None,
+            global_clipnorm=None,
+            use_ema=False,
+            ema_momentum=0.99,
+            ema_overwrite_frequency=None,
+            jit_compile=True,
             name="LARS",
             **kwargs
     ):
-        super(LARS, self).__init__(name, **kwargs)
-        self._set_hyper("learning_rate", learning_rate)
-        self._set_hyper("decay", self._initial_decay)
-        self._set_hyper("weight_decay", weight_decay)
-        self._set_hyper("momentum", momentum)
+        super().__init__(
+            name=name,
+            clipnorm=clipnorm,
+            clipvalue=clipvalue,
+            global_clipnorm=global_clipnorm,
+            use_ema=use_ema,
+            ema_momentum=ema_momentum,
+            ema_overwrite_frequency=ema_overwrite_frequency,
+            jit_compile=jit_compile,
+            **kwargs
+        )
+
+        self._learning_rate = self._build_learning_rate(learning_rate)
+        self.momentum = momentum
+        self.weight_decay = weight_decay
         self.dampening = dampening
-        self.trust_coefficient = trust_coefficient
         self.nesterov = nesterov
-        self.epsilon = epsilon or backend_config.epsilon()
+        self.trust_coefficient = trust_coefficient
+        self.epsilon = epsilon
+        if momentum != 0:
+            self.use_momentum = True
+        else:
+            self.use_momentum = False
+        if weight_decay !=0:
+            self.use_weight_decay = True
+        else:
+            self.use_weight_decay = False
 
-    def _create_slots(self, var_list):
-        for v in var_list:
-            self.add_slot(v, "momentum_buffer")
+    def build(self, var_list):
+        """Initialize optimizer variables.
 
-    @tf.function
-    def _resource_apply_dense(self, grad, var, apply_state=None):
-        var_dtype = var.dtype.base_dtype
-        lr_t = self._decayed_lr(var_dtype)
-        eps = tf.convert_to_tensor(self.epsilon, var_dtype)
-        dampening = tf.convert_to_tensor(self.dampening, var_dtype)
-        weight_decay = self._get_hyper("weight_decay", var_dtype)
-        momentum = self._get_hyper("momentum", var_dtype)
+        LARS optimizer has one variable `momentums`.
 
-        m = self.get_slot(var, "momentum_buffer")
-        d_p = grad
-        w_norm = tf.norm(var, ord=2)
-        grad_norm = tf.norm(grad, ord=2)
+        Parameters
+        ----------
+        var_list
+            List of model variables to build Apollo variables on.
+        """
+        super().build(var_list)
+        if hasattr(self, "_built") and self._built:
+            return
+        self.momentums = []
+        for var in var_list:
+            self.momentums.append(
+                self.add_variable_from_reference(
+                    model_variable=var, variable_name="m"
+                )
+            )
+        self._built = True
+
+    def update_step(self, gradient, variable):
+        """Update step given gradient and the associated model variable."""
+
+        lr_t = tf.cast(self.learning_rate, variable.dtype)
+        dampening = tf.cast(self.dampening, variable.dtype)
+        weight_decay = tf.cast(self.weight_decay, variable.dtype)
+        momentum = tf.cast(self.momentum, variable.dtype)
+
+        m = None
+        var_key = self._var_key(variable)
+        m = self.momentums[self._index_dict[var_key]]
+
+        d_p = gradient
+        w_norm = tf.norm(variable, ord=2)
+        grad_norm = tf.norm(gradient, ord=2)
 
         # lars scaling + weight decay part
-        if weight_decay !=0:
-            if w_norm !=0 and grad_norm !=0:
-                lars_lr = w_norm/(grad_norm + w_norm*weight_decay + eps)
-                lars_lr *= self.trust_coefficient
+        if self.use_weight_decay:
+            d_p += variable * weight_decay
 
-                d_p += var*weight_decay
-                d_p *= lars_lr
-        if momentum != 0 :
+        lars_lr = lr_t * tf.where(
+            tf.greater(w_norm, 0),
+            tf.where(tf.greater(grad_norm, 0),
+                     (self.trust_coefficient * w_norm / (grad_norm + w_norm * weight_decay + self.epsilon)), 1.0),
+            1.0)
+        d_p += variable * weight_decay
+        d_p *= lars_lr
+
+        if self.use_momentum:
             m_t = tf.multiply(m, momentum)
-            m_t = tf.add(m_t, tf.multiply(grad, 1 - dampening))
+            m_t = tf.add(m_t, tf.multiply(gradient, 1 - dampening))
 
             if self.nesterov:
-                d_p += momentum*m_t
+                d_p += momentum * m_t
             else:
                 d_p = m_t
 
             m.assign(m_t)
 
-        var.assign_sub(lr_t * d_p, use_locking=self._use_locking)
-
-    def _resource_apply_sparse(self, grad, var, indices, apply_state=None):
-        raise RuntimeError("Sparse gradient updates are not supported.")
+        variable.assign_sub(lr_t * d_p)
 
     def get_config(self):
-        config = super(LARS, self).get_config()
-        config.update({
-            "learning_rate": self._serialize_hyperparameter("learning_rate"),
-            "momentum": self._serialize_hyperparameter("momentum"),
-            "dampening": self.dampening,
-            "weight_decay": self._serialize_hyperparameter("weight_decay"),
-            "nesterov": self.nesterov,
-            "trust_coefficient": self.trust_coefficient,
-            "epsilon": self.epsilon,
-        })
+        config = super().get_config()
+
+        config.update(
+            {
+                "learning_rate": self._serialize_hyperparameter("learning_rate"),
+                "momentum": self._serialize_hyperparameter("momentum"),
+                "dampening": self.dampening,
+                "weight_decay": self._serialize_hyperparameter("weight_decay"),
+                "nesterov": self.nesterov,
+                "trust_coefficient": self.trust_coefficient,
+                "epsilon": self.epsilon,
+            }
+        )
         return config
