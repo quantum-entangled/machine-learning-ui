@@ -1,16 +1,15 @@
-from typing import Type
-
 import tensorflow as tf
 
-import mlui.widgets.callbacks as wc
+import mlui.widgets.callbacks as widget
+from mlui.types.classes import CallbackTypes
+from mlui.types.widgets import CallbackWidgetTypes
 
-classes: dict[str, Type[tf.keras.callbacks.Callback]] = {
+classes: CallbackTypes = {
     "EarlyStopping": tf.keras.callbacks.EarlyStopping,
     "TerminateOnNaN": tf.keras.callbacks.TerminateOnNaN,
 }
 
-
-widgets: dict[str, Type[wc.CallbackWidget]] = {
-    "EarlyStopping": wc.EarlyStopping,
-    "TerminateOnNaN": wc.TerminateOnNaN,
+widgets: CallbackWidgetTypes = {
+    "EarlyStopping": widget.EarlyStopping,
+    "TerminateOnNaN": widget.TerminateOnNaN,
 }

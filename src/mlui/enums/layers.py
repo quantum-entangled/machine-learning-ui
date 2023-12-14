@@ -1,17 +1,21 @@
-from typing import Type
-
 import tensorflow as tf
 
-import mlui.widgets.layers as wl
+import mlui.widgets.layers as widget
+from mlui.types.classes import LayerTypes
+from mlui.types.widgets import LayerWidgetTypes
 
-classes: dict[str, Type[tf.keras.layers.Layer]] = {
+classes: LayerTypes = {
     "Input": tf.keras.Input,
     "Dense": tf.keras.layers.Dense,
     "Concatenate": tf.keras.layers.Concatenate,
+    "BatchNormalization": tf.keras.layers.BatchNormalization,
+    "Dropout": tf.keras.layers.Dropout,
 }
 
-widgets: dict[str, Type[wl.LayerWidget]] = {
-    "Input": wl.Input,
-    "Dense": wl.Dense,
-    "Concatenate": wl.Concatenate,
+widgets: LayerWidgetTypes = {
+    "Input": widget.Input,
+    "Dense": widget.Dense,
+    "Concatenate": widget.Concatenate,
+    "BatchNormalization": widget.BatchNormalization,
+    "Dropout": widget.Dropout,
 }

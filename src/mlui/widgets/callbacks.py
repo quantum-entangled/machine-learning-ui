@@ -1,29 +1,19 @@
-import abc
-from typing import TypedDict
+from abc import ABC, abstractmethod
 
 import streamlit as st
 
-
-class CallbackParams(TypedDict):
-    """Base type annotation for a callback's parameters."""
+from mlui.types.classes import CallbackParams, EarlyStoppingParams
 
 
-class EarlyStoppingParams(CallbackParams):
-    """Type annotation for the EarlyStopping callback."""
-
-    min_delta: float
-    patience: int
-
-
-class CallbackWidget(abc.ABC):
+class CallbackWidget(ABC):
     """Base class for a callback's widget."""
 
-    @abc.abstractmethod
+    @abstractmethod
     def __init__(self) -> None:
         ...
 
     @property
-    @abc.abstractmethod
+    @abstractmethod
     def params(self) -> CallbackParams:
         """Callback's parameters.
 
@@ -35,41 +25,40 @@ class CallbackWidget(abc.ABC):
 
 
 class EarlyStopping(CallbackWidget):
-    """EarlyStopping callback widget."""
+    """EarlyStopping callback's widget."""
 
     def __init__(self) -> None:
-        self.min_delta = float(
-            st.number_input(
-                "Min delta:",
-                min_value=0.0,
-                max_value=10.0,
-                value=0.0,
-                step=0.1,
-                format="%e",
-            )
+        self.min_delta = st.number_input(
+            "Min delta:",
+            min_value=0.0,
+            max_value=10.0,
+            value=0.0,
+            step=0.1,
+            format="%e",
         )
-        self.patience = int(
-            st.number_input("Patience:", min_value=0, max_value=50, value=10, step=1)
+        self.patience = st.number_input(
+            "Patience:", min_value=0, max_value=50, value=10, step=1
         )
 
     @property
     def params(self) -> EarlyStoppingParams:
-        """Callback's parameters.
+        """EarlyStopping callback's parameters.
 
         Returns
         -------
         dict
             Dictionary containing values of adjustable parameters.
         """
-        return {"min_delta": self.min_delta, "patience": self.patience}
+        return {"min_delta": float(self.min_delta), "patience": int(self.patience)}
 
 
 class TerminateOnNaN(CallbackWidget):
-    """TerminateOnNaN callback widget."""
+    """TerminateOnNaN callback's widget."""
 
     def __init__(self) -> None:
         pass
 
     @property
     def params(self) -> CallbackParams:
+        """TerminateOnNaN callback's parameters."""
         return {}

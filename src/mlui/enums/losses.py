@@ -1,12 +1,12 @@
-from typing import Type
+from mlui.types.classes import LossTypes
 
-import tensorflow as tf
-
-classes: dict[str, Type[tf.keras.losses.Loss]] = {
-    "MeanAbsoluteError": tf.keras.losses.MeanAbsoluteError,
-    "MeanAbsolutePercentageError": tf.keras.losses.MeanAbsolutePercentageError,
-    "MeanSquaredError": tf.keras.losses.MeanSquaredError,
-    "MeanSquaredLogarithmicError": tf.keras.losses.MeanSquaredLogarithmicError,
-    "Poisson": tf.keras.losses.Poisson,
-    "LogCosh": tf.keras.losses.LogCosh,
-}
+classes: LossTypes = [
+    "MeanAbsoluteError",
+    "MeanAbsolutePercentageError",
+    "MeanSquaredError",
+    "MeanSquaredLogarithmicError",
+    "Poisson",
+    "LogCosh",
+    "BinaryCrossentropy",
+    "CategoricalCrossentropy",
+]

@@ -1,0 +1,38 @@
+import streamlit as st
+
+from mlui.classes.data import Data
+from mlui.classes.errors import ModelError
+from mlui.classes.model import UploadedModel
+
+
+def make_predictions_ui(data: Data, model: UploadedModel) -> None:
+    """Generate the UI for making the model predictions.
+
+    Parameters
+    ----------
+    data : Data
+        Data object.
+    model : Model
+        Model object.
+    """
+    st.header("Make Predictions")
+
+    batch_size = st.number_input(
+        "Batch size:", min_value=1, max_value=1024, value=32, step=1
+    )
+    make_predictions_btn = st.button("Make Predictions")
+
+    if make_predictions_btn:
+        with st.status("Predictions"):
+            try:
+                df = data.dataframe
+                predictions = model.predict(df, int(batch_size))
+                outputs = model.outputs
+
+                for position, output in enumerate(outputs):
+                    st.subheader(output)
+                    st.dataframe(predictions[position])
+
+                st.toast("Predictions are completed!", icon="✅")
+            except ModelError as error:
+                st.toast(error, icon="❌")
