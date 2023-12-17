@@ -1,11 +1,11 @@
 import streamlit as st
 
-from mlui.classes.data import Data
-from mlui.classes.errors import ModelError
-from mlui.classes.model import UploadedModel
+import mlui.classes.data as data
+import mlui.classes.errors as errors
+import mlui.classes.model as model
 
 
-def make_predictions_ui(data: Data, model: UploadedModel) -> None:
+def make_predictions_ui(data: data.Data, model: model.UploadedModel) -> None:
     """Generate the UI for making the model predictions.
 
     Parameters
@@ -34,5 +34,5 @@ def make_predictions_ui(data: Data, model: UploadedModel) -> None:
                     st.dataframe(predictions[position])
 
                 st.toast("Predictions are completed!", icon="✅")
-            except ModelError as error:
+            except errors.ModelError as error:
                 st.toast(error, icon="❌")

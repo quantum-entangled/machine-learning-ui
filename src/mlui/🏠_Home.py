@@ -1,34 +1,39 @@
 import streamlit as st
 
-from mlui.classes.model import CreatedModel, UploadedModel
-from mlui.decorators.session import set_classes, set_task
+import mlui.classes.model as model
+import mlui.decorators as decorators
 
 st.set_page_config(page_title="Welcome!", page_icon="🏠")
 
 
-@set_task
-@set_classes
+@decorators.session.set_state
 def home_page() -> None:
-    st.write("# Welcome to Machine Learning UI! 👋")
+    st.write("# Welcome! 👋")
 
     tasks = ("Train", "Evaluate", "Predict")
-    current_task = tasks.index(st.session_state.task)
+    default = tasks.index(st.session_state.task)
+    task = st.selectbox("Select task:", tasks, default)
 
-    with st.form("set_task_form", border=False):
-        task = st.selectbox("Select a task:", tasks, current_task)
-        set_task_btn = st.form_submit_button("Set Task")
+    if task == "Train":
+        types = ("Created", "Uploaded")
+    else:
+        types = ("Uploaded",)
 
-    if set_task_btn:
+    default = types.index(st.session_state.model_type)
+    model_type = st.selectbox("Select model type:", types, default)
+
+    def set_state() -> None:
+        """Supporting function for the accurate representation of widgets."""
         st.session_state.task = task
+        st.session_state.model_type = model_type
+        st.session_state.model = (
+            model.CreatedModel() if model_type == "Created" else model.UploadedModel()
+        )
 
         st.session_state.data.update_state()
+        st.toast("State is set!", icon="✅")
 
-        if st.session_state.task == "Train":
-            st.session_state.model = CreatedModel()
-        else:
-            st.session_state.model = UploadedModel()
-
-        st.toast("Task is set!", icon="✅")
+    st.button("Set State", on_click=set_state)
 
 
 if __name__ == "__main__":

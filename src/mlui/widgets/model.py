@@ -1,11 +1,11 @@
 import streamlit as st
-from streamlit_extras.capture import stdout
+import streamlit_extras.capture as capture
 
-from mlui.classes.data import Data
-from mlui.classes.model import Model
+import mlui.classes.data as data
+import mlui.classes.model as model
 
 
-def model_info_ui(model: Model) -> None:
+def model_info_ui(model: model.Model) -> None:
     """Generate the UI for displaying model information.
 
     Parameters
@@ -15,14 +15,14 @@ def model_info_ui(model: Model) -> None:
     """
     st.header("Model Info")
 
-    task = st.session_state.task
+    task = st.session_state.get("task")
     built = model.built
     input_configured = model.input_configured
     output_configured = model.output_configured
     compiled = model.compiled
 
     if not built:
-        st.info("The model is not uploaded or created.", icon="💡")
+        st.info("The model is not uploaded/created.", icon="💡")
         return
 
     if input_configured:
@@ -41,7 +41,7 @@ def model_info_ui(model: Model) -> None:
         st.info("The model is not compiled.", icon="💡")
 
 
-def summary_ui(model: Model) -> None:
+def summary_ui(model: model.Model) -> None:
     """Generate the UI for displaying the model's summary.
 
     Parameters
@@ -52,11 +52,11 @@ def summary_ui(model: Model) -> None:
     st.header("Summary")
 
     with st.expander("Summary"):
-        with stdout(st.empty().code):
+        with capture.stdout(st.empty().code):
             model.summary
 
 
-def graph_ui(model: Model) -> None:
+def graph_ui(model: model.Model) -> None:
     """Generate the UI for downloading the model's graph.
 
     Parameters
@@ -71,7 +71,7 @@ def graph_ui(model: Model) -> None:
     st.download_button("Download Graph", graph, "model_graph.pdf")
 
 
-def download_model_ui(model: Model) -> None:
+def download_model_ui(model: model.Model) -> None:
     """Generate the UI for downloading the model.
 
     Parameters
@@ -86,7 +86,7 @@ def download_model_ui(model: Model) -> None:
     st.download_button("Download Model", model_as_bytes, "model.h5")
 
 
-def reset_model_ui(data: Data, model: Model) -> None:
+def reset_model_ui(data: data.Data, model: model.Model) -> None:
     """Generate the UI for resetting the model.
 
     Parameters

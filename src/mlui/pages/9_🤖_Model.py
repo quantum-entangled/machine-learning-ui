@@ -1,13 +1,12 @@
 import streamlit as st
 
+import mlui.decorators as decorators
 import mlui.widgets.model as widgets
-from mlui.decorators.session import set_classes, set_task
 
 st.set_page_config(page_title="Model", page_icon="🤖")
 
 
-@set_task
-@set_classes
+@decorators.session.set_state
 def model_page() -> None:
     data = st.session_state.data
     model = st.session_state.model

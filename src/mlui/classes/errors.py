@@ -30,9 +30,5 @@ class DeleteError(Exception):
     """For arbitrary errors during the process of deleting an attribute's value."""
 
 
-class NoPrototypeError(Exception):
-    """For errors during the process of retrieving an entity's prototype."""
-
-
 class PlotError(Exception):
     """For errors during the process of displaying a plot."""

@@ -1,20 +1,20 @@
-from abc import ABC, abstractmethod
+import abc
 
 import streamlit as st
 
-from mlui.types.classes import AdamParams, OptimizerParams, RMSpropParams, SGDParams
+import mlui.types.classes as t
 
 
-class OptimizerWidget(ABC):
+class OptimizerWidget(abc.ABC):
     """Base class for an optimizer's widget."""
 
-    @abstractmethod
+    @abc.abstractmethod
     def __init__(self) -> None:
         ...
 
     @property
-    @abstractmethod
-    def params(self) -> OptimizerParams:
+    @abc.abstractmethod
+    def params(self) -> t.OptimizerParams:
         """Optimizer's parameters.
 
         Returns
@@ -30,10 +30,10 @@ class Adam(OptimizerWidget):
     def __init__(self) -> None:
         self.learning_rate = st.number_input(
             "Learning rate:",
-            min_value=0.0,
-            max_value=0.5,
-            value=0.001,
-            step=0.001,
+            min_value=1e-6,
+            max_value=1.0,
+            value=1e-3,
+            step=1e-3,
             format="%e",
         )
         self.beta_1 = st.number_input(
@@ -41,7 +41,7 @@ class Adam(OptimizerWidget):
             min_value=0.0,
             max_value=1.0,
             value=0.9,
-            step=0.001,
+            step=1e-3,
             format="%.3f",
         )
         self.beta_2 = st.number_input(
@@ -49,12 +49,12 @@ class Adam(OptimizerWidget):
             min_value=0.0,
             max_value=1.0,
             value=0.999,
-            step=0.001,
+            step=1e-3,
             format="%.3f",
         )
 
     @property
-    def params(self) -> AdamParams:
+    def params(self) -> t.AdamParams:
         """Adam optimizer's parameters.
 
         Returns
@@ -75,10 +75,10 @@ class RMSprop(OptimizerWidget):
     def __init__(self):
         self.learning_rate = st.number_input(
             "Learning rate:",
-            min_value=0.0,
-            max_value=0.5,
-            value=0.001,
-            step=0.001,
+            min_value=1e-6,
+            max_value=1.0,
+            value=1e-3,
+            step=1e-3,
             format="%e",
         )
         self.rho = st.number_input(
@@ -86,7 +86,7 @@ class RMSprop(OptimizerWidget):
             min_value=0.0,
             max_value=1.0,
             value=0.9,
-            step=0.001,
+            step=1e-3,
             format="%.3f",
         )
         self.momentum = st.number_input(
@@ -94,12 +94,12 @@ class RMSprop(OptimizerWidget):
             min_value=0.0,
             max_value=1.0,
             value=0.0,
-            step=0.001,
+            step=1e-3,
             format="%.3f",
         )
 
     @property
-    def params(self) -> RMSpropParams:
+    def params(self) -> t.RMSpropParams:
         """RMSprop optimizer's parameters.
 
         Returns
@@ -120,10 +120,10 @@ class SGD(OptimizerWidget):
     def __init__(self):
         self.learning_rate = st.number_input(
             "Learning rate:",
-            min_value=0.0,
-            max_value=0.5,
-            value=0.001,
-            step=0.001,
+            min_value=1e-6,
+            max_value=1.0,
+            value=1e-3,
+            step=1e-3,
             format="%e",
         )
         self.momentum = st.number_input(
@@ -131,12 +131,12 @@ class SGD(OptimizerWidget):
             min_value=0.0,
             max_value=1.0,
             value=0.0,
-            step=0.001,
+            step=1e-3,
             format="%.3f",
         )
 
     @property
-    def params(self) -> SGDParams:
+    def params(self) -> t.SGDParams:
         """SGD optimizer's parameters.
 
         Returns

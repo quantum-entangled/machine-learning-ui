@@ -1,6 +1,6 @@
-from mlui.types.classes import MetricTypes
+import mlui.types.classes as t
 
-classes: MetricTypes = [
+classes: t.MetricTypes = [
     "MeanAbsoluteError",
     "MeanAbsolutePercentageError",
     "MeanSquaredError",

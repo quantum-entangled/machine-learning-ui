@@ -1,18 +1,23 @@
 import streamlit as st
 
+import mlui.decorators as decorators
 import mlui.widgets.configure as widgets
-from mlui.decorators.pages import check_model
-from mlui.decorators.session import set_classes, set_task
 
 st.set_page_config(page_title="Configure", page_icon="⚙️")
 
 
-@set_task
-@set_classes
-@check_model(["built"])
+@decorators.session.set_state
 def prepare_page() -> None:
     data = st.session_state.data
     model = st.session_state.model
+
+    if data.empty or not model.built:
+        st.info(
+            "The content of this page will be available once the model "
+            "is uploaded/created and the data file is uploaded.",
+            icon="💡",
+        )
+        return
 
     with st.container():
         widgets.set_features_ui(data, model)

@@ -1,24 +1,16 @@
-from abc import ABC, abstractmethod
+import abc
 
 import streamlit as st
 
-from mlui.classes.errors import LayerError
-from mlui.enums import activations
-from mlui.types.classes import (
-    BatchNormalizationParams,
-    DenseParams,
-    DropoutParams,
-    InputParams,
-    Layer,
-    LayerConnection,
-    LayerParams,
-)
+import mlui.classes.errors as errors
+import mlui.enums as enums
+import mlui.types.classes as t
 
 
-class LayerWidget(ABC):
+class LayerWidget(abc.ABC):
     """Base class for a layer's widget."""
 
-    def __init__(self, layers: dict[str, Layer]) -> None:
+    def __init__(self, layers: t.LayerObject) -> None:
         """
         Parameters
         ----------
@@ -26,12 +18,9 @@ class LayerWidget(ABC):
             Dictionary of layers to connect to.
         """
         self._layers = layers
-        self._layer_name = st.text_input(
-            "Enter layer's name:", max_chars=50, placeholder="Enter the name"
-        )
 
-    @abstractmethod
-    def get_connection(self) -> LayerConnection:
+    @abc.abstractmethod
+    def get_connection(self) -> t.LayerConnection:
         """Get the layer's connection.
 
         Returns
@@ -41,8 +30,8 @@ class LayerWidget(ABC):
         """
 
     @property
-    @abstractmethod
-    def params(self) -> LayerParams:
+    @abc.abstractmethod
+    def params(self) -> t.LayerParams:
         """Layer's parameters.
 
         Returns
@@ -55,7 +44,7 @@ class LayerWidget(ABC):
 class Input(LayerWidget):
     """Input layer's widget."""
 
-    def __init__(self, layers: dict[str, Layer]) -> None:
+    def __init__(self, layers: t.LayerObject) -> None:
         """
         Parameters
         ----------
@@ -73,7 +62,7 @@ class Input(LayerWidget):
         return
 
     @property
-    def params(self) -> InputParams:
+    def params(self) -> t.InputParams:
         """Input layer's parameters.
 
         Returns
@@ -81,13 +70,13 @@ class Input(LayerWidget):
         dict
             Dictionary containing values of adjustable parameters.
         """
-        return {"name": self._layer_name, "shape": (int(self._input_shape),)}
+        return {"shape": (int(self._input_shape),)}
 
 
 class Dense(LayerWidget):
     """Dense layer's widget."""
 
-    def __init__(self, layers: dict[str, Layer]) -> None:
+    def __init__(self, layers: t.LayerObject) -> None:
         """
         Parameters
         ----------
@@ -96,15 +85,15 @@ class Dense(LayerWidget):
         """
         super().__init__(layers)
 
+        activations = enums.activations.classes
+
         self._units_num = st.number_input(
             "Number of units:", value=1, min_value=1, max_value=10_000
         )
-        activation_options = activations.classes.keys()
-        connect_to_options = self._layers.keys()
-        self._activation = st.selectbox("Activation function:", activation_options)
-        self._connect_to = st.selectbox("Connect layer to:", connect_to_options)
+        self._activation = st.selectbox("Activation function:", activations)
+        self._connect_to = st.selectbox("Connect layer to:", self._layers)
 
-    def get_connection(self) -> Layer:
+    def get_connection(self) -> t.Layer:
         """Dense layer's connection.
 
         Returns
@@ -114,16 +103,16 @@ class Dense(LayerWidget):
 
         Raises
         ------
-        LayerError
+        errors.LayerError
             If no layer is selected to connect to.
         """
         if not self._connect_to:
-            raise LayerError("Please, select the connection!")
+            raise errors.LayerError("Please, select the connection!")
 
         return self._layers[self._connect_to]
 
     @property
-    def params(self) -> DenseParams:
+    def params(self) -> t.DenseParams:
         """Dense layer's parameters.
 
         Returns
@@ -132,18 +121,17 @@ class Dense(LayerWidget):
             Dictionary containing values of adjustable parameters.
         """
         return {
-            "name": self._layer_name,
             "units": int(self._units_num),
-            "activation": activations.classes[self._activation]
+            "activation": enums.activations.classes[self._activation]
             if self._activation
-            else activations.classes["Linear"],
+            else enums.activations.classes["Linear"],
         }
 
 
 class Concatenate(LayerWidget):
     """Concatenate layer's widget."""
 
-    def __init__(self, layers: dict[str, Layer]) -> None:
+    def __init__(self, layers: t.LayerObject) -> None:
         """
         Parameters
         ----------
@@ -152,10 +140,9 @@ class Concatenate(LayerWidget):
         """
         super().__init__(layers)
 
-        options = self._layers.keys()
-        self._concatenate = st.multiselect("Select layers (at least 2):", options)
+        self._concatenate = st.multiselect("Select layers (at least 2):", self._layers)
 
-    def get_connection(self) -> list[Layer]:
+    def get_connection(self) -> list[t.Layer]:
         """Concatenate layer's connection.
 
         Returns
@@ -165,16 +152,16 @@ class Concatenate(LayerWidget):
 
         Raises
         ------
-        LayerError
+        errors.LayerError
             If fewer than 2 layers are selected for concatenation.
         """
         if len(self._concatenate) < 2:
-            raise LayerError("Please, select the layers to concatenate!")
+            raise errors.LayerError("Please, select the layers to concatenate!")
 
         return [self._layers[name] for name in self._concatenate]
 
     @property
-    def params(self) -> LayerParams:
+    def params(self) -> t.LayerParams:
         """Concatenate layer's parameters.
 
         Returns
@@ -182,13 +169,13 @@ class Concatenate(LayerWidget):
         dict
             Dictionary containing values of adjustable parameters.
         """
-        return {"name": self._layer_name}
+        return {}
 
 
 class BatchNormalization(LayerWidget):
     """BatchNormalization layer's widget."""
 
-    def __init__(self, layers: dict[str, Layer]) -> None:
+    def __init__(self, layers: t.LayerObject) -> None:
         """
         Parameters
         ----------
@@ -208,10 +195,9 @@ class BatchNormalization(LayerWidget):
             step=1e-4,
             format="%e",
         )
-        options = self._layers.keys()
-        self._connect_to = st.selectbox("Connect layer to:", options)
+        self._connect_to = st.selectbox("Connect layer to:", self._layers)
 
-    def get_connection(self) -> Layer:
+    def get_connection(self) -> t.Layer:
         """BatchNormalization layer's connection.
 
         Returns
@@ -221,16 +207,16 @@ class BatchNormalization(LayerWidget):
 
         Raises
         ------
-        LayerError
+        errors.LayerError
             If no layer is selected to connect to.
         """
         if not self._connect_to:
-            raise LayerError("Please, select the connection!")
+            raise errors.LayerError("Please, select the connection!")
 
         return self._layers[self._connect_to]
 
     @property
-    def params(self) -> BatchNormalizationParams:
+    def params(self) -> t.BatchNormalizationParams:
         """BatchNormalization layer's parameters.
 
         Returns
@@ -238,17 +224,13 @@ class BatchNormalization(LayerWidget):
         dict
             Dictionary containing values of adjustable parameters.
         """
-        return {
-            "name": self._layer_name,
-            "momentum": float(self._momentum),
-            "epsilon": float(self._epsilon),
-        }
+        return {"momentum": float(self._momentum), "epsilon": float(self._epsilon)}
 
 
 class Dropout(LayerWidget):
     """Dropout layer's widget."""
 
-    def __init__(self, layers: dict[str, Layer]) -> None:
+    def __init__(self, layers: t.LayerObject) -> None:
         """
         Parameters
         ----------
@@ -260,10 +242,9 @@ class Dropout(LayerWidget):
         self._rate = st.number_input(
             "Rate:", value=0.2, min_value=1e-2, max_value=0.99, step=1e-2
         )
-        options = self._layers.keys()
-        self._connect_to = st.selectbox("Connect layer to:", options)
+        self._connect_to = st.selectbox("Connect layer to:", self._layers)
 
-    def get_connection(self) -> Layer:
+    def get_connection(self) -> t.Layer:
         """Dropout layer's connection.
 
         Returns
@@ -273,16 +254,16 @@ class Dropout(LayerWidget):
 
         Raises
         ------
-        LayerError
+        errors.LayerError
             If no layer is selected to connect to.
         """
         if not self._connect_to:
-            raise LayerError("Please, select the connection!")
+            raise errors.LayerError("Please, select the connection!")
 
         return self._layers[self._connect_to]
 
     @property
-    def params(self) -> DropoutParams:
+    def params(self) -> t.DropoutParams:
         """Dropout layer's parameters.
 
         Returns
@@ -290,4 +271,4 @@ class Dropout(LayerWidget):
         dict
             Dictionary containing values of adjustable parameters.
         """
-        return {"name": self._layer_name, "rate": float(self._rate)}
+        return {"rate": float(self._rate)}

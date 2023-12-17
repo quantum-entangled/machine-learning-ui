@@ -2,11 +2,10 @@ import io
 
 import altair as alt
 import pandas as pd
-from altair import Chart
 
+import mlui.classes.errors as errors
 import mlui.tools as tools
-from mlui.classes.errors import ParseCSVError, PlotError, UploadError, ValidateDataError
-from mlui.types.classes import Columns, DataFrame
+import mlui.types.classes as t
 
 
 class Data:
@@ -14,12 +13,12 @@ class Data:
         self.reset_state()
 
     def reset_state(self) -> None:
-        self._dataframe: DataFrame = pd.DataFrame()
+        self._dataframe: t.DataFrame = pd.DataFrame()
         self.update_state()
 
     def update_state(self) -> None:
-        self._columns: Columns = list(self._dataframe.columns)
-        self._unused_columns: Columns = self._columns.copy()
+        self._columns: t.Columns = list(self._dataframe.columns)
+        self._unused_columns: t.Columns = self._columns.copy()
 
     def upload(self, buff: io.BytesIO) -> None:
         """Read a file to the pandas dataframe.
@@ -31,7 +30,7 @@ class Data:
 
         Raises
         ------
-        UploadError
+        errors.UploadError
             - If there are errors encountered during the parsing of the file.
             - If there are errors encountered during the execution of `pd.read_csv`
             function.
@@ -40,18 +39,18 @@ class Data:
         try:
             csv_str = buff.getvalue().decode("utf-8")
             delimiter = tools.data.parse_csv(csv_str)
-        except ParseCSVError as error:
-            raise UploadError(error)
+        except errors.ParseCSVError as error:
+            raise errors.UploadError(error)
 
         try:
             df = pd.read_csv(buff, sep=delimiter, header=0, skipinitialspace=True)
         except (ValueError, pd.errors.ParserError) as error:
-            raise UploadError(error)
+            raise errors.UploadError(error)
 
         try:
             tools.data.validate_df(df)
-        except ValidateDataError as error:
-            raise UploadError(error)
+        except errors.ValidateDataError as error:
+            raise errors.UploadError(error)
 
         self._dataframe = df
         self.update_state()
@@ -62,10 +61,10 @@ class Data:
 
         self._unused_columns = unused_columns
 
-    def get_unused_columns(self) -> Columns:
+    def get_unused_columns(self) -> t.Columns:
         return self._unused_columns.copy()
 
-    def get_stats(self) -> DataFrame:
+    def get_stats(self) -> t.DataFrame:
         try:
             stats = pd.concat(
                 [
@@ -83,9 +82,9 @@ class Data:
 
         return stats
 
-    def plot_columns(self, x: str | None, y: str | None, points: bool) -> Chart:
+    def plot_columns(self, x: str | None, y: str | None, points: bool) -> t.Chart:
         if not x or not y:
-            raise PlotError("Please, select the columns!")
+            raise errors.PlotError("Please, select the columns!")
 
         if x == y:
             columns = self._dataframe.loc[:, [x]].rename(columns={x: "Column"})
@@ -97,12 +96,12 @@ class Data:
             )
 
         if tools.data.contains_nonnumeric_dtypes(columns):
-            raise PlotError("Unable to plot columns of non-numeric dtype!")
+            raise errors.PlotError("Unable to plot columns of non-numeric dtype!")
 
         try:
             if x == y:
                 chart = (
-                    Chart(columns)
+                    alt.Chart(columns)
                     .mark_bar()
                     .encode(
                         x=alt.X("Column").title(x),
@@ -113,7 +112,7 @@ class Data:
                 )
             else:
                 chart = (
-                    Chart(columns)
+                    alt.Chart(columns)
                     .mark_line(point=points)
                     .encode(
                         x=alt.X("Column_1").scale(zero=False).title(x),
@@ -124,16 +123,16 @@ class Data:
                     .properties(height=500)
                 )
         except (ValueError, AttributeError, TypeError):
-            raise PlotError("Unable to display the plot!")
+            raise errors.PlotError("Unable to display the plot!")
 
         return chart
 
     @property
-    def dataframe(self) -> DataFrame:
+    def dataframe(self) -> t.DataFrame:
         return self._dataframe.copy()
 
     @property
-    def columns(self) -> Columns:
+    def columns(self) -> t.Columns:
         return self._columns.copy()
 
     @property

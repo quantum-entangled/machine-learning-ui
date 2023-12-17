@@ -1,50 +1,15 @@
 import io
 import tempfile
-from typing import cast as type_cast
+import typing
 
 import altair as alt
 import pandas as pd
 import tensorflow as tf
-from altair import Chart
 
+import mlui.classes.errors as errors
+import mlui.enums as enums
 import mlui.tools as tools
-from mlui.classes.errors import (
-    CreateError,
-    DeleteError,
-    ModelError,
-    NoPrototypeError,
-    PlotError,
-    SetError,
-    UploadError,
-)
-from mlui.enums import callbacks, layers, optimizers
-from mlui.types.classes import (
-    Callback,
-    CallbackParams,
-    Callbacks,
-    DataFrame,
-    EvaluationResults,
-    Features,
-    Layer,
-    LayerConfigured,
-    LayerConnection,
-    LayerData,
-    LayerFeatures,
-    LayerLosses,
-    LayerMetrics,
-    LayerParams,
-    Layers,
-    LayerShape,
-    Loss,
-    Metrics,
-    Name,
-    Object,
-    Optimizer,
-    OptimizerParams,
-    Predictions,
-    Shape,
-    Side,
-)
+import mlui.types.classes as t
 
 
 class Model:
@@ -52,36 +17,36 @@ class Model:
         self.reset_state()
 
     def reset_state(self) -> None:
-        self._object: Object = tf.keras.Model(inputs=list(), outputs=list())
+        self._object: t.Object = tf.keras.Model(inputs=list(), outputs=list())
         self._built: bool = False
         self._set_config()
         self.update_state()
 
     def _set_config(self) -> None:
-        self._name: Name = self._object.name
-        self._inputs: Layers = type_cast(Layers, self._object.input_names)
-        self._outputs: Layers = type_cast(Layers, self._object.output_names)
-        self._input_shape: LayerShape = self._get_processed_shape("input")
-        self._output_shape: LayerShape = self._get_processed_shape("output")
+        self._name: t.Name = self._object.name
+        self._inputs: t.Layers = typing.cast(t.Layers, self._object.input_names)
+        self._outputs: t.Layers = typing.cast(t.Layers, self._object.output_names)
+        self._input_shape: t.LayerShape = self._get_processed_shape("input")
+        self._output_shape: t.LayerShape = self._get_processed_shape("output")
 
     def update_state(self) -> None:
-        self._input_features: LayerFeatures = dict.fromkeys(self._inputs, list())
-        self._output_features: LayerFeatures = dict.fromkeys(self._outputs, list())
-        self._input_configured: LayerConfigured = dict.fromkeys(self._inputs, False)
-        self._output_configured: LayerConfigured = dict.fromkeys(self._outputs, False)
-        self._optimizer: Optimizer = None
-        self._losses: LayerLosses = dict.fromkeys(self._outputs)
-        self._metrics: LayerMetrics = dict.fromkeys(self._outputs, list())
-        self._callbacks: Callbacks = dict()
+        self._input_features: t.LayerFeatures = dict.fromkeys(self._inputs, list())
+        self._output_features: t.LayerFeatures = dict.fromkeys(self._outputs, list())
+        self._input_configured: t.LayerConfigured = dict.fromkeys(self._inputs, False)
+        self._output_configured: t.LayerConfigured = dict.fromkeys(self._outputs, False)
+        self._optimizer: t.Optimizer = None
+        self._losses: t.LayerLosses = dict.fromkeys(self._outputs)
+        self._metrics: t.LayerMetrics = dict.fromkeys(self._outputs, list())
+        self._callbacks: t.Callbacks = dict()
         self._compiled: bool = False
 
-    def _shapes_to_list(self, shapes: list[Shape] | Shape) -> list[Shape]:
+    def _shapes_to_list(self, shapes: list[t.Shape] | t.Shape) -> list[t.Shape]:
         if isinstance(shapes, dict):
             return list(shapes.values())
 
         return [shapes] if isinstance(shapes, tuple) else shapes
 
-    def _get_processed_shape(self, at: Side) -> LayerShape:
+    def _get_processed_shape(self, at: t.Side) -> t.LayerShape:
         if at == "input":
             layers = self._inputs
             shapes = self._object.input_shape
@@ -93,7 +58,7 @@ class Model:
 
         return {layer: shape[1] for layer, shape in zip(layers, shapes)}
 
-    def _get_processed_data(self, data: DataFrame, at: Side) -> LayerData:
+    def _get_processed_data(self, data: t.DataFrame, at: t.Side) -> t.LayerData:
         if at == "input":
             layers = self._inputs
             features = self._input_features
@@ -103,51 +68,51 @@ class Model:
 
         return {layer: data[features[layer]].to_numpy() for layer in layers}
 
-    def set_optimizer(self, entity: str, params: OptimizerParams) -> None:
-        prototype = optimizers.classes.get(entity)
-
-        if not prototype:
-            raise NoPrototypeError("There is no prototype for this optimizer!")
-
+    def set_optimizer(self, entity: str, params: t.OptimizerParams) -> None:
         try:
+            prototype = enums.optimizers.classes[entity]
             self._optimizer = prototype(**params)
+        except KeyError:
+            raise errors.SetError("There is no prototype for this optimizer!")
         except (ValueError, AttributeError, TypeError):
-            raise SetError("Unable to set the optimizer!")
+            raise errors.SetError("Unable to set the optimizer!")
 
-    def get_optimizer(self) -> Optimizer:
+    def get_optimizer(self) -> t.Optimizer:
         return self._optimizer.name if self._optimizer else None
 
     def set_loss(self, layer: str, entity: str) -> None:
         self._losses[layer] = entity
 
-    def get_loss(self, layer: str) -> Loss:
+    def get_loss(self, layer: str) -> t.Loss:
         return self._losses[layer] if self._losses.get(layer) else None
 
     def set_metrics(self, layer: str, entities: list[str]) -> None:
         self._metrics[layer] = entities
 
-    def get_metrics(self, layer: str) -> Metrics:
+    def get_metrics(self, layer: str) -> t.Metrics:
         return self._metrics[layer].copy() if self._metrics.get(layer) else list()
 
     def compile(self) -> None:
         if not self._optimizer_is_set:
-            raise ModelError("Please, set the model optimizer!")
+            raise errors.ModelError("Please, set the model optimizer!")
 
         if not self._losses_are_set:
-            raise ModelError("Please, set the loss function for each output layer!")
+            raise errors.ModelError(
+                "Please, set the loss function for each output layer!"
+            )
 
         try:
             self._object.compile(
                 optimizer=self._optimizer, loss=self._losses, metrics=self._metrics
             )
         except (ValueError, AttributeError, TypeError):
-            raise ModelError("Unable to compile the model!")
+            raise errors.ModelError("Unable to compile the model!")
 
         self._compiled = True
 
-    def set_features(self, layer: str, columns: list[str], at: Side) -> None:
+    def set_features(self, layer: str, columns: list[str], at: t.Side) -> None:
         if not columns:
-            raise SetError("Please, select at least one column!")
+            raise errors.SetError("Please, select at least one column!")
 
         if at == "input":
             shape = self._input_shape.get(layer)
@@ -159,10 +124,10 @@ class Model:
             features = self._output_features
 
         if not shape:
-            raise SetError("There is no such layer in the model!")
+            raise errors.SetError("There is no such layer in the model!")
 
         if len(columns) > shape:
-            raise SetError("Please, select fewer columns!")
+            raise errors.SetError("Please, select fewer columns!")
 
         if len(columns) == shape:
             configured[layer] = True
@@ -171,7 +136,7 @@ class Model:
 
         features[layer] = columns
 
-    def get_features(self, layer: str, at: Side) -> Features:
+    def get_features(self, layer: str, at: t.Side) -> t.Features:
         if at == "input":
             features = self._input_features
         else:
@@ -179,22 +144,24 @@ class Model:
 
         return features[layer].copy() if features.get(layer) else list()
 
-    def set_callback(self, entity: str, params: CallbackParams) -> None:
-        prototype = callbacks.classes.get(entity)
-
-        if not prototype:
-            raise NoPrototypeError("There is no prototype for this callback!")
-
+    def set_callback(self, entity: str, params: t.CallbackParams) -> None:
         try:
+            prototype = enums.callbacks.classes[entity]
             self._callbacks[entity] = prototype(**params)
+        except KeyError:
+            raise errors.SetError("There is no prototype for this callback!")
         except (ValueError, AttributeError, TypeError):
-            raise SetError("Unable to set the callback!")
+            raise errors.SetError("Unable to set the callback!")
 
-    def get_callback(self, entity: str) -> Callback:
+    def get_callback(self, entity: str) -> t.Callback:
         return self._callbacks.get(entity)
 
     def delete_callback(self, entity: str) -> None:
         self._callbacks.pop(entity, None)
+
+    @property
+    def name(self) -> str:
+        return self._name
 
     @property
     def inputs(self) -> list[str]:
@@ -283,26 +250,30 @@ class UploadedModel(Model):
 
         Raises
         ------
-        UploadError
+        errors.UploadError
             For errors during the uploading procedure.
         """
         try:
             with tempfile.NamedTemporaryFile() as tmp:
                 tmp.write(buff.getbuffer())
 
-                self._object = type_cast(Object, tf.keras.models.load_model(tmp.name))
+                self._object = typing.cast(
+                    t.Object, tf.keras.models.load_model(tmp.name)
+                )
                 self._built = True
                 self._set_config()
                 self.update_state()
         except ValueError:
-            raise UploadError("Unable to upload the model!")
+            raise errors.UploadError("Unable to upload the model!")
 
-    def evaluate(self, data: DataFrame, batch_size: int) -> EvaluationResults:
+    def evaluate(self, data: t.DataFrame, batch_size: int) -> t.EvaluationResults:
         if tools.data.contains_nonnumeric_dtypes(data):
-            raise ModelError("The data for evaluation contains non-numeric values!")
+            raise errors.ModelError(
+                "The data for evaluation contains non-numeric values!"
+            )
 
         try:
-            logs = type_cast(
+            logs = typing.cast(
                 dict[str, float],
                 self._object.evaluate(
                     x=self._get_processed_data(data, "input"),
@@ -314,13 +285,15 @@ class UploadedModel(Model):
             )  # Type-cast the return value as 'return_dict' is set to True
             results = pd.DataFrame(logs.items(), columns=["Name", "Value"])
         except (RuntimeError, ValueError, AttributeError, TypeError):
-            raise ModelError("Unable to evaluate the model!")
+            raise errors.ModelError("Unable to evaluate the model!")
 
         return results
 
-    def predict(self, data: DataFrame, batch_size: int) -> Predictions:
+    def predict(self, data: t.DataFrame, batch_size: int) -> t.Predictions:
         if tools.data.contains_nonnumeric_dtypes(data):
-            raise ModelError("The data for predictions contains non-numeric values!")
+            raise errors.ModelError(
+                "The data for predictions contains non-numeric values!"
+            )
 
         try:
             arrays = self._object.predict(
@@ -334,7 +307,7 @@ class UploadedModel(Model):
             else:
                 predictions = [pd.DataFrame(arrays)]
         except (RuntimeError, ValueError, AttributeError, TypeError):
-            raise ModelError("Unable to make the prediction!")
+            raise errors.ModelError("Unable to make the prediction!")
 
         return predictions
 
@@ -346,38 +319,41 @@ class CreatedModel(Model):
     def reset_state(self) -> None:
         super().reset_state()
 
-        self._layers: dict[str, Layer] = dict()
-        self._history: DataFrame = pd.DataFrame()
+        self._layers: t.LayerObject = dict()
+        self._history: t.DataFrame = pd.DataFrame()
 
     def update_state(self) -> None:
         super().update_state()
 
-        self._history: DataFrame = pd.DataFrame()
+        self._history: t.DataFrame = pd.DataFrame()
 
     def set_name(self, name: str) -> None:
-        if not name:
-            raise SetError("Please, enter the name!")
-
         self._name = name
 
     def set_layer(
-        self, entity: str, params: LayerParams, connection: LayerConnection
+        self,
+        entity: str,
+        name: str,
+        params: t.LayerParams,
+        connection: t.LayerConnection,
     ) -> None:
-        name = params.get("name")
+        if name in self._layers:
+            raise errors.SetError("Layer with this name already exists!")
 
-        if not name:
-            raise SetError("Please, enter the layer name!")
+        try:
+            prototype = enums.layers.classes[entity]
 
-        if self._layers.get(name):
-            raise SetError("Layer with this name already exists!")
+            if connection is None:
+                layer = prototype(name=name, **params)
+            else:
+                layer = prototype(name=name, **params)(connection)
+        except KeyError:
+            raise errors.SetError("There is no prototype for this layer!")
+        except (ValueError, AttributeError, TypeError):
+            raise errors.SetError("Unable to set the layer!")
 
         if entity == "Input":
             self._inputs.append(name)
-
-        if connection is None:
-            layer = layers.classes[entity](**params)
-        else:
-            layer = layers.classes[entity](**params)(connection)
 
         self._layers[name] = layer
 
@@ -385,7 +361,7 @@ class CreatedModel(Model):
         try:
             name = self._layers.popitem()[0]
         except KeyError:
-            raise DeleteError("There are no layers to remove!")
+            raise errors.DeleteError("There are no layers to remove!")
 
         try:
             self._inputs.remove(name)
@@ -399,7 +375,7 @@ class CreatedModel(Model):
 
     def set_outputs(self, outputs: list[str]) -> None:
         if not outputs:
-            raise SetError("Please, select at least one output!")
+            raise errors.SetError("Please, select at least one output!")
 
         self._outputs = outputs
 
@@ -408,24 +384,24 @@ class CreatedModel(Model):
         output_layers = {name: self._layers[name] for name in self._outputs}
 
         if not input_layers or not output_layers:
-            raise CreateError("There are no input or output layers!")
+            raise errors.CreateError("There are no input or output layers!")
 
         try:
             self._object = tf.keras.Model(
                 inputs=input_layers, outputs=output_layers, name=self._name
             )
         except (ValueError, AttributeError, TypeError):
-            raise CreateError("Unable to create the model!")
+            raise errors.CreateError("Unable to create the model!")
 
         self._built = True
         self._set_config()
         self.update_state()
 
     def fit(
-        self, data: DataFrame, batch_size: int, num_epochs: int, val_split: float
+        self, data: t.DataFrame, batch_size: int, num_epochs: int, val_split: float
     ) -> None:
         if tools.data.contains_nonnumeric_dtypes(data):
-            raise ModelError("The data for fitting contains non-numeric values!")
+            raise errors.ModelError("The data for fitting contains non-numeric values!")
 
         try:
             logs = self._object.fit(
@@ -437,19 +413,19 @@ class CreatedModel(Model):
                 callbacks=self._callbacks.values(),
             )
         except (RuntimeError, ValueError, AttributeError, TypeError):
-            raise ModelError("Unable to fit the model!")
+            raise errors.ModelError("Unable to fit the model!")
 
         self._update_history(pd.DataFrame(logs.history))
 
-    def _update_history(self, logs: DataFrame) -> None:
+    def _update_history(self, logs: t.DataFrame) -> None:
         history_len = len(self._history)
         logs.insert(0, "epoch", range(history_len + 1, history_len + len(logs) + 1))
 
         self._history = pd.concat([self._history, logs])
 
-    def plot_history(self, y: list[str], points: bool) -> Chart:
+    def plot_history(self, y: list[str], points: bool) -> t.Chart:
         if not y:
-            raise PlotError("Please, select at least one log!")
+            raise errors.PlotError("Please, select at least one log!")
 
         try:
             logs = self._history.loc[:, ["epoch", *y]]
@@ -457,7 +433,7 @@ class CreatedModel(Model):
                 "epoch", var_name="log_name", value_name="log_value"
             )
             chart = (
-                Chart(melted_logs)
+                alt.Chart(melted_logs)
                 .mark_line(point=points)
                 .encode(
                     x=alt.X("epoch").scale(zero=False).title("Epoch"),
@@ -470,14 +446,14 @@ class CreatedModel(Model):
                 .properties(height=500)
             )
         except (ValueError, AttributeError, TypeError):
-            raise PlotError("Unable to display the plot!")
+            raise errors.PlotError("Unable to display the plot!")
 
         return chart
 
     @property
-    def layers(self) -> dict[str, Layer]:
+    def layers(self) -> t.LayerObject:
         return self._layers.copy()
 
     @property
-    def history(self) -> DataFrame:
+    def history(self) -> t.DataFrame:
         return self._history.copy()

@@ -1,11 +1,11 @@
 import streamlit as st
 
-from mlui.classes.data import Data
-from mlui.classes.errors import ModelError
-from mlui.classes.model import UploadedModel
+import mlui.classes.data as data
+import mlui.classes.errors as errors
+import mlui.classes.model as model
 
 
-def evaluate_model_ui(data: Data, model: UploadedModel) -> None:
+def evaluate_model_ui(data: data.Data, model: model.UploadedModel) -> None:
     """Generate the UI for evaluating the model.
 
     Parameters
@@ -31,5 +31,5 @@ def evaluate_model_ui(data: Data, model: UploadedModel) -> None:
                 st.subheader("Tracked metrics and losses")
                 st.dataframe(results, hide_index=True)
                 st.toast("Evaluation is completed!", icon="✅")
-            except ModelError as error:
+            except errors.ModelError as error:
                 st.toast(error, icon="❌")

@@ -1,12 +1,12 @@
 import streamlit as st
 
-from mlui.classes.data import Data
-from mlui.classes.errors import SetError
-from mlui.classes.model import Model
-from mlui.enums import callbacks
+import mlui.classes.data as data
+import mlui.classes.errors as errors
+import mlui.classes.model as model
+import mlui.enums as enums
 
 
-def set_features_ui(data: Data, model: Model) -> None:
+def set_features_ui(data: data.Data, model: model.Model) -> None:
     """Generate the UI for setting the data columns
     as features for the model's input and output layers.
 
@@ -19,11 +19,12 @@ def set_features_ui(data: Data, model: Model) -> None:
     """
     st.header("Set Input/Output Features")
     st.markdown(
-        "Here, you can set the input and output features for each respective layer. "
-        "The changes will take place only after clicking the `Set Features` button. "
-        "Please, be aware that the order in which you add the columns is important, "
-        "as your future data need to be consistent with the data on which the model "
-        "was trained."
+        "Choose input and output features for each respective layer from the data "
+        "columns. Please be aware that the order in which you add the columns is "
+        "important for evaluating the model or making predictions, as the data needs "
+        "to be consistent with the data on which the model was trained. Additionally, "
+        "note that for multiclass classification problems, the output columns should "
+        "be one-hot encoded for the model to work correctly."
     )
 
     task = st.session_state.get("task")
@@ -42,29 +43,32 @@ def set_features_ui(data: Data, model: Model) -> None:
         layers = model.outputs
         shapes = model.output_shape
 
-    def set_features() -> None:
-        try:
-            model.set_features(layer, columns, at)
-            data.set_unused_columns(options, columns)
-            st.toast("Features are set!", icon="✅")
-        except SetError as error:
-            st.toast(error, icon="❌")
-
     layer = str(st.selectbox("Select layer:", layers))
-    features = model.get_features(layer, at)
-    options = data.get_unused_columns()
-    options.extend(features)
+
+    available = data.get_unused_columns()
+    default = model.get_features(layer, at)
+    available.extend(default)
+
     columns = st.multiselect(
         "Select columns (order is important):",
-        options,
-        features,
+        available,
+        default,
         max_selections=shapes[layer],
     )
+
+    def set_features() -> None:
+        """Supporting function for the accurate representation of widgets."""
+        try:
+            model.set_features(layer, columns, at)
+            data.set_unused_columns(available, columns)
+            st.toast("Features are set!", icon="✅")
+        except errors.SetError as error:
+            st.toast(error, icon="❌")
 
     st.button("Set Features", on_click=set_features)
 
 
-def set_callbacks_ui(model: Model) -> None:
+def set_callbacks_ui(model: model.Model) -> None:
     """Generate the UI for setting the model's callbacks.
 
     Parameters
@@ -73,27 +77,35 @@ def set_callbacks_ui(model: Model) -> None:
         Model object.
     """
     st.header("Set Callbacks")
+    st.markdown(
+        "Optionally choose callbacks for the model to use during evaluation, "
+        "training, or making predictions. Some callbacks have adjustable parameters. "
+        "Once you add a callback, you may delete it if you no longer need it or want "
+        "to readjust its parameters."
+    )
 
-    options = callbacks.classes.keys()
-    entity = str(st.selectbox("Select callback's class:", options))
+    callbacks = enums.callbacks.classes
+    entity = str(st.selectbox("Select callback's class:", callbacks))
 
     with st.expander("Callback's Parameters"):
-        widget = callbacks.widgets[entity]()
+        prototype = enums.callbacks.widgets[entity]
+        widget = prototype()
+
+    is_set = model.get_callback(entity)
+    label = "Set Callback" if not is_set else "Delete Callback"
 
     def manage_callback() -> None:
-        if not callback_is_set:
+        """Supporting function for the accurate representation of widgets."""
+        if not is_set:
             try:
                 params = widget.params
 
                 model.set_callback(entity, params)
                 st.toast("Callback is set!", icon="✅")
-            except SetError as error:
+            except errors.SetError as error:
                 st.toast(error, icon="❌")
-        elif callback_is_set:
+        elif is_set:
             model.delete_callback(entity)
             st.toast("Callback is deleted!", icon="✅")
-
-    callback_is_set = model.get_callback(entity)
-    label = "Set Callback" if not callback_is_set else "Delete Callback"
 
     st.button(label, on_click=manage_callback)

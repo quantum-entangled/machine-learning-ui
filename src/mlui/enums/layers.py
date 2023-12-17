@@ -1,10 +1,10 @@
 import tensorflow as tf
 
+import mlui.types.classes as ct
+import mlui.types.widgets as wt
 import mlui.widgets.layers as widget
-from mlui.types.classes import LayerTypes
-from mlui.types.widgets import LayerWidgetTypes
 
-classes: LayerTypes = {
+classes: ct.LayerTypes = {
     "Input": tf.keras.Input,
     "Dense": tf.keras.layers.Dense,
     "Concatenate": tf.keras.layers.Concatenate,
@@ -12,7 +12,7 @@ classes: LayerTypes = {
     "Dropout": tf.keras.layers.Dropout,
 }
 
-widgets: LayerWidgetTypes = {
+widgets: wt.LayerWidgetTypes = {
     "Input": widget.Input,
     "Dense": widget.Dense,
     "Concatenate": widget.Concatenate,

@@ -1,11 +1,11 @@
 import streamlit as st
 
-from mlui.classes.data import Data
-from mlui.classes.errors import PlotError
-from mlui.classes.model import Model
+import mlui.classes.data as data
+import mlui.classes.errors as errors
+import mlui.classes.model as model
 
 
-def data_info_ui(data: Data) -> None:
+def data_info_ui(data: data.Data) -> None:
     """Generate the UI for displaying data information.
 
     Parameters
@@ -34,7 +34,7 @@ def data_info_ui(data: Data) -> None:
         st.success("The DataFrame doesn't contain non-numeric values.", icon="✅")
 
 
-def dataframe_ui(data: Data) -> None:
+def dataframe_ui(data: data.Data) -> None:
     """Generate the UI for displaying a dataframe.
 
     Parameters
@@ -53,7 +53,7 @@ def dataframe_ui(data: Data) -> None:
     st.dataframe(data.dataframe, use_container_width=True)
 
 
-def statistics_ui(data: Data) -> None:
+def statistics_ui(data: data.Data) -> None:
     """Generate the UI for displaying data statistics.
 
     Parameters
@@ -71,7 +71,7 @@ def statistics_ui(data: Data) -> None:
     st.dataframe(stats, use_container_width=True)
 
 
-def plot_columns_ui(data: Data) -> None:
+def plot_columns_ui(data: data.Data) -> None:
     """Generate the UI for plotting data columns.
 
     Parameters
@@ -97,11 +97,11 @@ def plot_columns_ui(data: Data) -> None:
             chart = data.plot_columns(x, y, points)
 
             st.altair_chart(chart, use_container_width=True)
-        except PlotError as error:
+        except errors.PlotError as error:
             st.toast(error, icon="❌")
 
 
-def reset_data_ui(data: Data, model: Model) -> None:
+def reset_data_ui(data: data.Data, model: model.Model) -> None:
     """Generate the UI for resetting the data.
 
     Parameters

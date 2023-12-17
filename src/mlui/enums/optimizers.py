@@ -1,16 +1,16 @@
 import tensorflow as tf
 
+import mlui.types.classes as ct
+import mlui.types.widgets as wt
 import mlui.widgets.optimizers as widget
-from mlui.types.classes import OptimizerTypes
-from mlui.types.widgets import OptimizerWidgetTypes
 
-classes: OptimizerTypes = {
+classes: ct.OptimizerTypes = {
     "Adam": tf.keras.optimizers.Adam,
     "RMSprop": tf.keras.optimizers.RMSprop,
     "SGD": tf.keras.optimizers.SGD,
 }
 
-widgets: OptimizerWidgetTypes = {
+widgets: wt.OptimizerWidgetTypes = {
     "Adam": widget.Adam,
     "RMSprop": widget.RMSprop,
     "SGD": widget.SGD,

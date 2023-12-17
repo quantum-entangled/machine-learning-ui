@@ -1,15 +1,15 @@
-from typing import Type, TypeAlias
+import typing
 
 import mlui.widgets as widgets
 
 # Layers
-LayerWidgetType: TypeAlias = Type[widgets.layers.LayerWidget]
-LayerWidgetTypes: TypeAlias = dict[str, LayerWidgetType]
+LayerWidgetType: typing.TypeAlias = typing.Type[widgets.layers.LayerWidget]
+LayerWidgetTypes: typing.TypeAlias = dict[str, LayerWidgetType]
 
 # Optimizers
-OptimizerWidgetType: TypeAlias = Type[widgets.optimizers.OptimizerWidget]
-OptimizerWidgetTypes: TypeAlias = dict[str, OptimizerWidgetType]
+OptimizerWidgetType: typing.TypeAlias = typing.Type[widgets.optimizers.OptimizerWidget]
+OptimizerWidgetTypes: typing.TypeAlias = dict[str, OptimizerWidgetType]
 
 # Callbacks
-CallbackWidgetType: TypeAlias = Type[widgets.callbacks.CallbackWidget]
-CallbackWidgetTypes: TypeAlias = dict[str, CallbackWidgetType]
+CallbackWidgetType: typing.TypeAlias = typing.Type[widgets.callbacks.CallbackWidget]
+CallbackWidgetTypes: typing.TypeAlias = dict[str, CallbackWidgetType]

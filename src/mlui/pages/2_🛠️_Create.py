@@ -1,17 +1,23 @@
 import streamlit as st
 
+import mlui.decorators as decorators
 import mlui.widgets.create as widgets
-from mlui.decorators.pages import check_task
-from mlui.decorators.session import set_classes, set_task
 
 st.set_page_config(page_title="Create", page_icon="🛠️")
 
 
-@set_task
-@set_classes
-@check_task(["Train"])
+@decorators.session.set_state
+@decorators.pages.check_task(["Train"])
 def create_page() -> None:
     model = st.session_state.model
+    model_type = st.session_state.model_type
+
+    if model_type != "Created":
+        st.info(
+            "The content of this page is not available for the specified model type.",
+            icon="💡",
+        )
+        return
 
     with st.container():
         widgets.set_name_ui(model)

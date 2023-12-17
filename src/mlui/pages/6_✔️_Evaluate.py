@@ -1,19 +1,23 @@
 import streamlit as st
 
+import mlui.decorators as decorators
 import mlui.widgets.evaluate as widgets
-from mlui.decorators.pages import check_model, check_task
-from mlui.decorators.session import set_classes, set_task
 
 st.set_page_config(page_title="Evaluate", page_icon="✔️")
 
 
-@set_task
-@set_classes
-@check_task(["Evaluate"])
-@check_model(["compiled"])
+@decorators.session.set_state
+@decorators.pages.check_task(["Evaluate"])
 def evaluate_page() -> None:
     data = st.session_state.data
     model = st.session_state.model
+
+    if not model.compiled:
+        st.info(
+            "The content of this page will be available once the model is compiled.",
+            icon="💡",
+        )
+        return
 
     with st.container():
         widgets.evaluate_model_ui(data, model)

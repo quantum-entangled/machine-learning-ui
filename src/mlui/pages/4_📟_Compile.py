@@ -1,18 +1,23 @@
 import streamlit as st
 
+import mlui.decorators as decorators
 import mlui.widgets.compile as widgets
-from mlui.decorators.pages import check_model, check_task
-from mlui.decorators.session import set_classes, set_task
 
 st.set_page_config(page_title="Compile", page_icon="📟")
 
 
-@set_task
-@set_classes
-@check_task(["Train", "Evaluate"])
-@check_model(["input_configured", "output_configured"])
+@decorators.session.set_state
+@decorators.pages.check_task(["Train", "Evaluate"])
 def compile_page() -> None:
     model = st.session_state.model
+
+    if not model.input_configured or not model.output_configured:
+        st.info(
+            "The content of this page will be available "
+            "once the model's layers are configured.",
+            icon="💡",
+        )
+        return
 
     with st.container():
         widgets.set_optimizer_ui(model)

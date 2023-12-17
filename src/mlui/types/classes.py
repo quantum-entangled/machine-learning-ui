@@ -1,9 +1,13 @@
 import typing
 
+import altair as alt
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
 import tensorflow as tf
+
+# Pages
+PageTasks: typing.TypeAlias = list[str]
 
 # Data & Model
 Columns: typing.TypeAlias = list[str]
@@ -18,6 +22,9 @@ NDArray: typing.TypeAlias = npt.NDArray[np.float64]
 EvaluationResults: typing.TypeAlias = DataFrame
 Predictions: typing.TypeAlias = list[DataFrame]
 
+# Charts
+Chart: typing.TypeAlias = alt.Chart
+
 # Activations
 Tensor: typing.TypeAlias = tf.Tensor
 ActivationType: typing.TypeAlias = typing.Type[typing.Callable[..., tf.Tensor]]
@@ -31,14 +38,13 @@ Layers: typing.TypeAlias = list[str]
 LayerShape: typing.TypeAlias = dict[str, int]
 LayerFeatures: typing.TypeAlias = dict[str, Features]
 LayerConfigured: typing.TypeAlias = dict[str, bool]
-LayerConnection: typing.TypeAlias = Layer | list[Layer] | None
+LayerObject: typing.TypeAlias = dict[str, Layer]
 LayerData: typing.TypeAlias = dict[str, NDArray]
+LayerConnection: typing.TypeAlias = Layer | list[Layer] | None
 
 
 class LayerParams(typing.TypedDict):
     """Base type annotation for a layer's parameters."""
-
-    name: str
 
 
 class InputParams(LayerParams):

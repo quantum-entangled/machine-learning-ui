@@ -1,19 +1,24 @@
 import streamlit as st
 
+import mlui.decorators as decorators
 import mlui.widgets.predict as widgets
-from mlui.decorators.pages import check_model, check_task
-from mlui.decorators.session import set_classes, set_task
 
 st.set_page_config(page_title="Predict", page_icon="🔮")
 
 
-@set_task
-@set_classes
-@check_task(["Predict"])
-@check_model(["input_configured"])
+@decorators.session.set_state
+@decorators.pages.check_task(["Predict"])
 def predict_page() -> None:
     data = st.session_state.data
     model = st.session_state.model
+
+    if not model.input_configured:
+        st.info(
+            "The content of this page will be available "
+            "once the model's input layers are configured.",
+            icon="💡",
+        )
+        return
 
     with st.container():
         widgets.make_predictions_ui(data, model)

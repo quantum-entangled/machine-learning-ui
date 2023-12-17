@@ -1,6 +1,6 @@
-from mlui.types.classes import LossTypes
+import mlui.types.classes as t
 
-classes: LossTypes = [
+classes: t.LossTypes = [
     "MeanAbsoluteError",
     "MeanAbsolutePercentageError",
     "MeanSquaredError",
