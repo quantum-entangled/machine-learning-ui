@@ -18,6 +18,15 @@ def fit_model_ui(data: data.Data, model: model.CreatedModel) -> None:
         Model object.
     """
     st.header("Fit Model")
+    st.markdown(
+        "Train the model by specifying the required hyperparameters. Once the "
+        "`Fit Model` button is clicked, the training process will start, and logs "
+        "will be displayed in the respective dropdown. Depending on the size of your "
+        "model and chosen hyperparameters, it might take some time. Be aware that if "
+        "you change a widget's value or navigate to other pages, the logs dropdown "
+        "will disappear. However, you will still be able to examine the history "
+        "dataframe and plot the logs in the next section."
+    )
 
     batch_size = st.number_input(
         "Batch size:", min_value=1, max_value=1024, value=32, step=1
@@ -51,6 +60,13 @@ def plot_history_ui(model: model.CreatedModel) -> None:
         Model object.
     """
     st.header("Plot History")
+    st.markdown(
+        "Plot the training logs by specifying one or more you want to view. You can "
+        "also examine and download the training history dataframe from which the "
+        "plot is constructed. Additionally, you can interact with the plot by "
+        "zooming in and out, dragging it, and accessing different download options "
+        "by clicking the three dots in the upper right corner."
+    )
 
     history = model.history
     options = history.columns.drop("epoch") if not history.empty else list()

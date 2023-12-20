@@ -16,6 +16,13 @@ def make_predictions_ui(data: data.Data, model: model.UploadedModel) -> None:
         Model object.
     """
     st.header("Make Predictions")
+    st.markdown(
+        "Make predictions with the model by specifying the batch size. Once the "
+        "`Make Predictions` button is clicked, the predictions will be displayed in "
+        "the respective dropdown. Depending on the size of your model and chosen "
+        "batch size, it might take some time. The predictions are values for each "
+        "node of each output layer."
+    )
 
     batch_size = st.number_input(
         "Batch size:", min_value=1, max_value=1024, value=32, step=1

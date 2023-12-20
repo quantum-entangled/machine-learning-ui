@@ -16,10 +16,11 @@ def home_page() -> None:
 
     if task == "Train":
         types = ("Created", "Uploaded")
+        default = types.index(st.session_state.model_type)
     else:
         types = ("Uploaded",)
+        default = 0
 
-    default = types.index(st.session_state.model_type)
     model_type = st.selectbox("Select model type:", types, default)
 
     def set_state() -> None:
