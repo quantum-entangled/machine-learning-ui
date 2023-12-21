@@ -1,6 +1,6 @@
 from typing import Type
 
-from mlui.CustomOptimizers import AdaMod, Apollo, MADGRAD, LARS
+from mlui.CustomOptimizers import AdaMod, Apollo, MADGRAD, LARS, AdaHessian
 import tensorflow_addons as tfa
 import tensorflow as tf
 
@@ -17,6 +17,7 @@ classes: dict[str, tf.keras.optimizers.Optimizer] = {
     "RAdam": tfa.optimizers.RectifiedAdam,
     "MADGRAD": MADGRAD,
     "LARS": LARS,
+    "AdaHessian": AdaHessian,
 }
 
 widgets: dict[str, Type[wo.OptimizerWidget]] = {
@@ -30,4 +31,5 @@ widgets: dict[str, Type[wo.OptimizerWidget]] = {
     "RAdam": wo.RAdam,
     "MADGRAD": wo.MADGRAD,
     "LARS": wo.LARS,
+    "AdaHessian": wo.AdaHessian,
 }
