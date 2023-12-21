@@ -14,6 +14,9 @@ def model_info_ui(model: model.Model) -> None:
         Model object.
     """
     st.header("Model Info")
+    st.markdown(
+        "View the essential information about your model in relation to other sections."
+    )
 
     task = st.session_state.get("task")
     built = model.built
@@ -50,6 +53,7 @@ def summary_ui(model: model.Model) -> None:
         Model object.
     """
     st.header("Summary")
+    st.markdown("View the model's summary.")
 
     with st.expander("Summary"):
         with capture.stdout(st.empty().code):
@@ -65,6 +69,7 @@ def graph_ui(model: model.Model) -> None:
         Model object.
     """
     st.header("Graph")
+    st.markdown("Download the graph describing the model's architecture.")
 
     graph = model.graph
 
@@ -80,6 +85,7 @@ def download_model_ui(model: model.Model) -> None:
         Model object.
     """
     st.header("Download Model")
+    st.markdown("Download the model in `H5` format.")
 
     model_as_bytes = model.as_bytes
 
@@ -97,6 +103,11 @@ def reset_model_ui(data: data.Data, model: model.Model) -> None:
         Model object.
     """
     st.header("Reset Model")
+    st.markdown(
+        "Reset your model for the app session. Once the `Reset Model` button is "
+        "clicked, the model file you have uploaded/created will be erased, and all "
+        "connections with other sections will be removed."
+    )
 
     reset_model_btn = st.button("Reset Model")
 

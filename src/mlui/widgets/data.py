@@ -14,6 +14,9 @@ def data_info_ui(data: data.Data) -> None:
         Data object.
     """
     st.header("Data Info")
+    st.markdown(
+        "View the essential information about your data in relation to other sections."
+    )
 
     empty = data.empty
     has_nans = data.has_nans
@@ -44,10 +47,10 @@ def dataframe_ui(data: data.Data) -> None:
     """
     st.header("Dataframe")
     st.markdown(
-        "Here, you can view the uploaded file's dataframe and edit it. "
-        "You can sort and resize columns, search through data (click on table, "
-        "then `⌘ Cmd + F` or `Ctrl + F`), as well as edit each cell, copy/paste "
-        "different parts to/from clipboard."
+        "View your data file. You can sort and resize columns, search through data "
+        "by clicking the search icon or pressing `⌘ Cmd + F` / `Ctrl + F` on the "
+        "table, copy/paste different parts to/from clipboard, and download the "
+        "dataset in `CSV` format."
     )
 
     st.dataframe(data.dataframe, use_container_width=True)
@@ -63,8 +66,8 @@ def statistics_ui(data: data.Data) -> None:
     """
     st.header("Statistics")
     st.markdown(
-        "Here, you can view the descriptive statistics of the dataset, as well as "
-        "the type and number of missing values for each column."
+        "View the descriptive statistics of the dataset, as well as "
+        "the dtype and percent of missing values for each column."
     )
 
     stats = data.get_stats()
@@ -81,9 +84,11 @@ def plot_columns_ui(data: data.Data) -> None:
     """
     st.header("Plot Columns")
     st.markdown(
-        "Here, you can plot different columns of the dataset against each other. "
-        "A simple line plot is used for two distinct columns, and a histogram "
-        "is used for the same ones."
+        "Plot different columns of the dataset against each other. A simple line "
+        "plot is used for two distinct columns, and a histogram is used for the "
+        "same ones. Additionally, you can interact with the plot by zooming in and "
+        "out, dragging it, and accessing different download options by clicking the "
+        "three dots in the upper right corner."
     )
 
     with st.form("plot_columns_form", border=False):
@@ -112,6 +117,11 @@ def reset_data_ui(data: data.Data, model: model.Model) -> None:
         Model object.
     """
     st.header("Reset Data")
+    st.markdown(
+        "Reset your data for the app session. Once the `Reset Data` button is "
+        "clicked, the data file you have uploaded will be erased, and all "
+        "connections with other sections will be removed."
+    )
 
     reset_data_btn = st.button("Reset Data")
 
