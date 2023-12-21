@@ -1,17 +1,17 @@
-from typing import Type
-
 import tensorflow as tf
 
-import mlui.widgets.optimizers as wo
+import mlui.types.classes as ct
+import mlui.types.widgets as wt
+import mlui.widgets.optimizers as widget
 
-classes: dict[str, tf.keras.optimizers.Optimizer] = {
+classes: ct.OptimizerTypes = {
     "Adam": tf.keras.optimizers.Adam,
     "RMSprop": tf.keras.optimizers.RMSprop,
     "SGD": tf.keras.optimizers.SGD,
 }
 
-widgets: dict[str, Type[wo.OptimizerWidget]] = {
-    "Adam": wo.Adam,
-    "RMSprop": wo.RMSprop,
-    "SGD": wo.SGD,
+widgets: wt.OptimizerWidgetTypes = {
+    "Adam": widget.Adam,
+    "RMSprop": widget.RMSprop,
+    "SGD": widget.SGD,
 }

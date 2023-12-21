@@ -1,55 +1,59 @@
 import streamlit as st
 
-import mlui.data_classes.data as data_cls
-import mlui.data_classes.model as model_cls
-import mlui.managers.data_manager as dm
-import mlui.managers.errors as err
-import mlui.managers.model_manager as mm
+import mlui.classes.data as data
+import mlui.classes.errors as errors
+import mlui.classes.model as model
 
 
-def upload_file_ui(data: data_cls.Data, model: model_cls.Model) -> None:
-    """Generate UI for uploading a file.
+def upload_data_ui(data: data.Data) -> None:
+    """Generate the UI for uploading a data file.
 
     Parameters
     ----------
     data : Data
-        Data container object.
-    model : Model
-        Model container object.
+        Data object.
     """
     st.header("Upload File")
-    st.markdown("Upload a file from your system by clicking the `Browse files` button.")
+    st.markdown(
+        "Upload a data file from your system using the provided form. You will be "
+        "able to view your dataset on the `Data` page. Please note that errors may "
+        "occur during the upload if the file is poorly formatted or lacks sufficient "
+        "rows and columns. Additionally, be aware that files containing _NaN_ and/or "
+        "non-numeric values may result in errors during the training, evaluation, or "
+        "prediction processes."
+    )
 
-    uploaded_file = st.file_uploader("Choose a data file:", "csv", key="file_uploader")
+    buff = st.file_uploader("Choose a data file:", "csv", key="file_uploader")
 
-    if uploaded_file:
+    if buff:
         try:
-            dm.upload_file(uploaded_file, data, model)
-            st.success("File is uploaded and ready to be processed!", icon="✅")
-        except (err.UploadError, err.FileEmptyError) as error:
-            st.error(error, icon="❌")
+            data.upload(buff)
+            st.toast("File is uploaded!", icon="✅")
+        except errors.UploadError as error:
+            st.toast(error, icon="❌")
 
 
-def upload_model_ui(model: model_cls.Model) -> None:
-    """Generate UI for uploading a model.
+def upload_model_ui(model: model.UploadedModel) -> None:
+    """Generate the UI for uploading a model file.
 
     Parameters
     ----------
     model : Model
-        Model container object.
+        Model object.
     """
     st.header("Upload Model")
     st.markdown(
-        "Upload a model from your system by clicking the `Browse files` button."
+        "Upload a model file from your system using the provided form. You will be "
+        "able to view your model on the `Model` page. Please note that models with "
+        "more than one dimension in their inputs or outputs, except for the batch "
+        "size, are not supported and may cause errors."
     )
 
-    uploaded_model = st.file_uploader(
-        "Choose a model file:", "h5", key="model_uploader"
-    )
+    buff = st.file_uploader("Choose a model file:", "h5", key="model_uploader")
 
-    if uploaded_model:
+    if buff:
         try:
-            mm.upload_model(uploaded_model, model)
-            st.success("Model is uploaded and ready to be processed!", icon="✅")
-        except err.UploadError as error:
-            st.error(error, icon="❌")
+            model.upload(buff)
+            st.toast("Model is uploaded!", icon="✅")
+        except errors.UploadError as error:
+            st.toast(error, icon="❌")
