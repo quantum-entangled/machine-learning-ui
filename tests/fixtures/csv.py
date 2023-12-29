@@ -46,7 +46,7 @@ def csv_with_NaN() -> str:
 
 @pytest.fixture
 def csv_invalid_delimiter() -> str:
-    return "\r\n".join(["h1;h2;h3", "1;2;2", "1;1;6", "2;7;5", "3;3;6", ""])
+    return "\r\n".join(["h1:h2:h3", "1:2:2", "1:1:6", "2:7:5", "3:3:6", ""])
 
 
 @pytest.fixture

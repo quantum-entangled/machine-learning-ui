@@ -1,4 +1,14 @@
-from fixtures.models_and_data import data, model, not_empty_model, model_with_layers
+from fixtures.models_and_data import (
+    data,
+    model,
+    uploaded_model,
+    created_model,
+    not_empty_model,
+    model_with_layers,
+    full_model,
+    compiled_model,
+)
+
 from fixtures.csv import (
     csv_str,
     empty_csv,

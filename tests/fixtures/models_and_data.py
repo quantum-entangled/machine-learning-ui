@@ -1,10 +1,11 @@
 import pytest
 import tensorflow as tf
 
-from mlui.data_classes import data as data_cls
-from mlui.data_classes import model as model_cls
-from mlui.managers import model_manager as mm
+import mlui.classes.model as model_cls
+import mlui.classes.data as data_cls
 import mlui.widgets.layers as wl
+import mlui.enums as enums
+import mlui.types.classes as t
 
 
 @pytest.fixture
@@ -18,58 +19,53 @@ def model() -> model_cls.Model:
 
 
 @pytest.fixture
-def not_empty_model() -> model_cls.Model:
-    model = model_cls.Model()
-    model_name = "test_model"
-    model.name = model_name
-    model.instance = tf.keras.Model(inputs=list(), outputs=list(), name=model_name)
+def uploaded_model() -> model_cls.UploadedModel:
+    return model_cls.UploadedModel()
+
+
+@pytest.fixture
+def created_model() -> model_cls.CreatedModel:
+    return model_cls.CreatedModel()
+
+
+@pytest.fixture
+def not_empty_model() -> model_cls.CreatedModel:
+    model = model_cls.CreatedModel()
+    model.set_name("test_model")
+    earlystopping_params = t.EarlyStoppingParams(min_delta=0, patience=0)
+    model.set_callback("EarlyStopping", earlystopping_params)
+    layer_params = t.InputParams(shape=(4,))
+    model.set_layer("Input", "input", layer_params, None)
     return model
 
 
 @pytest.fixture
 def model_with_layers() -> model_cls.Model:
-    model = model_cls.Model()
-    model_name = "test_model"
-    mm.create_model(model_name, model)
-
-    input_params = wl.InputParams(name="input", shape=(4,))
-    mm.add_layer(
-        layer_cls=tf.keras.Input,
-        layer_params=input_params,
-        layer_connection=None,
-        model=model,
-    )
-
-    dense_1_params = wl.DenseParams(name="dense_1", units=32, activation="relu")
-    mm.add_layer(
-        layer_cls=tf.keras.layers.Dense,
-        layer_params=dense_1_params,
-        layer_connection="input",
-        model=model,
-    )
-
-    dense_2_params = wl.DenseParams(name="dense_2", units=32, activation="relu")
-    mm.add_layer(
-        layer_cls=tf.keras.layers.Dense,
-        layer_params=dense_2_params,
-        layer_connection="input",
-        model=model,
-    )
-
-    concatenate_params = wl.LayerParams(name="concatenate")
-    mm.add_layer(
-        layer_cls=tf.keras.layers.Concatenate,
-        layer_params=concatenate_params,
-        layer_connection=["dense_1", "dense_2"],
-        model=model,
-    )
-
-    output_params = wl.DenseParams(name="output", units=32, activation="relu")
-    mm.add_layer(
-        layer_cls=tf.keras.layers.Dense,
-        layer_params=output_params,
-        layer_connection="concatenate",
-        model=model,
-    )
-
+    model = model_cls.CreatedModel()
+    model.set_name("test_model_with_layers")
+    input_layer_params = t.InputParams(shape=(4,))
+    model.set_layer("Input", "input", input_layer_params, None)
+    input_layer = model.layers["input"]
+    dense_layer_params = t.DenseParams(units=32, activation="relu")
+    model.set_layer("Dense", "dense", dense_layer_params, input_layer)
+    dense_layer = model.layers["dense"]
+    output_layer_params = t.DenseParams(units=6, activation="relu")
+    model.set_layer("Dense", "output", output_layer_params, dense_layer)
     return model
+
+
+@pytest.fixture
+def full_model(model_with_layers: model_cls.Model) -> model_cls.Model:
+    model_with_layers.set_outputs(["output"])
+    model_with_layers.create()
+    return model_with_layers
+
+
+@pytest.fixture
+def compiled_model(full_model: model_cls.Model) -> model_cls.Model:
+    adam_params = t.AdamParams(learning_rate=0.001, beta_1=0.9, beta_2=0.999)
+    full_model.set_optimizer("Adam", adam_params)
+    full_model.set_loss("output", "MeanAbsoluteError")
+    full_model.set_metrics("output", ["MeanAbsoluteError"])
+    full_model.compile()
+    return full_model
