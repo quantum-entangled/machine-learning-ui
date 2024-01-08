@@ -11,7 +11,11 @@ class ParseCSVError(Exception):
 
 
 class ValidateDataError(Exception):
-    """For errors during the process of validating data."""
+    """For errors during the process of validating the data file."""
+
+
+class ValidateModelError(Exception):
+    """For errors during the process of validating the model."""
 
 
 class ModelError(Exception):

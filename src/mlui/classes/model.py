@@ -323,14 +323,16 @@ class UploadedModel(Model):
             with tempfile.NamedTemporaryFile() as tmp:
                 tmp.write(buff.getbuffer())
 
-                self._object = typing.cast(
-                    t.Object, tf.keras.models.load_model(tmp.name)
-                )
+                model = typing.cast(t.Object, tf.keras.models.load_model(tmp.name))
+                tools.model.validate_shapes(model, at="input")
+                tools.model.validate_shapes(model, at="output")
+
+                self._object = model
                 self._built = True
                 self._set_config()
                 self.update_state()
-        except ValueError:
-            raise errors.UploadError("Unable to upload the model!")
+        except (ValueError, errors.ValidateModelError) as error:
+            raise errors.UploadError(error)
 
     def evaluate(self, data: t.DataFrame, batch_size: int) -> t.EvaluationResults:
         if tools.data.contains_nonnumeric_dtypes(data):

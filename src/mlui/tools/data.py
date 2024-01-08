@@ -33,7 +33,7 @@ def validate_df(df: t.DataFrame) -> None:
         raise errors.ValidateDataError("The DataFrame contains less than 2 columns!")
 
     if len(df) < 2:
-        raise errors.ParseCSVError("The DataFrame contains less than 2 rows!")
+        raise errors.ValidateDataError("The DataFrame contains less than 2 rows!")
 
 
 def contains_nans(df: t.DataFrame) -> bool:
