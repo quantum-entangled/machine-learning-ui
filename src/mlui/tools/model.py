@@ -2,12 +2,7 @@ import mlui.types.classes as t
 from mlui.classes import errors
 
 
-def validate_shapes(model: t.Object, at: t.Side) -> None:
-    if at == "input":
-        shapes = model.input_shape
-    else:
-        shapes = model.output_shape
-
+def validate_shapes(shapes: t.Shapes) -> None:
     if not shapes:
         raise errors.ValidateModelError("The model's shapes are empty!")
 

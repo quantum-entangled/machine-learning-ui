@@ -23,7 +23,7 @@ class Model:
         self.update_state()
 
     def _set_config(self) -> None:
-        self._name: t.Name = self._object.name
+        self._name: str = self._object.name
         self._inputs: t.Layers = typing.cast(t.Layers, self._object.input_names)
         self._outputs: t.Layers = typing.cast(t.Layers, self._object.output_names)
         self._input_shape: t.LayerShape = self._get_processed_shape("input")
@@ -41,7 +41,7 @@ class Model:
         self._input_configured: t.LayerConfigured = dict.fromkeys(self._inputs, False)
         self._output_configured: t.LayerConfigured = dict.fromkeys(self._outputs, False)
 
-    def _shapes_to_list(self, shapes: list[t.Shape] | t.Shape) -> list[t.Shape]:
+    def _shapes_to_list(self, shapes: t.Shapes) -> list[t.Shape]:
         if isinstance(shapes, dict):
             return list(shapes.values())
 
@@ -119,7 +119,7 @@ class Model:
 
         self._compiled = True
 
-    def set_features(self, layer: str, columns: list[str], at: t.Side) -> None:
+    def set_features(self, layer: str, columns: t.Columns, at: t.Side) -> None:
         if not columns:
             raise errors.SetError("Please, select at least one column!")
 
@@ -194,7 +194,7 @@ class Model:
 
         self._history = pd.concat([self._history, logs])
 
-    def plot_history(self, y: list[str], points: bool) -> t.Chart:
+    def plot_history(self, y: t.LogsNames, points: bool) -> t.Chart:
         if not y:
             raise errors.PlotError("Please, select at least one log!")
 
@@ -226,19 +226,19 @@ class Model:
         return self._name
 
     @property
-    def inputs(self) -> list[str]:
+    def inputs(self) -> t.Layers:
         return self._inputs.copy()
 
     @property
-    def outputs(self) -> list[str]:
+    def outputs(self) -> t.Layers:
         return self._outputs.copy()
 
     @property
-    def input_shape(self) -> dict[str, int]:
+    def input_shape(self) -> t.LayerShape:
         return self._input_shape.copy()
 
     @property
-    def output_shape(self) -> dict[str, int]:
+    def output_shape(self) -> t.LayerShape:
         return self._output_shape.copy()
 
     @property
@@ -324,8 +324,8 @@ class UploadedModel(Model):
                 tmp.write(buff.getbuffer())
 
                 model = typing.cast(t.Object, tf.keras.models.load_model(tmp.name))
-                tools.model.validate_shapes(model, at="input")
-                tools.model.validate_shapes(model, at="output")
+                tools.model.validate_shapes(model.input_shape)
+                tools.model.validate_shapes(model.output_shape)
 
                 self._object = model
                 self._built = True
@@ -437,7 +437,7 @@ class CreatedModel(Model):
         except ValueError:
             pass
 
-    def set_outputs(self, outputs: list[str]) -> None:
+    def set_outputs(self, outputs: t.Layers) -> None:
         if not outputs:
             raise errors.SetError("Please, select at least one output!")
 

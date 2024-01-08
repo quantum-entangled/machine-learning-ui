@@ -17,14 +17,15 @@ Features: typing.TypeAlias = list[str]
 DataFrame: typing.TypeAlias = pd.DataFrame
 
 Object: typing.TypeAlias = tf.keras.Model
-Name: typing.TypeAlias = str
 Side: typing.TypeAlias = typing.Literal["input", "output"]
 Shape: typing.TypeAlias = tuple[None, int]
+Shapes: typing.TypeAlias = dict[str, Shape] | list[Shape] | Shape
 NDArray: typing.TypeAlias = npt.NDArray[np.float64]
 EvaluationResults: typing.TypeAlias = DataFrame
 Predictions: typing.TypeAlias = list[DataFrame]
 
 # Charts
+LogsNames: typing.TypeAlias = list[str]
 Chart: typing.TypeAlias = alt.Chart
 
 # Activations
