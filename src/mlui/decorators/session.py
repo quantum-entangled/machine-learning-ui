@@ -4,12 +4,12 @@ import streamlit as st
 
 import mlui.classes.data as data
 import mlui.classes.model as model
+import mlui.types.classes as t
 
 
-# TODO: Add type hints
-def set_state(func):
+def set_state(func: t.FuncType) -> t.FuncType:
     @functools.wraps(func)
-    def inner():
+    def wrapper() -> None:
         if not st.session_state.get("task"):
             st.session_state.task = "Train"
 
@@ -24,4 +24,4 @@ def set_state(func):
 
         func()
 
-    return inner
+    return wrapper

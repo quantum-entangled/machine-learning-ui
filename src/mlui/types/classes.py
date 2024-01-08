@@ -6,7 +6,9 @@ import numpy.typing as npt
 import pandas as pd
 import tensorflow as tf
 
-# Pages
+# Session
+FuncType: typing.TypeAlias = typing.Callable[..., None]
+DecorType: typing.TypeAlias = typing.Callable[[FuncType], FuncType]
 PageTasks: typing.TypeAlias = list[str]
 
 # Data & Model

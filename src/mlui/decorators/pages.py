@@ -5,11 +5,10 @@ import streamlit as st
 import mlui.types.classes as t
 
 
-# TODO: Add type hints
-def check_task(page_tasks: t.PageTasks):
-    def decorator(func):
+def check_task(page_tasks: t.PageTasks) -> t.DecorType:
+    def decorator(func: t.FuncType) -> t.FuncType:
         @functools.wraps(func)
-        def inner():
+        def wrapper() -> None:
             task = st.session_state.get("task")
 
             if task not in page_tasks:
@@ -21,6 +20,6 @@ def check_task(page_tasks: t.PageTasks):
 
             func()
 
-        return inner
+        return wrapper
 
     return decorator
