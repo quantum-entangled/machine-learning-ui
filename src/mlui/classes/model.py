@@ -28,17 +28,18 @@ class Model:
         self._outputs: t.Layers = typing.cast(t.Layers, self._object.output_names)
         self._input_shape: t.LayerShape = self._get_processed_shape("input")
         self._output_shape: t.LayerShape = self._get_processed_shape("output")
+        self._optimizer: t.Optimizer = self._object.optimizer
+        self._losses: t.LayerLosses = self._get_processed_losses()
+        self._metrics: t.LayerMetrics = dict.fromkeys(self._outputs, list())
+        self._callbacks: t.Callbacks = dict()
+        self._compiled: bool = self._object._is_compiled
+        self._history: t.DataFrame = pd.DataFrame()
 
     def update_state(self) -> None:
         self._input_features: t.LayerFeatures = dict.fromkeys(self._inputs, list())
         self._output_features: t.LayerFeatures = dict.fromkeys(self._outputs, list())
         self._input_configured: t.LayerConfigured = dict.fromkeys(self._inputs, False)
         self._output_configured: t.LayerConfigured = dict.fromkeys(self._outputs, False)
-        self._optimizer: t.Optimizer = None
-        self._losses: t.LayerLosses = dict.fromkeys(self._outputs)
-        self._metrics: t.LayerMetrics = dict.fromkeys(self._outputs, list())
-        self._callbacks: t.Callbacks = dict()
-        self._compiled: bool = False
 
     def _shapes_to_list(self, shapes: list[t.Shape] | t.Shape) -> list[t.Shape]:
         if isinstance(shapes, dict):
@@ -57,6 +58,14 @@ class Model:
         shapes = self._shapes_to_list(shapes)
 
         return {layer: shape[1] for layer, shape in zip(layers, shapes)}
+
+    def _get_processed_losses(self) -> t.LayerLosses:
+        try:
+            losses = typing.cast(list, self._object.loss)
+
+            return {layer: loss for layer, loss in zip(self._outputs, losses)}
+        except AttributeError:
+            return dict.fromkeys(self._outputs)
 
     def _get_processed_data(self, data: t.DataFrame, at: t.Side) -> t.LayerData:
         if at == "input":
@@ -159,6 +168,59 @@ class Model:
     def delete_callback(self, entity: str) -> None:
         self._callbacks.pop(entity, None)
 
+    def fit(
+        self, data: t.DataFrame, batch_size: int, num_epochs: int, val_split: float
+    ) -> None:
+        if tools.data.contains_nonnumeric_dtypes(data):
+            raise errors.ModelError("The data for fitting contains non-numeric values!")
+
+        try:
+            logs = self._object.fit(
+                x=self._get_processed_data(data, "input"),
+                y=self._get_processed_data(data, "output"),
+                batch_size=batch_size,
+                epochs=num_epochs,
+                validation_split=val_split,
+                callbacks=self._callbacks.values(),
+            )
+        except (RuntimeError, ValueError, AttributeError, TypeError):
+            raise errors.ModelError("Unable to fit the model!")
+
+        self._update_history(pd.DataFrame(logs.history))
+
+    def _update_history(self, logs: t.DataFrame) -> None:
+        history_len = len(self._history)
+        logs.insert(0, "epoch", range(history_len + 1, history_len + len(logs) + 1))
+
+        self._history = pd.concat([self._history, logs])
+
+    def plot_history(self, y: list[str], points: bool) -> t.Chart:
+        if not y:
+            raise errors.PlotError("Please, select at least one log!")
+
+        try:
+            logs = self._history.loc[:, ["epoch", *y]]
+            melted_logs = logs.melt(
+                "epoch", var_name="log_name", value_name="log_value"
+            )
+            chart = (
+                alt.Chart(melted_logs)
+                .mark_line(point=points)
+                .encode(
+                    x=alt.X("epoch").scale(zero=False).title("Epoch"),
+                    y=alt.Y("log_value").scale(zero=False).title("Value"),
+                    color=alt.Color("log_name")
+                    .scale(scheme="set1")
+                    .legend(title="Log"),
+                )
+                .interactive(bind_x=True, bind_y=True)
+                .properties(height=500)
+            )
+        except (ValueError, AttributeError, TypeError):
+            raise errors.PlotError("Unable to display the plot!")
+
+        return chart
+
     @property
     def name(self) -> str:
         return self._name
@@ -210,6 +272,10 @@ class Model:
     @property
     def compiled(self) -> bool:
         return self._compiled
+
+    @property
+    def history(self) -> t.DataFrame:
+        return self._history.copy()
 
     @property
     def summary(self) -> None:
@@ -302,7 +368,9 @@ class UploadedModel(Model):
                 callbacks=self._callbacks.values(),
             )
 
-            if isinstance(arrays, list):
+            if isinstance(arrays, dict):
+                predictions = [pd.DataFrame(array) for array in arrays.values()]
+            elif isinstance(arrays, list):
                 predictions = [pd.DataFrame(array) for array in arrays]
             else:
                 predictions = [pd.DataFrame(arrays)]
@@ -320,12 +388,6 @@ class CreatedModel(Model):
         super().reset_state()
 
         self._layers: t.LayerObject = dict()
-        self._history: t.DataFrame = pd.DataFrame()
-
-    def update_state(self) -> None:
-        super().update_state()
-
-        self._history: t.DataFrame = pd.DataFrame()
 
     def set_name(self, name: str) -> None:
         self._name = name
@@ -397,63 +459,6 @@ class CreatedModel(Model):
         self._set_config()
         self.update_state()
 
-    def fit(
-        self, data: t.DataFrame, batch_size: int, num_epochs: int, val_split: float
-    ) -> None:
-        if tools.data.contains_nonnumeric_dtypes(data):
-            raise errors.ModelError("The data for fitting contains non-numeric values!")
-
-        try:
-            logs = self._object.fit(
-                x=self._get_processed_data(data, "input"),
-                y=self._get_processed_data(data, "output"),
-                batch_size=batch_size,
-                epochs=num_epochs,
-                validation_split=val_split,
-                callbacks=self._callbacks.values(),
-            )
-        except (RuntimeError, ValueError, AttributeError, TypeError):
-            raise errors.ModelError("Unable to fit the model!")
-
-        self._update_history(pd.DataFrame(logs.history))
-
-    def _update_history(self, logs: t.DataFrame) -> None:
-        history_len = len(self._history)
-        logs.insert(0, "epoch", range(history_len + 1, history_len + len(logs) + 1))
-
-        self._history = pd.concat([self._history, logs])
-
-    def plot_history(self, y: list[str], points: bool) -> t.Chart:
-        if not y:
-            raise errors.PlotError("Please, select at least one log!")
-
-        try:
-            logs = self._history.loc[:, ["epoch", *y]]
-            melted_logs = logs.melt(
-                "epoch", var_name="log_name", value_name="log_value"
-            )
-            chart = (
-                alt.Chart(melted_logs)
-                .mark_line(point=points)
-                .encode(
-                    x=alt.X("epoch").scale(zero=False).title("Epoch"),
-                    y=alt.Y("log_value").scale(zero=False).title("Value"),
-                    color=alt.Color("log_name")
-                    .scale(scheme="set1")
-                    .legend(title="Log"),
-                )
-                .interactive(bind_x=True, bind_y=True)
-                .properties(height=500)
-            )
-        except (ValueError, AttributeError, TypeError):
-            raise errors.PlotError("Unable to display the plot!")
-
-        return chart
-
     @property
     def layers(self) -> t.LayerObject:
         return self._layers.copy()
-
-    @property
-    def history(self) -> t.DataFrame:
-        return self._history.copy()

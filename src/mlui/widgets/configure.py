@@ -44,11 +44,9 @@ def set_features_ui(data: data.Data, model: model.Model) -> None:
         shapes = model.output_shape
 
     layer = str(st.selectbox("Select layer:", layers))
-
     available = data.get_unused_columns()
     default = model.get_features(layer, at)
     available.extend(default)
-
     columns = st.multiselect(
         "Select columns (order is important):",
         available,

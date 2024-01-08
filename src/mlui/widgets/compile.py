@@ -21,7 +21,11 @@ def set_optimizer_ui(model: model.Model) -> None:
 
     optimizers = list(enums.optimizers.classes)
     optimizer = model.get_optimizer()
-    default = optimizers.index(optimizer) if optimizer else 0
+
+    try:
+        default = optimizers.index(optimizer) if optimizer else 0
+    except ValueError:
+        default = 0
 
     entity = str(st.selectbox("Select optimizer's class:", optimizers, default))
 
@@ -60,11 +64,13 @@ def set_loss_functions_ui(model: model.Model) -> None:
 
     layers = model.outputs
     losses = enums.losses.classes
-
     layer = str(st.selectbox("Select layer:", layers, key="losses"))
-
     loss = model.get_loss(layer)
-    default = losses.index(loss) if loss else 0
+
+    try:
+        default = losses.index(loss) if loss else 0
+    except ValueError:
+        default = 0
 
     entity = str(st.selectbox("Select loss function's class:", losses, default))
 
@@ -94,11 +100,8 @@ def set_metrics_ui(model: model.Model) -> None:
 
     layers = model.outputs
     metrics = enums.metrics.classes
-
     layer = str(st.selectbox("Select layer:", layers, key="metrics"))
-
     default = model.get_metrics(layer)
-
     entities = st.multiselect("Select metrics:", metrics, default)
 
     def set_metrics() -> None:

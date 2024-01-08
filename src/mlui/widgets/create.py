@@ -20,7 +20,6 @@ def set_name_ui(model: model.CreatedModel) -> None:
     )
 
     default = model.name
-
     name = st.text_input("Enter model's name:", max_chars=50, placeholder=default)
 
     def set_name() -> None:
@@ -53,7 +52,6 @@ def set_layers_ui(model: model.CreatedModel) -> None:
     layers = enums.layers.classes
     objects = model.layers
     default = f"layer_{len(objects) + 1}"
-
     entity = str(st.selectbox("Select layer's class:", layers))
     name = st.text_input("Enter layer's name:", max_chars=50, placeholder=default)
 
@@ -100,7 +98,6 @@ def set_outputs_ui(model: model.CreatedModel) -> None:
 
     layers = set(model.layers) - set(model.inputs)
     default = model.outputs
-
     outputs = st.multiselect("Select outputs:", layers, default)
 
     def set_outputs() -> None:

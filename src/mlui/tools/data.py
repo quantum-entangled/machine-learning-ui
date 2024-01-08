@@ -7,9 +7,12 @@ import mlui.types.classes as t
 
 
 def parse_csv(csv_str: str) -> str:
-    sniffer = csv.Sniffer()
-    delimiter = sniffer.sniff(csv_str).delimiter
-    has_header = sniffer.has_header(csv_str)
+    try:
+        sniffer = csv.Sniffer()
+        delimiter = sniffer.sniff(csv_str).delimiter
+        has_header = sniffer.has_header(csv_str)
+    except csv.Error:
+        raise errors.ParseCSVError("The file's delimiter cannot be found!")
 
     if delimiter not in (",", ";"):
         raise errors.ParseCSVError("The file's delimiter is not ',' or ';'!")

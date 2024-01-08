@@ -38,9 +38,9 @@ def model_info_ui(model: model.Model) -> None:
     elif task != "Predict" and not output_configured:
         st.info("The model's output layers are not configured.", icon="💡")
 
-    if compiled:
+    if task != "Predict" and compiled:
         st.success("The model is compiled.", icon="✅")
-    else:
+    elif task != "Predict" and not compiled:
         st.info("The model is not compiled.", icon="💡")
 
 
@@ -71,9 +71,10 @@ def graph_ui(model: model.Model) -> None:
     st.header("Graph")
     st.markdown("Download the graph describing the model's architecture.")
 
+    name = model.name
     graph = model.graph
 
-    st.download_button("Download Graph", graph, "model_graph.pdf")
+    st.download_button("Download Graph", graph, f"{name}_graph.pdf")
 
 
 def download_model_ui(model: model.Model) -> None:
@@ -87,9 +88,10 @@ def download_model_ui(model: model.Model) -> None:
     st.header("Download Model")
     st.markdown("Download the model in `H5` format.")
 
+    name = model.name
     model_as_bytes = model.as_bytes
 
-    st.download_button("Download Model", model_as_bytes, "model.h5")
+    st.download_button("Download Model", model_as_bytes, f"{name}.h5")
 
 
 def reset_model_ui(data: data.Data, model: model.Model) -> None:

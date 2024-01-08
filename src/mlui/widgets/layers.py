@@ -86,7 +86,6 @@ class Dense(LayerWidget):
         super().__init__(layers)
 
         activations = enums.activations.classes
-
         self._units_num = st.number_input(
             "Number of units:", value=1, min_value=1, max_value=10_000
         )
