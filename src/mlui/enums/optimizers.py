@@ -1,35 +1,17 @@
-from typing import Type
-
-from mlui.CustomOptimizers import AdaMod, Apollo, MADGRAD, LARS, AdaHessian
-import tensorflow_addons as tfa
 import tensorflow as tf
 
-import mlui.widgets.optimizers as wo
+import mlui.types.classes as ct
+import mlui.types.widgets as wt
+import mlui.widgets.optimizers as widget
 
-classes: dict[str, tf.keras.optimizers.Optimizer] = {
+classes: ct.OptimizerTypes = {
     "Adam": tf.keras.optimizers.Adam,
     "RMSprop": tf.keras.optimizers.RMSprop,
     "SGD": tf.keras.optimizers.SGD,
-    "AdaMod": AdaMod,
-    "Apollo": Apollo,
-    "LAMB": tfa.optimizers.LAMB,
-    "Lookahead": tfa.optimizers.Lookahead,
-    "RAdam": tfa.optimizers.RectifiedAdam,
-    "MADGRAD": MADGRAD,
-    "LARS": LARS,
-    "AdaHessian": AdaHessian,
 }
 
-widgets: dict[str, Type[wo.OptimizerWidget]] = {
-    "Adam": wo.Adam,
-    "RMSprop": wo.RMSprop,
-    "SGD": wo.SGD,
-    "AdaMod": wo.AdaMod,
-    "Apollo": wo.Apollo,
-    "LAMB": wo.LAMB,
-    "Lookahead": wo.Lookahead,
-    "RAdam": wo.RAdam,
-    "MADGRAD": wo.MADGRAD,
-    "LARS": wo.LARS,
-    "AdaHessian": wo.AdaHessian,
+widgets: wt.OptimizerWidgetTypes = {
+    "Adam": widget.Adam,
+    "RMSprop": widget.RMSprop,
+    "SGD": widget.SGD,
 }
