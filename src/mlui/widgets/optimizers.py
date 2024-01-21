@@ -6,73 +6,6 @@ import tensorflow as tf
 import mlui.types.classes as t
 
 
-class AdaModParams(OptimizerParams):
-    """Type annotation for the AdaMod optimizer."""
-
-    learning_rate: float
-    beta_1: float
-    beta_2: float
-    beta_3: float
-
-
-class ApolloParams(OptimizerParams):
-    """Type annotation for the Apollo optimizer."""
-
-    learning_rate: float
-    beta: float
-    weight_decay: float
-    weight_decay_type: str
-
-
-class LAMBParams(OptimizerParams):
-    """Type annotation for the LAMB optimizer."""
-
-    learning_rate: float
-    beta_1: float
-    beta_2: float
-
-
-class LookaheadParams(OptimizerParams):
-    """Type annotation for the Lookahead optimizer."""
-
-    optimizer: tf.keras.optimizers.Optimizer
-
-
-class RAdamParams(OptimizerParams):
-    """Type annotation for the RAdam optimizer."""
-
-    learning_rate: float
-    beta_1: float
-    beta_2: float
-
-
-class MADGRADParams(OptimizerParams):
-    """Type annotation for the MADGRAD optimizer."""
-
-    learning_rate: float
-    momentum: float
-    weight_decay: float
-
-
-class LARSParams(OptimizerParams):
-    """Type annotation for the LARS optimizer."""
-
-    learning_rate: float
-    momentum: float
-    weight_decay: float
-    dampening: float
-    nesterov: bool
-
-
-class AdaHessianParams(OptimizerParams):
-    """Type annotation for the AdaHessian optimizer."""
-
-    learning_rate: float
-    beta_1: float
-    beta_2: float
-    weight_decay: float
-
-
 class OptimizerWidget(abc.ABC):
     """Base class for an optimizer's widget."""
 
@@ -219,11 +152,10 @@ class SGD(OptimizerWidget):
 
 
 class AdaMod(OptimizerWidget):
-    """AdaMod optimizer widget."""
+    """AdaMod optimizer's widget."""
 
     def __init__(self):
-        self.learning_rate = float(
-            st.number_input(
+        self.learning_rate = st.number_input(
                 "Learning rate:",
                 min_value=0.0,
                 max_value=0.1,
@@ -231,9 +163,7 @@ class AdaMod(OptimizerWidget):
                 step=0.005,
                 format="%e",
             )
-        )
-        self.beta_1 = float(
-            st.number_input(
+        self.beta_1 = st.number_input(
                 "Decay 1:",
                 min_value=0.0,
                 max_value=1.0,
@@ -241,9 +171,7 @@ class AdaMod(OptimizerWidget):
                 step=0.001,
                 format="%.3f",
             )
-        )
-        self.beta_2 = float(
-            st.number_input(
+        self.beta_2 = st.number_input(
                 "Decay 2:",
                 min_value=0.0,
                 max_value=1.0,
@@ -251,9 +179,7 @@ class AdaMod(OptimizerWidget):
                 step=0.001,
                 format="%.3f",
             )
-        )
-        self.beta_3 = float(
-            st.number_input(
+        self.beta_3 = st.number_input(
                 "Decay 3:",
                 min_value=0.0,
                 max_value=1.0,
@@ -261,24 +187,29 @@ class AdaMod(OptimizerWidget):
                 step=0.001,
                 format="%.3f",
             )
-        )
 
     @property
-    def params(self) -> AdaModParams:
+    def params(self) -> t.AdaModParams:
+        """AdaMod optimizer's parameters.
+
+        Returns
+        -------
+        dict
+            Dictionary containing values of adjustable parameters.
+        """
         return {
-            "learning_rate": self.learning_rate,
-            "beta_1": self.beta_1,
-            "beta_2": self.beta_2,
-            "beta_3": self.beta_3,
+            "learning_rate": float(self.learning_rate),
+            "beta_1": float(self.beta_1),
+            "beta_2": float(self.beta_2),
+            "beta_3": float(self.beta_3),
         }
 
 
 class Apollo(OptimizerWidget):
-    """Apollo optimizer widget."""
+    """Apollo optimizer's widget."""
 
     def __init__(self):
-        self.learning_rate = float(
-            st.number_input(
+        self.learning_rate = st.number_input(
                 "Learning rate:",
                 min_value=0.0,
                 max_value=0.1,
@@ -286,9 +217,7 @@ class Apollo(OptimizerWidget):
                 step=0.005,
                 format="%e",
             )
-        )
-        self.beta = float(
-            st.number_input(
+        self.beta = st.number_input(
                 "Beta:",
                 min_value=0.0,
                 max_value=1.0,
@@ -296,9 +225,7 @@ class Apollo(OptimizerWidget):
                 step=0.005,
                 format="%.3f",
             )
-        )
-        self.weight_decay = float(
-            st.number_input(
+        self.weight_decay = st.number_input(
                 "Weight Decay:",
                 min_value=0.0,
                 max_value=0.001,
@@ -306,30 +233,33 @@ class Apollo(OptimizerWidget):
                 step=0.00005,
                 format="%.3f",
             )
-        )
-        self.weight_decay_type = str(
-            st.selectbox(
+        self.weight_decay_type = st.selectbox(
                 "Weight Decay Type:",
                 ("L2", "Decoupled", "Stable"),
             )
-        )
 
     @property
-    def params(self) -> ApolloParams:
+    def params(self) -> t.ApolloParams:
+        """Apollo optimizer's parameters.
+
+        Returns
+        -------
+        dict
+            Dictionary containing values of adjustable parameters.
+        """
         return {
-            "learning_rate": self.learning_rate,
-            "beta": self.beta,
-            "weight_decay": self.weight_decay,
-            "weight_decay_type": self.weight_decay_type,
+            "learning_rate": float(self.learning_rate),
+            "beta": float(self.beta),
+            "weight_decay": float(self.weight_decay),
+            "weight_decay_type": str(self.weight_decay_type),
         }
 
 
 class LAMB(OptimizerWidget):
-    """LAMB optimizer widget."""
+    """LAMB optimizer's widget."""
 
     def __init__(self):
-        self.learning_rate = float(
-            st.number_input(
+        self.learning_rate = st.number_input(
                 "Learning rate:",
                 min_value=0.0,
                 max_value=0.1,
@@ -337,9 +267,7 @@ class LAMB(OptimizerWidget):
                 step=0.005,
                 format="%e",
             )
-        )
-        self.beta_1 = float(
-            st.number_input(
+        self.beta_1 = st.number_input(
                 "Decay 1:",
                 min_value=0.0,
                 max_value=1.0,
@@ -347,9 +275,7 @@ class LAMB(OptimizerWidget):
                 step=0.005,
                 format="%.3f",
             )
-        )
-        self.beta_2 = float(
-            st.number_input(
+        self.beta_2 = st.number_input(
                 "Decay 2:",
                 min_value=0.0,
                 max_value=1.0,
@@ -357,42 +283,52 @@ class LAMB(OptimizerWidget):
                 step=0.005,
                 format="%.3f",
             )
-        )
 
     @property
-    def params(self) -> LAMBParams:
+    def params(self) -> t.LAMBParams:
+        """LAMB optimizer's parameters.
+
+        Returns
+        -------
+        dict
+            Dictionary containing values of adjustable parameters.
+        """
         return {
-            "learning_rate": self.learning_rate,
-            "beta_1": self.beta_1,
-            "beta_2": self.beta_2,
+            "learning_rate": float(self.learning_rate),
+            "beta_1": float(self.beta_1),
+            "beta_2": float(self.beta_2),
         }
 
 
 class Lookahead(OptimizerWidget):
-    """Lookahead optimizer widget."""
+    """Lookahead optimizer's widget."""
 
     def __init__(self):
-        self.optimizer = tf.keras.optimizers.Optimizer(
-            st.selectbox(
+        self.optimizer = st.selectbox(
                 "Optimizer:",
                 options=(tf.keras.optimizers.SGD(), tf.keras.optimizers.Adam(), tf.keras.optimizers.RMSprop(),
                  tf.keras.optimizers.Adamax(), tf.keras.optimizers.Adagrad())
             )
-        )
 
     @property
-    def params(self) -> LookaheadParams:
+    def params(self) -> t.LookaheadParams:
+        """Lookahead optimizer's parameters.
+
+        Returns
+        -------
+        dict
+            Dictionary containing values of adjustable parameters.
+        """
         return {
-            "optimizer": self.optimizer
+            "optimizer": tf.keras.optimizers.Optimizer(self.optimizer)
         }
 
 
 class RAdam(OptimizerWidget):
-    """RAdam optimizer widget."""
+    """RAdam optimizer's widget."""
 
-    def __init__(self) -> None:
-        self.learning_rate = float(
-            st.number_input(
+    def __init__(self):
+        self.learning_rate = st.number_input(
                 "Learning rate:",
                 min_value=0.0,
                 max_value=0.1,
@@ -400,9 +336,7 @@ class RAdam(OptimizerWidget):
                 step=0.005,
                 format="%e",
             )
-        )
-        self.beta_1 = float(
-            st.number_input(
+        self.beta_1 = st.number_input(
                 "Decay 1:",
                 min_value=0.0,
                 max_value=1.0,
@@ -410,9 +344,7 @@ class RAdam(OptimizerWidget):
                 step=0.005,
                 format="%.3f",
             )
-        )
-        self.beta_2 = float(
-            st.number_input(
+        self.beta_2 = st.number_input(
                 "Decay 2:",
                 min_value=0.0,
                 max_value=1.0,
@@ -420,23 +352,28 @@ class RAdam(OptimizerWidget):
                 step=0.005,
                 format="%.3f",
             )
-        )
 
     @property
-    def params(self) -> RAdamParams:
+    def params(self) -> t.RAdamParams:
+        """RAdam optimizer's parameters.
+
+        Returns
+        -------
+        dict
+            Dictionary containing values of adjustable parameters.
+        """
         return {
-            "learning_rate": self.learning_rate,
-            "beta_1": self.beta_1,
-            "beta_2": self.beta_2,
+            "learning_rate": float(self.learning_rate),
+            "beta_1": float(self.beta_1),
+            "beta_2": float(self.beta_2),
         }
 
 
 class MADGRAD(OptimizerWidget):
-    """MADGRAD optimizer widget."""
+    """MADGRAD optimizer's widget."""
 
-    def __init__(self) -> None:
-        self.learning_rate = float(
-            st.number_input(
+    def __init__(self):
+        self.learning_rate = st.number_input(
                 "Learning rate:",
                 min_value=0.0,
                 max_value=0.1,
@@ -444,9 +381,7 @@ class MADGRAD(OptimizerWidget):
                 step=0.005,
                 format="%e",
             )
-        )
-        self.momentum = float(
-            st.number_input(
+        self.momentum = st.number_input(
                 "Momentum:",
                 min_value=0.0,
                 max_value=0.999,
@@ -454,9 +389,7 @@ class MADGRAD(OptimizerWidget):
                 step=0.001,
                 format="%.3f",
             )
-        )
-        self.weight_decay = float(
-            st.number_input(
+        self.weight_decay = st.number_input(
                 "Weight decay:",
                 min_value=0.0,
                 max_value=0.999,
@@ -464,23 +397,28 @@ class MADGRAD(OptimizerWidget):
                 step=0.001,
                 format="%.3f",
             )
-        )
 
     @property
-    def params(self) -> MADGRADParams:
+    def params(self) -> t.MADGRADParams:
+        """MADGRAD optimizer's parameters.
+
+        Returns
+        -------
+        dict
+            Dictionary containing values of adjustable parameters.
+        """
         return {
-            "learning_rate": self.learning_rate,
-            "momentum": self.momentum,
-            "weight_decay": self.weight_decay,
+            "learning_rate": float(self.learning_rate),
+            "momentum": float(self.momentum),
+            "weight_decay": float(self.weight_decay),
         }
 
 
 class LARS(OptimizerWidget):
-    """LARS optimizer widget."""
+    """LARS optimizer's widget."""
 
-    def __init__(self) -> None:
-        self.learning_rate = float(
-            st.number_input(
+    def __init__(self):
+        self.learning_rate = st.number_input(
                 "Learning rate:",
                 min_value=0.0,
                 max_value=0.1,
@@ -488,9 +426,7 @@ class LARS(OptimizerWidget):
                 step=0.005,
                 format="%e",
             )
-        )
-        self.momentum = float(
-            st.number_input(
+        self.momentum = st.number_input(
                 "Momentum:",
                 min_value=0.0,
                 max_value=0.999,
@@ -498,9 +434,7 @@ class LARS(OptimizerWidget):
                 step=0.001,
                 format="%.3f",
             )
-        )
-        self.weight_decay = float(
-            st.number_input(
+        self.weight_decay = st.number_input(
                 "Weight decay:",
                 min_value=0.0,
                 max_value=0.999,
@@ -508,9 +442,7 @@ class LARS(OptimizerWidget):
                 step=0.001,
                 format="%.3f",
             )
-        )
-        self.dampening = float(
-            st.number_input(
+        self.dampening = st.number_input(
                 "Dampening for momentum:",
                 min_value=0.0,
                 max_value=0.1,
@@ -518,31 +450,34 @@ class LARS(OptimizerWidget):
                 step=0.001,
                 format="%.3f",
             )
-        )
-        self.nesterov = bool(
-            st.selectbox(
+        self.nesterov = st.selectbox(
                 "Nesterov momentum:",
                 (False, True),
             )
-        )
 
     @property
-    def params(self) -> LARSParams:
+    def params(self) -> t.LARSParams:
+        """LARS optimizer's parameters.
+
+        Returns
+        -------
+        dict
+            Dictionary containing values of adjustable parameters.
+        """
         return {
-            "learning_rate": self.learning_rate,
-            "momentum": self.momentum,
-            "weight_decay": self.weight_decay,
-            "dampening": self.dampening,
-            "nesterov": self.nesterov,
+            "learning_rate": float(self.learning_rate),
+            "momentum": float(self.momentum),
+            "weight_decay": float(self.weight_decay),
+            "dampening": float(self.dampening),
+            "nesterov": bool(self.nesterov),
         }
 
 
 class AdaHessian(OptimizerWidget):
-    """AdaHessian optimizer widget."""
+    """AdaHessian optimizer's widget."""
 
-    def __init__(self) -> None:
-        self.learning_rate = float(
-            st.number_input(
+    def __init__(self):
+        self.learning_rate = st.number_input(
                 "Learning rate:",
                 min_value=0.0,
                 max_value=0.5,
@@ -550,9 +485,7 @@ class AdaHessian(OptimizerWidget):
                 step=0.005,
                 format="%e",
             )
-        )
-        self.beta_1 = float(
-            st.number_input(
+        self.beta_1 = st.number_input(
                 "Decay 1:",
                 min_value=0.0,
                 max_value=1.0,
@@ -560,9 +493,7 @@ class AdaHessian(OptimizerWidget):
                 step=0.001,
                 format="%.3f",
             )
-        )
-        self.beta_2 = float(
-            st.number_input(
+        self.beta_2 = st.number_input(
                 "Decay 2:",
                 min_value=0.0,
                 max_value=1.0,
@@ -570,9 +501,7 @@ class AdaHessian(OptimizerWidget):
                 step=0.001,
                 format="%.3f",
             )
-        )
-        self.weight_decay = float(
-            st.number_input(
+        self.weight_decay = st.number_input(
                 "Weight decay:",
                 min_value=0.0,
                 max_value=0.1,
@@ -580,13 +509,19 @@ class AdaHessian(OptimizerWidget):
                 step=0.001,
                 format="%.3f",
             )
-        )
 
     @property
-    def params(self) -> AdaHessianParams:
+    def params(self) -> t.AdaHessianParams:
+        """AdaHessian optimizer's parameters.
+
+        Returns
+        -------
+        dict
+            Dictionary containing values of adjustable parameters.
+        """
         return {
-            "learning_rate": self.learning_rate,
-            "beta_1": self.beta_1,
-            "beta_2": self.beta_2,
-            "weight_decay": self.weight_decay,
+            "learning_rate": float(self.learning_rate),
+            "beta_1": float(self.beta_1),
+            "beta_2": float(self.beta_2),
+            "weight_decay": float(self.weight_decay),
         }

@@ -105,6 +105,74 @@ class SGDParams(OptimizerParams):
     momentum: float
 
 
+class AdaModParams(OptimizerParams):
+    """Type annotation for the AdaMod optimizer."""
+
+    learning_rate: float
+    beta_1: float
+    beta_2: float
+    beta_3: float
+
+
+class ApolloParams(OptimizerParams):
+    """Type annotation for the Apollo optimizer."""
+
+    learning_rate: float
+    beta: float
+    weight_decay: float
+    weight_decay_type: str
+
+
+class LAMBParams(OptimizerParams):
+    """Type annotation for the LAMB optimizer."""
+
+    learning_rate: float
+    beta_1: float
+    beta_2: float
+
+
+class LookaheadParams(OptimizerParams):
+    """Type annotation for the Lookahead optimizer."""
+
+    optimizer: tf.keras.optimizers.Optimizer
+
+
+class RAdamParams(OptimizerParams):
+    """Type annotation for the RAdam optimizer."""
+
+    learning_rate: float
+    beta_1: float
+    beta_2: float
+
+
+class MADGRADParams(OptimizerParams):
+    """Type annotation for the MADGRAD optimizer."""
+
+    learning_rate: float
+    momentum: float
+    weight_decay: float
+
+
+class LARSParams(OptimizerParams):
+    """Type annotation for the LARS optimizer."""
+
+    learning_rate: float
+    momentum: float
+    weight_decay: float
+    dampening: float
+    nesterov: bool
+
+
+class AdaHessianParams(OptimizerParams):
+    """Type annotation for the AdaHessian optimizer."""
+
+    learning_rate: float
+    beta_1: float
+    beta_2: float
+    weight_decay: float
+
+
+
 # Losses
 Loss: typing.TypeAlias = str | None
 LossType: typing.TypeAlias = str
