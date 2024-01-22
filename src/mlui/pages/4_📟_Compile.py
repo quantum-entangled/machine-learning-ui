@@ -9,6 +9,7 @@ st.set_page_config(page_title="Compile", page_icon="📟")
 @decorators.session.set_state
 @decorators.pages.check_task(["Train", "Evaluate"])
 def compile_page() -> None:
+    """Generate a Streamlit app page for compiling the model."""
     model = st.session_state.model
 
     if not model.input_configured or not model.output_configured:

@@ -6,26 +6,21 @@ import mlui.types.classes as t
 
 
 class OptimizerWidget(abc.ABC):
-    """Base class for an optimizer's widget."""
+    """Base class for a widget of the optimizer."""
 
     @abc.abstractmethod
     def __init__(self) -> None:
+        """Initialize the widgets of parameters."""
         ...
 
     @property
     @abc.abstractmethod
     def params(self) -> t.OptimizerParams:
-        """Optimizer's parameters.
-
-        Returns
-        -------
-        dict
-            Dictionary containing values of adjustable parameters.
-        """
+        """Adjustable parameters of the optimizer."""
 
 
 class Adam(OptimizerWidget):
-    """Adam optimizer's widget."""
+    """Widget class for the Adam optimizer."""
 
     def __init__(self) -> None:
         self.learning_rate = st.number_input(
@@ -55,13 +50,6 @@ class Adam(OptimizerWidget):
 
     @property
     def params(self) -> t.AdamParams:
-        """Adam optimizer's parameters.
-
-        Returns
-        -------
-        dict
-            Dictionary containing values of adjustable parameters.
-        """
         return {
             "learning_rate": float(self.learning_rate),
             "beta_1": float(self.beta_1),
@@ -70,7 +58,7 @@ class Adam(OptimizerWidget):
 
 
 class RMSprop(OptimizerWidget):
-    """RMSprop optimizer's widget."""
+    """Widget class for the RMSprop optimizer."""
 
     def __init__(self):
         self.learning_rate = st.number_input(
@@ -100,13 +88,6 @@ class RMSprop(OptimizerWidget):
 
     @property
     def params(self) -> t.RMSpropParams:
-        """RMSprop optimizer's parameters.
-
-        Returns
-        -------
-        dict
-            Dictionary containing values of adjustable parameters.
-        """
         return {
             "learning_rate": float(self.learning_rate),
             "rho": float(self.rho),
@@ -115,7 +96,7 @@ class RMSprop(OptimizerWidget):
 
 
 class SGD(OptimizerWidget):
-    """SGD optimizer's widget."""
+    """Widget class for the SGD optimizer."""
 
     def __init__(self):
         self.learning_rate = st.number_input(
@@ -137,13 +118,6 @@ class SGD(OptimizerWidget):
 
     @property
     def params(self) -> t.SGDParams:
-        """SGD optimizer's parameters.
-
-        Returns
-        -------
-        dict
-            Dictionary containing values of adjustable parameters.
-        """
         return {
             "learning_rate": float(self.learning_rate),
             "momentum": float(self.momentum),

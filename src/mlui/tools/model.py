@@ -3,6 +3,20 @@ from mlui.classes import errors
 
 
 def validate_shapes(shapes: t.Shapes) -> None:
+    """
+    Validate the shapes of a model.
+
+    Parameters
+    ----------
+    shapes : dict of tuples, list of tuples or tuple
+        Shapes to be validated. Single shape is a `tuple` of `(None, int)`.
+
+    Raises
+    ------
+    ValidateModelError
+        If the shapes are empty. If any individual shape is empty. If any individual
+        shape contains more than 2 dimensions.
+    """
     if not shapes:
         raise errors.ValidateModelError("The model's shapes are empty!")
 

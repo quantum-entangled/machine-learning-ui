@@ -6,26 +6,21 @@ import mlui.types.classes as t
 
 
 class CallbackWidget(abc.ABC):
-    """Base class for a callback's widget."""
+    """Base class for a widget of the callback."""
 
     @abc.abstractmethod
     def __init__(self) -> None:
+        """Initialize the widgets of parameters."""
         ...
 
     @property
     @abc.abstractmethod
     def params(self) -> t.CallbackParams:
-        """Callback's parameters.
-
-        Returns
-        -------
-        dict
-            Dictionary containing values of adjustable parameters.
-        """
+        """Adjustable parameters of the callback."""
 
 
 class EarlyStopping(CallbackWidget):
-    """EarlyStopping callback's widget."""
+    """Widget class for the EarlyStopping callback."""
 
     def __init__(self) -> None:
         self._min_delta = st.number_input(
@@ -42,23 +37,15 @@ class EarlyStopping(CallbackWidget):
 
     @property
     def params(self) -> t.EarlyStoppingParams:
-        """EarlyStopping callback's parameters.
-
-        Returns
-        -------
-        dict
-            Dictionary containing values of adjustable parameters.
-        """
         return {"min_delta": float(self._min_delta), "patience": int(self._patience)}
 
 
 class TerminateOnNaN(CallbackWidget):
-    """TerminateOnNaN callback's widget."""
+    """Widget class for the TerminateOnNaN callback."""
 
     def __init__(self) -> None:
         pass
 
     @property
     def params(self) -> t.CallbackParams:
-        """TerminateOnNaN callback's parameters."""
         return {}

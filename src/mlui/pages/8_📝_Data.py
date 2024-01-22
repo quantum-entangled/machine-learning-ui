@@ -8,6 +8,7 @@ st.set_page_config(page_title="Data", page_icon="📝")
 
 @decorators.session.set_state
 def data_page() -> None:
+    """Generate a Streamlit app page for examining the data."""
     data = st.session_state.data
     model = st.session_state.model
 

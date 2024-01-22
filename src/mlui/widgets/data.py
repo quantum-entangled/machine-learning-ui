@@ -6,7 +6,7 @@ import mlui.classes.model as model
 
 
 def data_info_ui(data: data.Data) -> None:
-    """Generate the UI for displaying data information.
+    """Generate the UI for displaying the data information.
 
     Parameters
     ----------
@@ -27,9 +27,9 @@ def data_info_ui(data: data.Data) -> None:
         return
 
     if has_nans:
-        st.info("The DataFrame contains `NaN` values.", icon="💡")
+        st.info("The DataFrame contains NaN values.", icon="💡")
     else:
-        st.success("The DataFrame doesn't contain `NaN` values.", icon="✅")
+        st.success("The DataFrame doesn't contain NaN values.", icon="✅")
 
     if has_nonnumeric_dtypes:
         st.info("The DataFrame contains non-numeric values.", icon="💡")
@@ -38,7 +38,7 @@ def data_info_ui(data: data.Data) -> None:
 
 
 def dataframe_ui(data: data.Data) -> None:
-    """Generate the UI for displaying a dataframe.
+    """Generate the UI for displaying the DataFrame.
 
     Parameters
     ----------
@@ -47,17 +47,17 @@ def dataframe_ui(data: data.Data) -> None:
     """
     st.header("Dataframe")
     st.markdown(
-        "View your data file. You can sort and resize columns, search through data "
-        "by clicking the search icon or pressing `⌘ Cmd + F` / `Ctrl + F` on the "
-        "table, copy/paste different parts to/from clipboard, and download the "
-        "dataset in `CSV` format."
+        "View your data file. You can sort and resize columns, search through data by "
+        "clicking the search icon or pressing `⌘ Cmd + F` / `Ctrl + F` on the table, "
+        "copy/paste different parts to/from clipboard, and download the dataset in "
+        "`CSV` format."
     )
 
     st.dataframe(data.dataframe, use_container_width=True)
 
 
 def statistics_ui(data: data.Data) -> None:
-    """Generate the UI for displaying data statistics.
+    """Generate the UI for displaying the data statistics.
 
     Parameters
     ----------
@@ -66,8 +66,8 @@ def statistics_ui(data: data.Data) -> None:
     """
     st.header("Statistics")
     st.markdown(
-        "View the descriptive statistics of the dataset, as well as "
-        "the dtype and percent of missing values for each column."
+        "View the descriptive statistics of the dataset, as well as the dtype and "
+        "percent of missing values for each column."
     )
 
     stats = data.get_stats()
@@ -75,7 +75,7 @@ def statistics_ui(data: data.Data) -> None:
 
 
 def plot_columns_ui(data: data.Data) -> None:
-    """Generate the UI for plotting data columns.
+    """Generate the UI for plotting the data columns.
 
     Parameters
     ----------
@@ -84,11 +84,11 @@ def plot_columns_ui(data: data.Data) -> None:
     """
     st.header("Plot Columns")
     st.markdown(
-        "Plot different columns of the dataset against each other. A simple line "
-        "plot is used for two distinct columns, and a histogram is used for the "
-        "same ones. Additionally, you can interact with the plot by zooming in and "
-        "out, dragging it, and accessing different download options by clicking the "
-        "three dots in the upper right corner."
+        "Plot different columns of the dataset against each other. A simple line plot "
+        "is used for two distinct columns, and a histogram is used for the same ones. "
+        "Additionally, you can interact with the plot by zooming in and out, dragging "
+        "it, and accessing different download options by clicking the three dots in "
+        "the upper right corner."
     )
 
     with st.form("plot_columns_form", border=False):
@@ -118,9 +118,9 @@ def reset_data_ui(data: data.Data, model: model.Model) -> None:
     """
     st.header("Reset Data")
     st.markdown(
-        "Reset your data for the app session. Once the `Reset Data` button is "
-        "clicked, the data file you have uploaded will be erased, and all "
-        "connections with other sections will be removed."
+        "Reset your data for the app session. Once the `Reset Data` button is clicked, "
+        "the data file you have uploaded will be erased, and all connections with "
+        "other sections will be removed."
     )
 
     reset_data_btn = st.button("Reset Data")

@@ -6,7 +6,7 @@ import mlui.enums as enums
 
 
 def set_optimizer_ui(model: model.Model) -> None:
-    """Generate the UI for setting the model's optimizer.
+    """Generate the UI for setting the optimizer for the model.
 
     Parameters
     ----------
@@ -21,12 +21,7 @@ def set_optimizer_ui(model: model.Model) -> None:
 
     optimizers = list(enums.optimizers.classes)
     optimizer = model.get_optimizer()
-
-    try:
-        default = optimizers.index(optimizer) if optimizer else 0
-    except ValueError:
-        default = 0
-
+    default = optimizers.index(optimizer) if optimizer else 0
     entity = str(st.selectbox("Select optimizer's class:", optimizers, default))
 
     with st.expander("Optimizer's Parameters"):
@@ -47,7 +42,7 @@ def set_optimizer_ui(model: model.Model) -> None:
 
 
 def set_loss_functions_ui(model: model.Model) -> None:
-    """Generate the UI for setting the model's loss functions.
+    """Generate the UI for setting the loss functions for the model.
 
     Parameters
     ----------
@@ -57,21 +52,16 @@ def set_loss_functions_ui(model: model.Model) -> None:
     st.header("Set Loss Functions")
     st.markdown(
         "Choose a loss function for each respective output layer of the model to use "
-        "during evaluation or training. Select `BinaryCrossentropy` loss for "
-        "binary classification, `CategoricalCrossentropy` for multiclass "
-        "classification, and any other for regression."
+        "during evaluation or training. Select `BinaryCrossentropy` loss for binary "
+        "classification, `CategoricalCrossentropy` for multiclass classification, and "
+        "any other for regression."
     )
 
     layers = model.outputs
     losses = enums.losses.classes
     layer = str(st.selectbox("Select layer:", layers, key="losses"))
     loss = model.get_loss(layer)
-
-    try:
-        default = losses.index(loss) if loss else 0
-    except ValueError:
-        default = 0
-
+    default = losses.index(loss) if loss else 0
     entity = str(st.selectbox("Select loss function's class:", losses, default))
 
     def set_loss() -> None:
@@ -83,7 +73,7 @@ def set_loss_functions_ui(model: model.Model) -> None:
 
 
 def set_metrics_ui(model: model.Model) -> None:
-    """Generate the UI for setting the model's metrics.
+    """Generate the UI for setting the metrics for the model.
 
     Parameters
     ----------
@@ -92,10 +82,10 @@ def set_metrics_ui(model: model.Model) -> None:
     """
     st.header("Set Metrics")
     st.markdown(
-        "Optionally choose additional metrics for the model to track during "
-        "evaluation or training. You may select multiple metrics for each layer. "
-        "`Crossentropy` and `Accuracy` metrics are automatically adjusted to the "
-        "type of classification problem you solve."
+        "Optionally choose additional metrics for the model to track during evaluation "
+        "or training. You may select multiple metrics for each layer. `Crossentropy` "
+        "and `Accuracy` metrics are automatically adjusted to the type of "
+        "classification problem you solve."
     )
 
     layers = model.outputs
@@ -122,9 +112,9 @@ def compile_model_ui(model: model.Model) -> None:
     """
     st.header("Compile Model")
     st.markdown(
-        "Compile the model by pressing the provided button. It will use the "
-        "parameters selected above. Any changes made to the previous sections "
-        "afterward will not take effect until you click the button again."
+        "Compile the model by pressing the provided button. It will use the parameters "
+        "selected above. Any changes made to the previous sections afterward will not "
+        "take effect until you click the button again."
     )
 
     def compile_model() -> None:

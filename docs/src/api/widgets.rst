@@ -5,13 +5,14 @@ Widgets
    :maxdepth: 2
 
    widgets/callbacks.rst
-   widgets/data_preparation.rst
+   widgets/compile.rst
+   widgets/configure.rst
+   widgets/create.rst
+   widgets/data.rst
+   widgets/evaluate.rst
    widgets/layers.rst
-   widgets/model_compilation.rst
-   widgets/model_evaluation.rst
-   widgets/model_preparation.rst
+   widgets/model.rst
    widgets/optimizers.rst
-   widgets/predictions.rst
-   widgets/training_preparation.rst
-   widgets/training.rst
+   widgets/predict.rst
+   widgets/train.rst
    widgets/upload.rst

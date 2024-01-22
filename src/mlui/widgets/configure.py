@@ -7,8 +7,8 @@ import mlui.enums as enums
 
 
 def set_features_ui(data: data.Data, model: model.Model) -> None:
-    """Generate the UI for setting the data columns
-    as features for the model's input and output layers.
+    """Generate the UI for setting the data columns as features for the input and
+    output layers of the model.
 
     Parameters
     ----------
@@ -67,7 +67,7 @@ def set_features_ui(data: data.Data, model: model.Model) -> None:
 
 
 def set_callbacks_ui(model: model.Model) -> None:
-    """Generate the UI for setting the model's callbacks.
+    """Generate the UI for setting the callbacks for the model.
 
     Parameters
     ----------
@@ -76,10 +76,10 @@ def set_callbacks_ui(model: model.Model) -> None:
     """
     st.header("Set Callbacks")
     st.markdown(
-        "Optionally choose callbacks for the model to use during evaluation, "
-        "training, or making predictions. Some callbacks have adjustable parameters. "
-        "Once you add a callback, you may delete it if you no longer need it or want "
-        "to readjust its parameters."
+        "Optionally choose callbacks for the model to use during evaluation, training, "
+        "or making predictions. Some callbacks have adjustable parameters. Once you "
+        "add a callback, you may delete it if you no longer need it or want to "
+        "readjust its parameters."
     )
 
     callbacks = enums.callbacks.classes

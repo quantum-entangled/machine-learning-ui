@@ -6,22 +6,22 @@ import mlui.classes.model as model
 
 
 def make_predictions_ui(data: data.Data, model: model.UploadedModel) -> None:
-    """Generate the UI for making the model predictions.
+    """Generate the UI for making the predictions of the model.
 
     Parameters
     ----------
     data : Data
         Data object.
-    model : Model
+    model : UploadedModel
         Model object.
     """
     st.header("Make Predictions")
     st.markdown(
-        "Make predictions with the model by specifying the batch size. Once the "
-        "`Make Predictions` button is clicked, the predictions will be displayed in "
-        "the respective dropdown. Depending on the size of your model and chosen "
-        "batch size, it might take some time. The predictions are values for each "
-        "node of each output layer."
+        "Make predictions with the model by specifying the batch size. Once the `Make "
+        "Predictions` button is clicked, the predictions will be displayed in the "
+        "respective dropdown. Depending on the size of your model and chosen batch "
+        "size, it might take some time. The predictions are values for each node of "
+        "each output layer."
     )
 
     batch_size = st.number_input(

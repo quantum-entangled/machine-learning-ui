@@ -8,6 +8,7 @@ st.set_page_config(page_title="Welcome!", page_icon="🏠")
 
 @decorators.session.set_state
 def home_page() -> None:
+    """Generate a Streamlit app page for the home screen."""
     st.write("# Welcome! 👋")
     st.markdown(
         "💠 On this page, you can select the task you want to perform as well as "

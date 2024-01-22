@@ -7,7 +7,8 @@ st.set_page_config(page_title="Configure", page_icon="⚙️")
 
 
 @decorators.session.set_state
-def prepare_page() -> None:
+def configure_page() -> None:
+    """Generate a Streamlit app page for configuring the model."""
     data = st.session_state.data
     model = st.session_state.model
 
@@ -25,4 +26,4 @@ def prepare_page() -> None:
 
 
 if __name__ == "__main__":
-    prepare_page()
+    configure_page()

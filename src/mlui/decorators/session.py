@@ -8,6 +8,20 @@ import mlui.types.classes as t
 
 
 def set_state(func: t.FuncType) -> t.FuncType:
+    """
+    Decorator to set the initial state for a Streamlit app.
+
+    Parameters
+    ----------
+    func : Callable
+        Function to wrap and execute.
+
+    Returns
+    -------
+    Callable
+        Wrapped function.
+    """
+
     @functools.wraps(func)
     def wrapper() -> None:
         if not st.session_state.get("task"):

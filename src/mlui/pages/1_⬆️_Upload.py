@@ -8,6 +8,7 @@ st.set_page_config(page_title="Upload", page_icon="⬆️")
 
 @decorators.session.set_state
 def upload_page() -> None:
+    """Generate a Streamlit app page for uploading the data and the model."""
     data = st.session_state.data
     model = st.session_state.model
     model_type = st.session_state.model_type

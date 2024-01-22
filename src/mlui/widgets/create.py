@@ -6,11 +6,11 @@ import mlui.enums as enums
 
 
 def set_name_ui(model: model.CreatedModel) -> None:
-    """Generate the UI for setting the model's name.
+    """Generate the UI for setting the name for the model.
 
     Parameters
     ----------
-    model : Model
+    model : CreatedModel
         Model object.
     """
     st.header("Set Name")
@@ -34,19 +34,19 @@ def set_name_ui(model: model.CreatedModel) -> None:
 
 
 def set_layers_ui(model: model.CreatedModel) -> None:
-    """Generate the UI for setting the model's layers.
+    """Generate the UI for setting the layers for the model.
 
     Parameters
     ----------
-    model : Model
+    model : CreatedModel
         Model object.
     """
     st.header("Set Layers")
     st.markdown(
         "Add layers to the model, specifying their class, name (default value if "
         "nothing is provided), and additional parameters. Always start with `Input` "
-        "layer(s). If needed, you can delete the last added layer in case of a "
-        "mistake or if you want to make changes."
+        "layer(s). If needed, you can delete the last added layer in case of a mistake "
+        "or if you want to make changes."
     )
 
     layers = enums.layers.classes
@@ -83,17 +83,17 @@ def set_layers_ui(model: model.CreatedModel) -> None:
 
 
 def set_outputs_ui(model: model.CreatedModel) -> None:
-    """Generate the UI for setting the model's outputs.
+    """Generate the UI for setting the outputs for the model.
 
     Parameters
     ----------
-    model : Model
+    model : CreatedModel
         Model object.
     """
     st.header("Set Outputs")
     st.markdown(
-        "Specify the model's outputs among the added layers. `Input` layers are "
-        "not included here."
+        "Specify the model's outputs among the added layers. `Input` layers are not "
+        "included here."
     )
 
     layers = set(model.layers) - set(model.inputs)
@@ -116,14 +116,14 @@ def create_model_ui(model: model.CreatedModel) -> None:
 
     Parameters
     ----------
-    model : Model
+    model : CreatedModel
         Model object.
     """
     st.header("Create Model")
     st.markdown(
         "By pressing the provided button, you will create a model with the parameters "
-        "specified above. Any changes made to the previous sections afterward will "
-        "not take effect until you click the button again."
+        "specified above. Any changes made to the previous sections afterward will not "
+        "take effect until you click the button again."
     )
 
     def build_model() -> None:

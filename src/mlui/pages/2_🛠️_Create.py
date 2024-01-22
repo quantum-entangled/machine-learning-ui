@@ -9,6 +9,7 @@ st.set_page_config(page_title="Create", page_icon="🛠️")
 @decorators.session.set_state
 @decorators.pages.check_task(["Train"])
 def create_page() -> None:
+    """Generate a Streamlit app page for creating the model."""
     model = st.session_state.model
     model_type = st.session_state.model_type
 

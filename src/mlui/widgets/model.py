@@ -6,7 +6,7 @@ import mlui.classes.model as model
 
 
 def model_info_ui(model: model.Model) -> None:
-    """Generate the UI for displaying model information.
+    """Generate the UI for displaying the information about the model.
 
     Parameters
     ----------
@@ -45,7 +45,7 @@ def model_info_ui(model: model.Model) -> None:
 
 
 def summary_ui(model: model.Model) -> None:
-    """Generate the UI for displaying the model's summary.
+    """Generate the UI for displaying the summary of the model.
 
     Parameters
     ----------
@@ -61,7 +61,7 @@ def summary_ui(model: model.Model) -> None:
 
 
 def graph_ui(model: model.Model) -> None:
-    """Generate the UI for downloading the model's graph.
+    """Generate the UI for downloading the graph of the model.
 
     Parameters
     ----------

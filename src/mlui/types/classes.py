@@ -47,28 +47,32 @@ LayerConnection: typing.TypeAlias = Layer | list[Layer] | None
 
 
 class LayerParams(typing.TypedDict):
-    """Base type annotation for a layer's parameters."""
+    """Base type annotation class for the parameters of the layer."""
 
 
 class InputParams(LayerParams):
-    """Type annotation for the Input layer."""
+    """Type annotation class for the Input layer."""
 
     shape: tuple[int]
 
 
 class DenseParams(LayerParams):
-    """Type annotation for the Dense layer."""
+    """Type annotation class for the Dense layer."""
 
     units: int
     activation: typing.Callable[..., Tensor]
 
 
 class BatchNormalizationParams(LayerParams):
+    """Type annotation class for the BatchNormalization layer."""
+
     momentum: float
     epsilon: float
 
 
 class DropoutParams(LayerParams):
+    """Type annotation class for the Dropout layer."""
+
     rate: float
 
 
@@ -79,11 +83,11 @@ OptimizerTypes: typing.TypeAlias = dict[str, OptimizerType]
 
 
 class OptimizerParams(typing.TypedDict):
-    """Base type annotation for an optimizer's parameters."""
+    """Base type annotation class for the parameters of the optimizer."""
 
 
 class AdamParams(OptimizerParams):
-    """Type annotation for the Adam optimizer."""
+    """Type annotation class for the Adam optimizer."""
 
     learning_rate: float
     beta_1: float
@@ -91,7 +95,7 @@ class AdamParams(OptimizerParams):
 
 
 class RMSpropParams(OptimizerParams):
-    """Type annotation for the RMSprop optimizer."""
+    """Type annotation class for the RMSprop optimizer."""
 
     learning_rate: float
     rho: float
@@ -99,7 +103,7 @@ class RMSpropParams(OptimizerParams):
 
 
 class SGDParams(OptimizerParams):
-    """Type annotation for the SGD optimizer."""
+    """Type annotation class for the SGD optimizer."""
 
     learning_rate: float
     momentum: float
@@ -127,11 +131,11 @@ Callbacks: typing.TypeAlias = dict[str, Callback]
 
 
 class CallbackParams(typing.TypedDict):
-    """Base type annotation for a callback's parameters."""
+    """Base type annotation class for the parameters of the callback."""
 
 
 class EarlyStoppingParams(CallbackParams):
-    """Type annotation for the EarlyStopping callback."""
+    """Type annotation class for the EarlyStopping callback."""
 
     min_delta: float
     patience: int

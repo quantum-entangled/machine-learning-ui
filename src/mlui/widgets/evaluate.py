@@ -12,16 +12,16 @@ def evaluate_model_ui(data: data.Data, model: model.UploadedModel) -> None:
     ----------
     data : Data
         Data object.
-    model : Model
+    model : UploadedModel
         Model object.
     """
     st.header("Evaluate Model")
     st.markdown(
         "Evaluate the model by specifying the batch size. Once the `Evaluate Model` "
-        "button is clicked, the evaluation results will be displayed in the "
-        "respective dropdown. Depending on the size of your model and chosen batch "
-        "size, it might take some time. The results are values of specified metrics "
-        "and loss functions."
+        "button is clicked, the evaluation results will be displayed in the respective "
+        "dropdown. Depending on the size of your model and chosen batch size, it might "
+        "take some time. The results are values of specified metrics and loss "
+        "functions."
     )
 
     batch_size = st.number_input(
