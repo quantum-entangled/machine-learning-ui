@@ -3,35 +3,31 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Machine Learning UI's documentation!
+Welcome to ML UI's documentation!
 ===============================================
 
-.. image:: https://mybinder.org/badge_logo.svg
-   :target: https://mybinder.org/v2/gh/quantum-entangled/machine-learning-ui/0.1.0?urlpath=voila%2Frender%2Fmain.ipynb
+The app provides User Interface based on `Streamlit <https://streamlit.io/>`_ framework for managing basic Machine Learning workflows.
 
-The app provides User Interface based on Jupyter's `ipywidgets <https://github.com/jupyter-widgets/ipywidgets>`_ for managing basic Machine Learning workflows. You can launch it using Binder badge above or installing app locally.
+The app was originally developed as part of research project, funded by **St. Petersburg State University**, to help researchers solve problems of Non-equilibrium Gas Dynamics using Machine Learning methods.
 
-The app was originally developed as part of research project, funded by **St. Petersburg State University**, to help researchers solve problems of non-equilibrium gas dynamics using machine learning methods.
-
-.. note::
-
-   This project is under active development.
+Table of Contents
+-----------------
 
 .. toctree::
    :caption: Local Installation
    :maxdepth: 2
    
-   LocalInstallation.rst
+   local_installation.md
 
 .. toctree::
    :caption: User Guide
    :maxdepth: 2
 
-   UserGuide.rst
-   AcceptedInput.rst   
+   user_manual.rst
+   supported_data_file_formats.rst  
 
 .. toctree::
    :caption: Developer Guide
    :maxdepth: 2
 
-   APIDocs.rst
+   api.rst

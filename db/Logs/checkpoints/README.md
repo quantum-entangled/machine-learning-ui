@@ -1,1 +1,0 @@
-Folder for [ModelCheckpoint](https://www.tensorflow.org/api_docs/python/tf/keras/callbacks/ModelCheckpoint) callback.

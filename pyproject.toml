@@ -1,0 +1,59 @@
+[tool.poetry]
+name = "machine-learning-ui"
+version = "0.2.0"
+description = "Streamlit app for basic Machine Learning workflows"
+authors = ["SPbU"]
+license = "GPL-3.0-only"
+readme = "README.md"
+repository = "https://github.com/quantum-entangled/machine-learning-ui"
+documentation = "https://quantum-entangled.github.io/machine-learning-ui/index.html"
+keywords = ["python", "machine learning"]
+packages = [{include = "mlui", from = "src"}]
+include = [
+    {path = "tests", format = "sdist"},
+    {path = "docs", format = "sdist"}
+]
+
+[tool.poetry.dependencies]
+python = "~3.11.0"
+pandas = "~2.0.3"
+numpy = "~1.24.3"
+tensorflow-io-gcs-filesystem = "0.31.0"
+tensorflow-cpu = "2.12.1"
+pydot = "~1.4.2"
+streamlit = "~1.29.0"
+plotly = "~5.15.0"
+altair = "~5.1.2"
+streamlit-extras = "~0.3.5"
+
+[tool.poetry.group.dev.dependencies]
+black = "~23.7.0"
+
+[tool.poetry.group.tests]
+optional = true
+
+[tool.poetry.group.tests.dependencies]
+pytest = "^7.4.0"
+pytest-cov = "^4.1.0"
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+Sphinx = "~7.2.6"
+furo = "~2023.9.10"
+myst-parser = "~2.0.0"
+sphinx_design = "~0.5.0"
+
+[tool.poetry.group.windows]
+optional = true
+
+[tool.poetry.group.windows.dependencies]
+tensorflow-intel = "2.12.1"
+
+[tool.pytest.ini_options]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
